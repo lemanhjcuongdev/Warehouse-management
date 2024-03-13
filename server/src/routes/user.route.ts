@@ -2,9 +2,10 @@ import express from 'express'
 
 import userController from '~/controllers/user.controller'
 
-const router = express.Router()
+const userRouter = express.Router()
 
-// userController.index
-router.get('/', userController.index)
+userRouter.get('/', userController.getAllUser)
+userRouter.get('/:id', userController.getUserById)
+userRouter.post('/create-user', userController.createUser)
 
-export default router
+export default userRouter

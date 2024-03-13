@@ -1,9 +1,12 @@
 import { Express } from 'express'
-
-import api from './api'
+import userRouter from './user.route'
+import authRouter from './auth'
 
 function route(app: Express) {
-  app.use('/api', api)
+  //User routes
+  app.use('/users', userRouter)
+  //login routes
+  app.use('/auth', authRouter)
 }
 
 export default route
