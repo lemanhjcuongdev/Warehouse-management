@@ -1,14 +1,17 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { publicRoutes } from "./routes/routes";
+import { privateRoutes, publicRoutes } from "./routes/routes";
 import { DefaultLayout } from "./components/Layout";
 import { Fragment } from "react/jsx-runtime";
 
 function App() {
+    const isLogin = true;
+    let routes = privateRoutes;
+    if (isLogin) routes = publicRoutes;
     return (
         <Router>
             <div className="App">
                 <Routes>
-                    {publicRoutes.map((route, index) => {
+                    {routes.map((route, index) => {
                         const Layout =
                             route.layout === null ? Fragment : DefaultLayout;
                         const Page = route.component;
