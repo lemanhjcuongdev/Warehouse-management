@@ -20,15 +20,15 @@ function checkJwt(req: Request, res: Response, next: NextFunction) {
     res.status(400).send()
     return
   }
-
+  JwtPayload = {
+    exp: Math.floor(Date.now() / 1000) + 3600 //expired in 1h
+  }
   //send new token from every request
-  const newToken = jwt.sign(JwtPayload, secretJwt, {
-    expiresIn: '1h'
-  })
+  const newToken = jwt.sign(JwtPayload, secretJwt)
   res.setHeader('token', newToken)
 
   //next middleware or controller
   next()
 }
 
-export default checkJwt
+export { checkJwt }

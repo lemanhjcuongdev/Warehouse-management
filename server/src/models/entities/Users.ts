@@ -85,7 +85,8 @@ export class Users {
   transportReceipts2: TransportReceipts[]
 
   hashPassword() {
-    this.password = bcrypt.hashSync(this.password, saltRounds)
+    const salt = bcrypt.genSaltSync(saltRounds)
+    this.password = bcrypt.hashSync(this.password, salt)
   }
 
   verifyPassword(unencryptedPassword: string) {

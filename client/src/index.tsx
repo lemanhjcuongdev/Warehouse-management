@@ -7,6 +7,7 @@ import GlobalStyles from "./components/GlobalStyles";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import { StoreProvider } from "./store";
 
 const root = ReactDOM.createRoot(
     document.getElementById("root") as HTMLElement
@@ -14,7 +15,9 @@ const root = ReactDOM.createRoot(
 root.render(
     <React.StrictMode>
         <GlobalStyles>
-            <App />
+            <StoreProvider>
+                <App />
+            </StoreProvider>
         </GlobalStyles>
     </React.StrictMode>
 );

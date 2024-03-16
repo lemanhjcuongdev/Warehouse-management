@@ -1,10 +1,11 @@
-import { Nav, Navbar } from "react-bootstrap";
+import { Col, Nav, Navbar } from "react-bootstrap";
 import { Link, NavLink } from "react-router-dom";
 import { Fragment } from "react/jsx-runtime";
 
 import DropdownMenu from "../../components/Dropdown/Dropdown";
 import SearchBar from "../../components/Searchbar/Searchbar";
 import navbar_items from "./navbar-item";
+import HeaderProfile from "../../components/HeaderProfile/HeaderProfile";
 
 function Header() {
     const navbarItems = navbar_items;
@@ -16,7 +17,7 @@ function Header() {
                     src="https://deo.shopeemobile.com/shopee/shopee-spx-live-vn/static/media/spx-express.f3023639.svg"
                     alt="SPX Express"
                 />
-                Hệ thống quản lý kho hàng
+                {/* Hệ thống quản lý kho hàng */}
             </NavLink>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse
@@ -37,6 +38,7 @@ function Header() {
                     ))}
                 </Nav>
                 <SearchBar />
+                <HeaderProfile />
             </Navbar.Collapse>
         </Navbar>
     );
