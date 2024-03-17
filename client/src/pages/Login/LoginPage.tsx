@@ -3,7 +3,7 @@ import classNames from "classnames/bind";
 import styles from "./Login.module.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { ChangeEventHandler, FormEventHandler, useRef, useState } from "react";
-import { postLogin } from "~/apis/auth";
+import { postLogin } from "~/apis/authAPI";
 import { setCookie } from "~/utils/cookies";
 import useGlobalState from "~/hooks/useGlobalState";
 import { actions } from "~/store";

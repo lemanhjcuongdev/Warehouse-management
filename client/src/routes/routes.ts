@@ -13,7 +13,7 @@ interface iRoute {
 const publicRoutes: Array<iRoute> = [
     { path: "/", component: Home },
     { path: "/detail", component: Detail },
-    { path: "/list-data", component: ListData },
+    { path: "/list/:category", component: ListData },
     { path: "*", component: Home },
 ];
 

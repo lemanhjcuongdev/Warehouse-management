@@ -13,7 +13,12 @@ function HeaderProfile() {
 
     return (
         <Nav>
-            <NavDropdown title={state.username || "Chưa đăng nhập"}>
+            <NavDropdown
+                style={{
+                    fontWeight: "bold",
+                }}
+                title={state.username || "Chưa đăng nhập"}
+            >
                 <NavDropdown.Item onClick={handleLogout}>
                     Đăng xuất
                 </NavDropdown.Item>

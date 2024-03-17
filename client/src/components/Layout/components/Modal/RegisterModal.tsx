@@ -18,7 +18,7 @@ interface iRegisterDataProps {
     email: string;
     gender: "M" | "F" | "O";
     phone: string;
-    start_date: Date;
+    start_date: string;
     username: string;
     password: string;
     login_status?: 0;
@@ -31,7 +31,7 @@ const initialState: iRegisterDataProps = {
     email: "",
     gender: "M",
     phone: "",
-    start_date: new Date(),
+    start_date: "",
     username: "",
     password: "",
     login_status: 0,
@@ -81,9 +81,12 @@ function RegisterModal(props: iRegisterModalProps) {
     };
 
     const handleSubmit: FormEventHandler<HTMLButtonElement> = (e) => {
-        const form = e.currentTarget;
+        const form = formRef.current;
 
-        if (form.checkValidity() === false || validateForm() === false) {
+        if (
+            (form && form.checkValidity() === false) ||
+            validateForm() === false
+        ) {
             setValidated(true);
             return;
         }
@@ -100,9 +103,15 @@ function RegisterModal(props: iRegisterModalProps) {
     };
 
     return (
-        <Modal backdrop="static" show={show} onHide={onHide} keyboard={false}>
+        <Modal
+            backdrop="static"
+            show={show}
+            onHide={onHide}
+            keyboard={false}
+            fullscreen={"sm-down"}
+        >
             <Modal.Header>
-                <Modal.Title>Thêm mới</Modal.Title>
+                <Modal.Title>Thêm mới nhân viên</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form
@@ -110,6 +119,7 @@ function RegisterModal(props: iRegisterModalProps) {
                     validated={validated}
                     ref={formRef}
                     autoComplete="off"
+                    onSubmit={(e) => e.preventDefault()}
                 >
                     <Row>
                         <Form.Group as={Col}>
@@ -228,10 +238,10 @@ function RegisterModal(props: iRegisterModalProps) {
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={handleCancel}>
+                <Button variant="secondary" type="reset" onClick={handleCancel}>
                     Huỷ
                 </Button>
-                <Button variant="primary" onClick={handleSubmit}>
+                <Button variant="primary" type="submit" onClick={handleSubmit}>
                     Thêm mới
                 </Button>
             </Modal.Footer>

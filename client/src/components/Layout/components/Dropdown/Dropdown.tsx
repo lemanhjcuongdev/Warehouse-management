@@ -1,5 +1,5 @@
 import { NavDropdown } from "react-bootstrap";
-import { iNavbarItem } from "../../DefaultLayout/Header/navbar-item";
+import { iNavbarItem } from "../../DefaultLayout/Header/navbar-items";
 import { Link } from "react-router-dom";
 
 function DropdownMenu(props: { items: iNavbarItem }): React.ReactElement {

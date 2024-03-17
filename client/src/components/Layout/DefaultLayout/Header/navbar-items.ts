@@ -41,7 +41,7 @@ const navbar_items: iNavbarItem[] = [
         children: [
             {
                 label: "Hàng hoá",
-                to: "/",
+                to: "/list/goods",
             },
             {
                 label: "Nhà cung cấp",
@@ -67,7 +67,7 @@ const navbar_items: iNavbarItem[] = [
     },
     {
         label: "Quản lý nhân sự",
-        to: "/list-data",
+        to: "/list/users",
     },
 ];
 

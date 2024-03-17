@@ -4,7 +4,7 @@ import { Fragment } from "react/jsx-runtime";
 
 import DropdownMenu from "../../components/Dropdown/Dropdown";
 import SearchBar from "../../components/Searchbar/Searchbar";
-import navbar_items from "./navbar-item";
+import navbar_items from "./navbar-items";
 import HeaderProfile from "../../components/HeaderProfile/HeaderProfile";
 
 function Header() {

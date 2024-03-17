@@ -2,17 +2,18 @@ import { useEffect, useState } from "react";
 import { Modal, ModalBody, Spinner } from "react-bootstrap";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { Fragment } from "react/jsx-runtime";
-import { getUserById } from "./apis/auth";
 import { DefaultLayout } from "./components/Layout";
 import useGlobalState from "./hooks/useGlobalState";
 import { privateRoutes, publicRoutes } from "./routes/routes";
 import { actions } from "./store";
 import { getCookie } from "./utils/cookies";
+import { getUserById } from "./apis/userAPI";
 
 function App() {
     const { state, dispatch } = useGlobalState();
     const { isAuthentication } = state;
     const [isLoading, setLoading] = useState(true);
+
     useEffect(() => {
         //load authentic state
         if (!isAuthentication) {
