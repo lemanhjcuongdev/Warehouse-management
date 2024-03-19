@@ -5,7 +5,9 @@ const setCookie = (
     sameSite: "Lax" | "Strict",
     httpOnly: boolean
 ) => {
-    const cookieString = `${name}=${value}, SameSite=${sameSite}, HttpOnly=${httpOnly}`;
+    const expireTime = new Date();
+    expireTime.setHours(expireTime.getHours() + 1);
+    const cookieString = `${name}=${value}, SameSite=${sameSite}, HttpOnly=${httpOnly}, expires=${expireTime.toUTCString()}`;
     document.cookie = cookieString;
 };
 

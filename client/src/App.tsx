@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { Modal, ModalBody, Spinner } from "react-bootstrap";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { Fragment } from "react/jsx-runtime";
+import { getUserById } from "./apis/userAPI";
 import { DefaultLayout } from "./components/Layout";
 import useGlobalState from "./hooks/useGlobalState";
 import { privateRoutes, publicRoutes } from "./routes/routes";
 import { actions } from "./store";
 import { getCookie } from "./utils/cookies";
-import { getUserById } from "./apis/userAPI";
 
 function App() {
     const { state, dispatch } = useGlobalState();
@@ -25,20 +25,22 @@ function App() {
                     jwt: jwt,
                 })
                     .then((data) => {
-                        dispatch(
-                            actions.setAuthentication({
-                                userId: data.idUsers,
-                                username: data.username,
-                            })
-                        );
+                        data &&
+                            dispatch(
+                                actions.setAuthentication({
+                                    userId: data.idUsers,
+                                    username: data.username,
+                                })
+                            );
+                        return;
                     })
-                    .catch((error) => console.log(error))
                     .finally(() => setLoading(false));
             } else setLoading(false);
         }
     }, [isAuthentication]);
 
     const routes = isAuthentication ? publicRoutes : privateRoutes;
+    console.log(isAuthentication);
 
     return (
         <>

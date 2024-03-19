@@ -1,12 +1,12 @@
-import React, { ReactElement } from "react";
-import "./GlobalStyles.scss"
+import { ReactElement } from "react";
+import "./GlobalStyles.scss";
 
 interface iProps {
-    children: ReactElement
+    children: ReactElement;
 }
 
-const GlobalStyles = ({children}:iProps) =>{
-    return ( children );
-}
+const GlobalStyles = ({ children }: iProps) => {
+    return children;
+};
 
 export default GlobalStyles;

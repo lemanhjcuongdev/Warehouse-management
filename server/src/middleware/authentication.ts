@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import * as jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
+import STATUS from '~/constants/statusCode'
 
 dotenv.config()
 
@@ -17,7 +18,9 @@ function checkJwt(req: Request, res: Response, next: NextFunction) {
     res.locals.JwtPayload = JwtPayload
   } catch (error) {
     //if token is invalid, respond 401
-    res.status(400).send()
+    res.status(STATUS.BAD_REQUEST).send({
+      error: 'Đã hết phiên đăng nhập'
+    })
     return
   }
   JwtPayload = {

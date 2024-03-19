@@ -1,11 +1,11 @@
-import { Col, Nav, Navbar } from "react-bootstrap";
+import { Nav, Navbar } from "react-bootstrap";
 import { Link, NavLink } from "react-router-dom";
 import { Fragment } from "react/jsx-runtime";
 
-import DropdownMenu from "../../components/Dropdown/Dropdown";
-import SearchBar from "../../components/Searchbar/Searchbar";
-import navbar_items from "./navbar-items";
+import DropdownMenu from "../../components/Dropdown/NavDropdownMenu";
 import HeaderProfile from "../../components/HeaderProfile/HeaderProfile";
+import SearchBar from "../../components/Searchbar/Searchbar";
+import navbar_items from "../../../../constants/navbar-items";
 
 function Header() {
     const navbarItems = navbar_items;

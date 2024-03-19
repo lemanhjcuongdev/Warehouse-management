@@ -5,6 +5,7 @@ import { appDataSource } from '~/constants/appDataSource'
 import { Users } from '~/models/entities/Users'
 import * as jwt from 'jsonwebtoken'
 import { validate } from 'class-validator'
+import STATUS from '~/constants/statusCode'
 
 dotenv.config()
 
@@ -14,7 +15,9 @@ class AuthController {
     //Check empty
     const { username, password } = req.body
     if (!(username && password)) {
-      res.status(400).send()
+      res.status(STATUS.BAD_REQUEST).send({
+        error: 'Tài khoản hoặc mật khẩu rỗng'
+      })
     }
 
     //Get user from DB
@@ -29,13 +32,17 @@ class AuthController {
         }
       })
     } catch (error) {
-      res.status(401).send('Tài khoản hoặc mật khẩu không đúng')
+      res.status(STATUS.UNAUTHORIZED).send({
+        error: 'Tài khoản hoặc mật khẩu không đúng'
+      })
       return
     }
 
     // //Check if encrypted password match
     if (!user.verifyPassword(password)) {
-      res.status(401).send('Tài khoản hoặc mật khẩu không đúng')
+      res.status(STATUS.UNAUTHORIZED).send({
+        error: 'Tài khoản hoặc mật khẩu không đúng'
+      })
       return
     }
 
@@ -58,7 +65,9 @@ class AuthController {
   async changePassword(req: Request, res: Response, next: NextFunction) {
     //get id from jwt
     if (res.locals.jwtPayload?.userId === undefined) {
-      res.status(400).send('Không tìm thấy ID người dùng')
+      res.status(STATUS.BAD_REQUEST).send({
+        error: 'Không tìm thấy ID người dùng'
+      })
       return
     }
     const id = res.locals.jwtPayload.userId
@@ -66,7 +75,9 @@ class AuthController {
     //get params from body request
     const { oldPassword, newPassword } = req.body
     if (!(oldPassword && newPassword)) {
-      res.status(400).send('Mật khẩu không trùng khớp')
+      res.status(STATUS.BAD_REQUEST).send({
+        error: 'Mật khẩu không trùng khớp'
+      })
     }
 
     //get user from DB
@@ -81,13 +92,17 @@ class AuthController {
         }
       })
     } catch (error) {
-      res.status(401).send()
+      res.status(STATUS.UNAUTHORIZED).send({
+        error: 'Không tìm thấy tài khoản'
+      })
       return
     }
 
     //check if old password matches
     if (!user.verifyPassword(oldPassword)) {
-      res.status(401).send()
+      res.status(STATUS.UNAUTHORIZED).send({
+        error: 'Mật khẩu không đúng'
+      })
       return
     }
 
@@ -95,7 +110,9 @@ class AuthController {
     user.password = newPassword
     const errors = await validate(user)
     if (errors.length > 0) {
-      res.status(400).send(errors)
+      res.status(STATUS.BAD_REQUEST).send({
+        error: 'Mật khẩu sai định dạng'
+      })
       return
     }
 
@@ -111,11 +128,15 @@ class AuthController {
         }
       )
     } catch (error) {
-      res.status(400).send('Đổi mật khẩu thất bại')
+      res.status(STATUS.BAD_REQUEST).send({
+        error: 'Đổi mật khẩu thất bại'
+      })
       return
     }
 
-    res.status(204).send('Đổi mật khẩu thành công')
+    res.status(STATUS.CREATED).send({
+      message: 'Đổi mật khẩu thành công'
+    })
   }
 }
 

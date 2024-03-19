@@ -5,6 +5,7 @@ import { Repository } from 'typeorm'
 import { appDataSource } from '~/constants/appDataSource'
 import { Users } from '~/models/entities/Users'
 import authController from './auth.controller'
+import STATUS from '~/constants/statusCode'
 
 dotenv.config()
 
@@ -37,29 +38,31 @@ class UserController {
       })
       res.send(user)
     } catch (error) {
-      res.status(404).send('Không tìm thấy người dùng')
+      res.status(STATUS.NOT_FOUND).send({
+        error: 'Không tìm thấy người dùng'
+      })
     }
   }
 
   //[POST /users/create-user]
   async createUser(req: Request, res: Response, next: NextFunction) {
     //get params from request body
-    const { name, email, gender, phone, startDate, username, password } = req.body
+    const { name, email, gender, phone, start_date, username, password, id_created } = req.body
 
     const user = new Users()
     user.name = name
     user.email = email
     user.gender = gender
     user.phone = phone
-    user.startDate = startDate
+    user.startDate = start_date
     user.username = username
     user.password = password
-    user.idCreated = 1
+    user.idCreated = id_created
 
     //validate type of params
     const errors = await validate(user)
     if (errors.length > 0) {
-      res.status(400).send(errors)
+      res.status(STATUS.BAD_REQUEST).send({ error: 'Dữ liệu không đúng định dạng' })
       return
     }
 
@@ -70,11 +73,27 @@ class UserController {
     try {
       await userRepository.save(user)
     } catch (error) {
-      res.status(400).send('Tên đăng nhập đã được sử dụng trước đó ' + error + user.password)
+      res.status(STATUS.CONFLICT).send({
+        error: 'Username, email hoặc SĐT đã được sử dụng trước đó'
+      })
       return
     }
 
-    res.status(201).send('Đã tạo người dùng mới')
+    //get new user from DB
+    let newUser: Users
+    try {
+      newUser = await userRepository.findOneOrFail({
+        select: ['idUsers', 'name', 'gender', 'username', 'phone', 'email', 'startDate', 'disabled'],
+        where: {
+          username: username
+        }
+      })
+    } catch (error) {
+      res.status(404).send('Không tìm thấy người dùng')
+      return
+    }
+
+    res.status(STATUS.CREATED).send(newUser)
   }
 
   //[PATCH /:id]
@@ -93,7 +112,9 @@ class UserController {
         }
       })
     } catch (error) {
-      res.status(404).send('Không tìm thấy người dùng')
+      res.status(STATUS.NOT_FOUND).send({
+        error: 'Không tìm thấy người dùng'
+      })
       return
     }
 
@@ -107,7 +128,9 @@ class UserController {
     user.disabled = disabled
     const errors = await validate(user)
     if (errors.length > 0) {
-      res.status(400).send(errors)
+      res.status(STATUS.BAD_REQUEST).send({
+        error: 'Dữ liệu không đúng định dạng'
+      })
       return
     }
 
@@ -128,16 +151,37 @@ class UserController {
         }
       )
     } catch (error) {
-      res.status(409).send('Tên đăng nhập đã được sử dụng')
+      res.status(STATUS.CONFLICT).send({
+        error: 'Tên đăng nhập đã được sử dụng'
+      })
       return
     }
 
     //if ok
-    res.status(204).send('Cập nhật người dùng thành công')
+    res.status(STATUS.NO_CONTENT).send({
+      error: 'Cập nhật người dùng thành công'
+    })
   }
 
   async softDeleteUserById(req: Request, res: Response, next: NextFunction) {
     const id: number = +req.params.id
+
+    let user: Users
+    try {
+      user = await userRepository.findOneOrFail({
+        select: ['disabled'],
+        where: {
+          idUsers: id
+        }
+      })
+    } catch (error) {
+      res.status(STATUS.NOT_FOUND).send({
+        error: 'Không tìm thấy người dùng'
+      })
+      return
+    }
+
+    const isDisabled = user.disabled
 
     try {
       userRepository.update(
@@ -145,16 +189,20 @@ class UserController {
           idUsers: id
         },
         {
-          disabled: 1
+          disabled: isDisabled ? 0 : 1
         }
       )
     } catch (error) {
-      res.status(404).send('Không tìm thấy người dùng')
+      res.status(STATUS.NOT_FOUND).send({
+        error: 'Không tìm thấy người dùng'
+      })
       return
     }
 
     //if ok
-    res.status(204).send('Đã vô hiệu hoá người dùng')
+    res.status(STATUS.NO_CONTENT).send({
+      // error: isDisabled ? 'Đã kích hoạt lại người dùng thành công' : 'Đã vô hiệu hoá người dùng thành công'
+    })
   }
 }
 

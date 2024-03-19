@@ -6,43 +6,36 @@ import {
     useRef,
     useState,
 } from "react";
-import { Button, Col, Form, FormLabel, Modal, Row } from "react-bootstrap";
+import {
+    Alert,
+    Button,
+    Col,
+    Form,
+    FormLabel,
+    Modal,
+    Row,
+} from "react-bootstrap";
+import { createUser } from "~/apis/userAPI";
+import { getCookie } from "~/utils/cookies";
+import { iModalTypes, iUserDataProps, iUserModalProps } from "./types";
 
-interface iRegisterModalProps {
-    show: true | false;
-    onHide: () => void;
-}
-
-interface iRegisterDataProps {
-    name: string;
-    email: string;
-    gender: "M" | "F" | "O";
-    phone: string;
-    start_date: string;
-    username: string;
-    password: string;
-    login_status?: 0;
-    id_created?: number;
-    disabled: 0;
-}
-
-const initialState: iRegisterDataProps = {
-    name: "",
-    email: "",
-    gender: "M",
-    phone: "",
-    start_date: "",
-    username: "",
-    password: "",
-    login_status: 0,
-    id_created: 1,
-    disabled: 0,
-};
-
-function RegisterModal(props: iRegisterModalProps) {
-    const { show, onHide } = props;
+function UserModal(props: iUserModalProps) {
+    const { show, onHide, setListData } = props;
+    const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
+    const managerId = getCookie("id") || 1;
     const [validated, setValidated] = useState(false);
-    const [formData, setFormData] = useState<iRegisterDataProps>(initialState);
+    const initialState: iUserDataProps = {
+        name: "",
+        email: "",
+        gender: "M",
+        phone: "",
+        start_date: "",
+        username: "",
+        password: "",
+        id_created: +managerId,
+        disabled: 0,
+    };
+    const [formData, setFormData] = useState<iUserDataProps>(initialState);
 
     const startDateRef = useRef<HTMLInputElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
@@ -57,11 +50,23 @@ function RegisterModal(props: iRegisterModalProps) {
                 })
         );
     };
+    const handleSelectedChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
+        const { value } = e.target;
+        if (value === "M" || value === "F" || value === "O") {
+            setFormData(
+                (prev) =>
+                    (prev = {
+                        ...prev,
+                        gender: value,
+                    })
+            );
+        }
+    };
 
     const validateForm = () => {
-        //validate startDate <= now
         const dateInput = startDateRef.current;
 
+        //validate startDate <= now
         if (dateInput && dateInput.value.length > 0) {
             const date = new Date(dateInput.value);
             const now = new Date(Date.now());
@@ -75,26 +80,49 @@ function RegisterModal(props: iRegisterModalProps) {
             } else {
                 dateInput.setCustomValidity("");
                 dateInput.reportValidity();
-                return true;
             }
-        } else return false;
-    };
-
-    const handleSubmit: FormEventHandler<HTMLButtonElement> = (e) => {
-        const form = formRef.current;
-
-        if (
-            (form && form.checkValidity() === false) ||
-            validateForm() === false
-        ) {
-            setValidated(true);
-            return;
         }
-        console.log(formData);
 
-        e.preventDefault();
-        e.stopPropagation();
+        return true;
     };
+
+    const handleSubmit: FormEventHandler<HTMLButtonElement> = useCallback(
+        (e) => {
+            const form = formRef.current;
+
+            //trim()
+            formData.name = formData.name.trim();
+            formData.email = formData.email.trim();
+            formData.phone = formData.phone.trim();
+            formData.username = formData.username.trim();
+            formData.password = formData.password.trim();
+            if (
+                (form && form.checkValidity() === false) ||
+                validateForm() === false
+            ) {
+                setValidated(true);
+                return;
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            console.log(formData);
+
+            //call API
+            createUser(formData)
+                .then((data) => {
+                    data &&
+                        setListData((prev) => [
+                            ...prev,
+                            {
+                                ...data,
+                            },
+                        ]);
+                })
+                .then(() => handleCancel())
+                .catch((error) => console.log(error.message));
+        },
+        []
+    );
 
     const handleCancel = () => {
         setFormData(initialState);
@@ -154,7 +182,10 @@ function RegisterModal(props: iRegisterModalProps) {
 
                         <Form.Group as={Col} controlId="formGridGender">
                             <Form.Label>Giới tính</Form.Label>
-                            <Form.Select required>
+                            <Form.Select
+                                required
+                                onChange={handleSelectedChange}
+                            >
                                 <option value="M">Nam</option>
                                 <option value="F">Nữ</option>
                                 <option value="O">Khác</option>
@@ -236,6 +267,10 @@ function RegisterModal(props: iRegisterModalProps) {
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Form>
+                <Alert variant="info">
+                    Các khoảng trắng trước và sau giá trị sẽ bị loại bỏ. Vui
+                    lòng kiểm tra kỹ thông tin!
+                </Alert>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" type="reset" onClick={handleCancel}>
@@ -249,4 +284,5 @@ function RegisterModal(props: iRegisterModalProps) {
     );
 }
 
-export default RegisterModal;
+export type { iUserDataProps };
+export default memo(UserModal);
