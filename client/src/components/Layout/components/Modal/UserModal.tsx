@@ -1,6 +1,8 @@
 import {
     ChangeEventHandler,
+    Dispatch,
     FormEventHandler,
+    SetStateAction,
     memo,
     useCallback,
     useRef,
@@ -15,30 +17,49 @@ import {
     Modal,
     Row,
 } from "react-bootstrap";
-import { createUser } from "~/apis/userAPI";
-import { getCookie } from "~/utils/cookies";
-import { iModalTypes, iUserDataProps, iUserModalProps } from "./types";
+import _ from "lodash";
 
-function UserModal(props: iUserModalProps) {
-    const { show, onHide, setListData } = props;
-    const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
-    const managerId = getCookie("id") || 1;
+import { createUser, updateUser } from "~/apis/userAPI";
+import ROLES from "~/constants/roles";
+import { iModalTypes, iUserDataProps } from "./types";
+import { iUserItemProps } from "~/pages/ListData/types";
+import { initialUserDataState } from "~/views/UserView/UserView";
+import { getCookie } from "~/utils/cookies";
+import stringToDate from "~/utils/stringToDate";
+
+function UserModal(props: {
+    show: true | false;
+    onHide: () => void;
+    setListData: Dispatch<SetStateAction<iUserItemProps[]>>;
+    modalType: iModalTypes;
+    formData: iUserDataProps;
+    setFormData: Dispatch<React.SetStateAction<iUserDataProps>>;
+}) {
+    const { show, onHide, setListData, modalType, formData, setFormData } =
+        props;
+
     const [validated, setValidated] = useState(false);
-    const initialState: iUserDataProps = {
-        name: "",
-        email: "",
-        gender: "M",
-        phone: "",
-        start_date: "",
-        username: "",
-        password: "",
-        id_created: +managerId,
-        disabled: 0,
-    };
-    const [formData, setFormData] = useState<iUserDataProps>(initialState);
 
     const startDateRef = useRef<HTMLInputElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
+    let title: string;
+    let readOnly: boolean;
+    const role = ROLES.map((role) => {
+        if (role.idPermissions.length === formData.idPermissions.length)
+            return role;
+    })[0]?.id;
+    console.log("ROLE:", role);
+
+    switch (modalType.type) {
+        case "create":
+            title = "Thêm mới";
+            readOnly = false;
+            break;
+        case "update":
+            title = "Xem / Chỉnh sửa thông tin";
+            readOnly = false;
+            break;
+    }
 
     const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
         const { value, name } = e.target;
@@ -51,19 +72,36 @@ function UserModal(props: iUserModalProps) {
         );
     };
     const handleSelectedChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
-        const { value } = e.target;
-        if (value === "M" || value === "F" || value === "O") {
-            setFormData(
-                (prev) =>
-                    (prev = {
-                        ...prev,
-                        gender: value,
-                    })
-            );
+        const { value, name } = e.target;
+        switch (name) {
+            case "gender":
+                if (value === "M" || value === "F" || value === "O") {
+                    setFormData(
+                        (prev) =>
+                            (prev = {
+                                ...prev,
+                                [name]: value,
+                            })
+                    );
+                }
+                break;
+            case "id_permissions": {
+                const idPermissions = ROLES.filter(
+                    (role) => role.id === +value
+                )[0].idPermissions;
+
+                setFormData(
+                    (prev) =>
+                        (prev = {
+                            ...prev,
+                            idPermissions: idPermissions,
+                        })
+                );
+            }
         }
     };
 
-    const validateForm = () => {
+    const customValidateDate = () => {
         const dateInput = startDateRef.current;
 
         //validate startDate <= now
@@ -86,60 +124,85 @@ function UserModal(props: iUserModalProps) {
         return true;
     };
 
-    const handleSubmit: FormEventHandler<HTMLButtonElement> = useCallback(
-        (e) => {
-            const form = formRef.current;
+    const validateForm = () => {
+        const form = formRef.current;
 
-            //trim()
-            formData.name = formData.name.trim();
-            formData.email = formData.email.trim();
-            formData.phone = formData.phone.trim();
-            formData.username = formData.username.trim();
+        //trim()
+        formData.name = formData.name.trim();
+        formData.email = formData.email.trim();
+        formData.phone = formData.phone.trim();
+        formData.username = formData.username.trim();
+        if (modalType.type === "create" && formData.password)
             formData.password = formData.password.trim();
-            if (
-                (form && form.checkValidity() === false) ||
-                validateForm() === false
-            ) {
-                setValidated(true);
-                return;
-            }
+        if (
+            (form && form.checkValidity() === false) ||
+            customValidateDate() === false
+        ) {
+            setValidated(true);
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleSubmitCreate: FormEventHandler<HTMLButtonElement> = useCallback(
+        (e) => {
+            const isValidated = validateForm();
             e.preventDefault();
             e.stopPropagation();
-            console.log(formData);
 
             //call API
-            createUser(formData)
-                .then((data) => {
-                    data &&
-                        setListData((prev) => [
-                            ...prev,
-                            {
-                                ...data,
-                            },
-                        ]);
-                })
-                .then(() => handleCancel())
-                .catch((error) => console.log(error.message));
+            isValidated &&
+                createUser(formData)
+                    .then((data) => {
+                        data &&
+                            setListData((prev) => [
+                                ...prev,
+                                {
+                                    ...data,
+                                },
+                            ]);
+                        !data.error && handleCancel();
+                    })
+                    .catch((error) => console.log(error));
         },
-        []
+        [formData, setListData]
     );
 
+    const handleSubmitUpdate: FormEventHandler<HTMLButtonElement> = (e) => {
+        const isValidated = validateForm();
+        e.preventDefault();
+        e.stopPropagation();
+        if (!isValidated) return;
+        const managerId = +getCookie("id");
+
+        setFormData(
+            (prev) =>
+                (prev = {
+                    ...prev,
+                    idUpdated: managerId,
+                })
+        );
+
+        updateUser(formData);
+    };
+
     const handleCancel = () => {
-        setFormData(initialState);
+        setFormData(initialUserDataState);
         setValidated(false);
         onHide();
     };
 
     return (
         <Modal
-            backdrop="static"
+            backdrop={modalType.type === "create" ? "static" : undefined}
             show={show}
             onHide={onHide}
             keyboard={false}
             fullscreen={"sm-down"}
         >
             <Modal.Header>
-                <Modal.Title>Thêm mới nhân viên</Modal.Title>
+                <Modal.Title>{`${title} nhân viên`}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form
@@ -158,6 +221,7 @@ function UserModal(props: iUserModalProps) {
                                 value={formData.name}
                                 onChange={handleChange}
                                 autoComplete="off"
+                                readOnly={readOnly}
                             />
                             <Form.Control.Feedback type="invalid">
                                 Bắt buộc nhập
@@ -174,6 +238,7 @@ function UserModal(props: iUserModalProps) {
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
+                                readOnly={readOnly}
                             />
                             <Form.Control.Feedback type="invalid">
                                 Bắt buộc nhập
@@ -184,6 +249,7 @@ function UserModal(props: iUserModalProps) {
                             <Form.Label>Giới tính</Form.Label>
                             <Form.Select
                                 required
+                                name="gender"
                                 onChange={handleSelectedChange}
                             >
                                 <option value="M">Nam</option>
@@ -209,6 +275,7 @@ function UserModal(props: iUserModalProps) {
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handleChange}
+                                readOnly={readOnly}
                             />
                             <Form.Text id="PhoneHelpBlock" muted>
                                 Bắt đầu từ 0 và có 10 số
@@ -224,10 +291,11 @@ function UserModal(props: iUserModalProps) {
                                 type="date"
                                 required
                                 ref={startDateRef}
-                                name="start_date"
-                                value={formData.start_date.toString()}
+                                name="startDate"
+                                value={formData.startDate}
                                 onChange={handleChange}
-                                onBlur={() => validateForm()}
+                                onBlur={() => customValidateDate()}
+                                readOnly={readOnly}
                             />
                             <Form.Control.Feedback type="invalid">
                                 Bắt buộc nhập
@@ -242,43 +310,101 @@ function UserModal(props: iUserModalProps) {
                             name="username"
                             value={formData.username}
                             onChange={handleChange}
+                            readOnly={readOnly}
                         />
                         <Form.Control.Feedback type="invalid">
                             Bắt buộc nhập
                         </Form.Control.Feedback>
                     </Form.Group>
 
-                    <Form.Group className="mb-3" controlId="formGridPassword">
-                        <Form.Label>Mật khẩu</Form.Label>
-                        <Form.Control
-                            type="password"
+                    {modalType.type === "create" && (
+                        <Form.Group
+                            className="mb-3"
+                            controlId="formGridPassword"
+                        >
+                            <Form.Label>Mật khẩu</Form.Label>
+                            <Form.Control
+                                type="password"
+                                required
+                                minLength={4}
+                                aria-describedby="PasswordHelpBlock"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                            />
+                            <Form.Text id="PasswordHelpBlock" muted>
+                                Tối thiểu 4 ký tự
+                            </Form.Text>
+                            <Form.Control.Feedback type="invalid">
+                                Bắt buộc nhập
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                    )}
+                    <Form.Group className="mb-3" controlId="formGridRole">
+                        <Form.Label>Phòng ban</Form.Label>
+                        <Form.Select
                             required
-                            minLength={4}
-                            aria-describedby="PasswordHelpBlock"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                        />
-                        <Form.Text id="PasswordHelpBlock" muted>
-                            Tối thiểu 4 ký tự
-                        </Form.Text>
+                            onChange={handleSelectedChange}
+                            name="id_permissions"
+                            value={role}
+                        >
+                            {ROLES.map((role) => (
+                                <option key={role.id} value={role.id}>
+                                    {role.roleName}
+                                </option>
+                            ))}
+                        </Form.Select>
                         <Form.Control.Feedback type="invalid">
                             Bắt buộc nhập
                         </Form.Control.Feedback>
                     </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Check
+                            required
+                            label="Đã kiểm tra kỹ thông tin"
+                            feedback="Vui lòng đánh dấu checkbox này để gửi thông tin!"
+                            feedbackType="invalid"
+                        />
+                    </Form.Group>
+                    <Alert variant="info">
+                        Vui lòng kiểm tra kỹ thông tin!
+                    </Alert>
+                    <Form.Text>
+                        {`Tạo lúc ${
+                            formData.createdAt &&
+                            stringToDate(formData.createdAt?.toString())
+                        } bởi ${formData.usernameCreated}`}
+                    </Form.Text>
+                    <br />
+                    <Form.Text>
+                        {`Sửa đổi lần cuối lúc ${
+                            formData.updatedAt &&
+                            stringToDate(formData.updatedAt?.toString())
+                        } bởi ${formData.usernameUpdated}`}
+                    </Form.Text>
                 </Form>
-                <Alert variant="info">
-                    Các khoảng trắng trước và sau giá trị sẽ bị loại bỏ. Vui
-                    lòng kiểm tra kỹ thông tin!
-                </Alert>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" type="reset" onClick={handleCancel}>
-                    Huỷ
+                    {modalType.type === "update" ? "Đóng" : "Huỷ"}
                 </Button>
-                <Button variant="primary" type="submit" onClick={handleSubmit}>
-                    Thêm mới
-                </Button>
+                {modalType.type === "create" ? (
+                    <Button
+                        variant="primary"
+                        type="submit"
+                        onClick={handleSubmitCreate}
+                    >
+                        Thêm mới
+                    </Button>
+                ) : (
+                    <Button
+                        variant="warning"
+                        type="submit"
+                        onClick={handleSubmitUpdate}
+                    >
+                        Cập nhật chỉnh sửa
+                    </Button>
+                )}
             </Modal.Footer>
         </Modal>
     );

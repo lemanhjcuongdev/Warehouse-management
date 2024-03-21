@@ -1,14 +1,33 @@
 import { Dispatch, SetStateAction, memo, useCallback } from "react";
 import { Badge, ButtonGroup, Dropdown } from "react-bootstrap";
-import { softDeleteUser } from "~/apis/userAPI";
+import { getUserById, softDeleteUser } from "~/apis/userAPI";
 import { iUserItemProps } from "~/pages/ListData/types";
+import { iModalTypes, iUserDataProps } from "../../Modal/types";
 
-function DataRow(props: {
+function UserTableRow(props: {
     item: iUserItemProps;
     setListData: Dispatch<SetStateAction<iUserItemProps[]>>;
     index: number;
+    toggleShowModal: () => void;
+    setModalType: Dispatch<SetStateAction<iModalTypes>>;
+    setFormData: Dispatch<React.SetStateAction<iUserDataProps>>;
 }) {
-    const { item, setListData, index } = props;
+    const {
+        item,
+        setListData,
+        index,
+        toggleShowModal,
+        setModalType,
+        setFormData,
+    } = props;
+
+    const handleReadOrUpdateUser = async () => {
+        const userInfo: iUserDataProps = await getUserById(item.idUsers);
+        setFormData(userInfo);
+
+        toggleShowModal();
+        setModalType({ type: "update" });
+    };
 
     const handleDelete = useCallback(
         (id: number) => {
@@ -34,7 +53,7 @@ function DataRow(props: {
                     .catch((error) => console.log(error));
             }
         },
-        [item]
+        [index, item, setListData]
     );
     return (
         <tr
@@ -42,7 +61,7 @@ function DataRow(props: {
             style={{
                 cursor: "pointer",
             }}
-            onClick={() => console.log(item.idUsers)}
+            onClick={() => handleReadOrUpdateUser()}
         >
             <td>{item.idUsers}</td>
             <td>{item.name}</td>
@@ -67,7 +86,11 @@ function DataRow(props: {
                         className="px-3"
                     />
                     <Dropdown.Menu>
-                        <Dropdown.Item>
+                        <Dropdown.Item onClick={() => handleReadOrUpdateUser()}>
+                            <i className="fa-solid fa-user"></i>
+                            &nbsp; Xem thông tin chi tiết
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={() => handleReadOrUpdateUser()}>
                             <i className="fa-solid fa-pen-to-square"></i>
                             &nbsp; Cập nhật thông tin
                         </Dropdown.Item>
@@ -91,4 +114,4 @@ function DataRow(props: {
     );
 }
 
-export default memo(DataRow);
+export default memo(UserTableRow);

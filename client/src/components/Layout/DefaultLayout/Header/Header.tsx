@@ -14,6 +14,8 @@ function Header() {
         <Navbar expand="xl">
             <NavLink className="navbar-brand" to="/">
                 <img
+                    width="75px"
+                    height="30px"
                     src="https://deo.shopeemobile.com/shopee/shopee-spx-live-vn/static/media/spx-express.f3023639.svg"
                     alt="SPX Express"
                 />
@@ -24,7 +26,7 @@ function Header() {
                 id="basic-navbar-nav"
                 className="justify-content-between"
             >
-                <Nav className="">
+                <Nav>
                     {navbarItems.map((item, index) => (
                         <Fragment key={index}>
                             {item.children ? (

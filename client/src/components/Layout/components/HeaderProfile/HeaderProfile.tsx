@@ -7,7 +7,6 @@ function HeaderProfile() {
     const { state, dispatch } = useGlobalState();
 
     const handleLogout = () => {
-        document.cookie = "jwt=, expires=Thu, 01 Jan 1970 00:00:00 GMT";
         dispatch(actions.setUnauthentication());
     };
 

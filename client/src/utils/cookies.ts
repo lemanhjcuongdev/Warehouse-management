@@ -1,22 +1,21 @@
+import Cookies from "js-cookie";
+
 //set cookie
-const setCookie = (
-    name: string,
-    value: string,
-    sameSite: "Lax" | "Strict",
-    httpOnly: boolean
-) => {
-    const expireTime = new Date();
-    expireTime.setHours(expireTime.getHours() + 1);
-    const cookieString = `${name}=${value}, SameSite=${sameSite}, HttpOnly=${httpOnly}, expires=${expireTime.toUTCString()}`;
-    document.cookie = cookieString;
+const setCookie = (name: string, value: string) => {
+    Cookies.set(name, value, {
+        expires: 1 / 24,
+        sameSite: "Strict",
+        secure: true,
+    });
 };
 
 const getCookie = (cookieName: string) => {
-    const cookie = document.cookie;
-    const regex = new RegExp(`${cookieName}=([^,]+)`);
-
-    const match = cookie.match(regex);
-    return match && match[1];
+    const cookie = Cookies.get();
+    return cookie[cookieName];
 };
 
-export { setCookie, getCookie };
+const removeCookie = (cookieName: string) => {
+    Cookies.remove(cookieName);
+};
+
+export { setCookie, getCookie, removeCookie };

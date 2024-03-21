@@ -1,6 +1,6 @@
 {
     "short_name": "SPX Express",
-    "name": "SPX Express - Quản lý kho",
+    "name": "SPX Express - Quản lý kho hàng",
     "icons": [
         {
             "src": "favicon.ico",
@@ -10,7 +10,8 @@
         {
             "src": "favicon.ico",
             "type": "image/png",
-            "sizes": "192x192"
+            "sizes": "192x192",
+            "purpose": "maskable"
         },
         {
             "src": "favicon.ico",

@@ -1,5 +1,6 @@
 import { SET_AUTHENTICATION, SET_UNAUTHENTICATION } from "~/constants";
 import { iActionProps, iStateProps } from "./types";
+import { removeCookie } from "~/utils/cookies";
 
 const initialState: iStateProps = {
     isAuthentication: false,
@@ -15,6 +16,8 @@ const reducer = (state: iStateProps, action: iActionProps): iStateProps => {
                 isAuthentication: true,
             });
         case SET_UNAUTHENTICATION:
+            removeCookie("id");
+            removeCookie("jwt");
             return (state = initialState);
         default:
             throw new Error("Invalid action!");

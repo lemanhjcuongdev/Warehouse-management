@@ -18,14 +18,11 @@ function App() {
         //load authentic state
         if (!isAuthentication) {
             const userId = getCookie("id");
-            const jwt = getCookie("jwt");
-            if (userId && jwt) {
-                getUserById({
-                    id: +userId,
-                    jwt: jwt,
-                })
+
+            if (userId) {
+                getUserById(+userId)
                     .then((data) => {
-                        data &&
+                        !data.error &&
                             dispatch(
                                 actions.setAuthentication({
                                     userId: data.idUsers,
@@ -34,13 +31,23 @@ function App() {
                             );
                         return;
                     })
+                    .catch((error) => {
+                        error && dispatch(actions.setUnauthentication());
+                    })
                     .finally(() => setLoading(false));
             } else setLoading(false);
         }
-    }, [isAuthentication]);
+        //set expire in 1h
+        const expireTime = setTimeout(() => {
+            alert("Đã hết phiên đăng nhập, vui lòng đăng nhập lại");
+            dispatch(actions.setUnauthentication());
+        }, 3600000);
+
+        //cleanup function
+        return () => clearTimeout(expireTime);
+    }, [isAuthentication, dispatch]);
 
     const routes = isAuthentication ? publicRoutes : privateRoutes;
-    console.log(isAuthentication);
 
     return (
         <>

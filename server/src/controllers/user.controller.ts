@@ -1,16 +1,29 @@
 import { validate } from 'class-validator'
 import dotenv from 'dotenv'
 import { NextFunction, Request, Response } from 'express'
-import { Repository } from 'typeorm'
+import { In, Repository } from 'typeorm'
 import { appDataSource } from '~/constants/appDataSource'
 import { Users } from '~/models/entities/Users'
 import authController from './auth.controller'
 import STATUS from '~/constants/statusCode'
+import { Permissions } from '~/models/entities/Permissions'
+import { PermissionDetails } from '~/models/entities/PermissionDetails'
 
 dotenv.config()
 
+interface iRequestUserInfo {
+  name: string
+  email: string
+  gender: 'M' | 'F' | 'O'
+  phone: string
+  startDate: string
+  username: string
+  disabled: 0 | 1
+}
+
 //use datasource
 const userRepository = appDataSource.getRepository(Users)
+const entityManager = appDataSource.createEntityManager()
 
 class UserController {
   //[GET /users]
@@ -31,12 +44,52 @@ class UserController {
     //get user by id from DB
     try {
       const user = await userRepository.findOneOrFail({
-        select: ['idUsers', 'name', 'gender', 'username', 'phone', 'email', 'startDate', 'disabled'],
+        select: [
+          'idUsers',
+          'name',
+          'gender',
+          'username',
+          'phone',
+          'email',
+          'startDate',
+          'disabled',
+          'idCreated',
+          'idUpdated',
+          'createdAt',
+          'updatedAt'
+        ],
         where: {
           idUsers: id
         }
       })
-      res.send(user)
+      const createdManager = await userRepository.findOneOrFail({
+        select: ['username'],
+        where: {
+          idUsers: user.idCreated
+        }
+      })
+      let updatedManager = user
+      if (user.idUpdated) {
+        updatedManager = await userRepository.findOneOrFail({
+          select: ['username'],
+          where: {
+            idUsers: user.idUpdated
+          }
+        })
+      }
+      //get permissions of user
+      const existingPermissions = await entityManager.find(PermissionDetails, {
+        where: {
+          idUsers: id
+        }
+      })
+      const idPermissions = existingPermissions.map((permission) => permission.idPermission)
+      res.send({
+        ...user,
+        usernameCreated: createdManager.username,
+        usernameUpdated: updatedManager.username,
+        idPermissions: idPermissions
+      })
     } catch (error) {
       res.status(STATUS.NOT_FOUND).send({
         error: 'Không tìm thấy người dùng'
@@ -47,17 +100,17 @@ class UserController {
   //[POST /users/create-user]
   async createUser(req: Request, res: Response, next: NextFunction) {
     //get params from request body
-    const { name, email, gender, phone, start_date, username, password, id_created } = req.body
+    const { name, email, gender, phone, startDate, username, password, idCreated, idPermissions } = req.body
 
     const user = new Users()
     user.name = name
     user.email = email
     user.gender = gender
     user.phone = phone
-    user.startDate = start_date
+    user.startDate = startDate
     user.username = username
     user.password = password
-    user.idCreated = id_created
+    user.idCreated = idCreated
 
     //validate type of params
     const errors = await validate(user)
@@ -93,6 +146,27 @@ class UserController {
       return
     }
 
+    //push permissions with user into permission detail
+    try {
+      const permissions = await entityManager.find(Permissions, {
+        where: {
+          idPermissions: In(idPermissions)
+        }
+      })
+      const userPermissions = permissions.map((permissionId) => {
+        const permission_detail = new PermissionDetails()
+        permission_detail.idUsers = newUser.idUsers
+        permission_detail.idPermission = permissionId.idPermissions
+
+        return permission_detail
+      })
+
+      await entityManager.save(userPermissions)
+    } catch (error) {
+      res.status(STATUS.BAD_REQUEST).send('Quyền không hợp lệ')
+      return
+    }
+
     res.status(STATUS.CREATED).send(newUser)
   }
 
@@ -101,41 +175,46 @@ class UserController {
     //get id from query string
     const id: number = +req.params.id
     //get params from body request
-    const { name, email, gender, phone, startDate, username, disabled } = req.body
+    const { name, email, gender, phone, startDate, username, disabled, idUpdated, idPermissions } = req.body
 
-    //get user by id from DB
+    //get fields need to be updated
+    const updatedFields = ['name', 'email', 'gender', 'phone', 'startDate', 'username', 'disabled', 'idUpdated'].filter(
+      (field) => req.body[field] !== undefined
+    )
+
     let user: Users
-    try {
-      user = await userRepository.findOneOrFail({
-        where: {
-          idUsers: id
-        }
-      })
-    } catch (error) {
-      res.status(STATUS.NOT_FOUND).send({
-        error: 'Không tìm thấy người dùng'
-      })
-      return
-    }
+    if (updatedFields.length > 0) {
+      //get user by id from DB
+      try {
+        user = await userRepository.findOneOrFail({
+          where: {
+            idUsers: id
+          }
+        })
+      } catch (error) {
+        res.status(STATUS.NOT_FOUND).send({
+          error: 'Không tìm thấy người dùng'
+        })
+        return
+      }
 
-    //validate type
-    user.name = name
-    user.email = email
-    user.gender = gender
-    user.phone = phone
-    user.startDate = startDate
-    user.username = username
-    user.disabled = disabled
-    const errors = await validate(user)
-    if (errors.length > 0) {
-      res.status(STATUS.BAD_REQUEST).send({
-        error: 'Dữ liệu không đúng định dạng'
-      })
-      return
-    }
+      //validate type
+      user.name = name
+      user.email = email
+      user.gender = gender
+      user.phone = phone
+      user.startDate = startDate
+      user.username = username
+      user.disabled = disabled
+      user.idUpdated = idUpdated
+      const errors = await validate(user)
+      if (errors.length > 0) {
+        res.status(STATUS.BAD_REQUEST).send({
+          error: 'Dữ liệu không đúng định dạng'
+        })
+        return
+      }
 
-    //try to update, if fails, the username is already in use
-    try {
       await userRepository.update(
         {
           idUsers: id
@@ -147,19 +226,50 @@ class UserController {
           phone,
           startDate,
           username,
-          disabled
+          disabled,
+          idUpdated,
+          updatedAt: new Date()
         }
       )
-    } catch (error) {
-      res.status(STATUS.CONFLICT).send({
-        error: 'Tên đăng nhập đã được sử dụng'
+    }
+
+    //try to update permission
+    //get existing permission of user
+    try {
+      const existingPermissions = await entityManager.find(PermissionDetails, {
+        where: {
+          idUsers: id
+        }
       })
-      return
+
+      //check differences
+      const isChanged = !existingPermissions.every((permission) => idPermissions.includes(permission.idPermission))
+
+      if (isChanged) {
+        //remove old permissions of user
+        await entityManager.delete(PermissionDetails, {
+          idUsers: id
+        })
+        //add new permissions of user
+        const userPermissions = idPermissions.map((permissionId: number) => {
+          const permission_detail = new PermissionDetails()
+          permission_detail.idUsers = id
+          permission_detail.idPermission = permissionId
+
+          return permission_detail
+        })
+
+        await entityManager.save(userPermissions)
+      }
+    } catch (error) {
+      res.status(STATUS.BAD_REQUEST).send({
+        error: 'Cập nhật quyền thất bại'
+      })
     }
 
     //if ok
     res.status(STATUS.NO_CONTENT).send({
-      error: 'Cập nhật người dùng thành công'
+      // error: 'Cập nhật người dùng thành công'
     })
   }
 

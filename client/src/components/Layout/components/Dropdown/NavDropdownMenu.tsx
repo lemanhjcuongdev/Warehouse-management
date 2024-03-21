@@ -6,7 +6,7 @@ function DropdownMenu(props: { items: iNavbarItem }): React.ReactElement {
     const items = props.items;
 
     return (
-        <NavDropdown id="basic-navbar-nav" title={items.label}>
+        <NavDropdown id="basic-navdropdown-nav" title={items.label}>
             {items.children &&
                 items.children.map((item, index) => (
                     <NavDropdown.Item as={Link} to={item.to} key={index}>

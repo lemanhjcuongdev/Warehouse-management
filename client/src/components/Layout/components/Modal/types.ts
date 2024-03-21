@@ -1,24 +1,23 @@
-import { Dispatch, SetStateAction } from "react";
-import { iUserItemProps } from "~/pages/ListData/types";
-
-interface iUserModalProps {
-    show: true | false;
-    onHide: () => void;
-    setListData: Dispatch<SetStateAction<iUserItemProps[]>>;
-}
 interface iModalTypes {
-    type: "create" | "read" | "update";
+    type: "create" | "update";
 }
 interface iUserDataProps {
+    idUsers?: number;
     name: string;
     email: string;
     gender: "M" | "F" | "O";
     phone: string;
-    start_date: string;
+    startDate: string;
     username: string;
-    password: string;
-    id_created?: number;
+    password?: string;
+    idCreated?: number;
+    usernameCreated?: string;
+    createdAt?: Date;
     disabled: 0;
+    idPermissions: number[];
+    idUpdated?: number;
+    usernameUpdated?: string;
+    updatedAt?: Date;
 }
 
-export type { iModalTypes, iUserModalProps, iUserDataProps };
+export type { iModalTypes, iUserDataProps };

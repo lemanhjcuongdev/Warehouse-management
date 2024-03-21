@@ -52,8 +52,8 @@ function Login() {
         try {
             const data = await postLogin(loginData);
             //store jwt in cookie
-            setCookie("jwt", data.token, "Lax", true);
-            setCookie("id", data.userId.toString(), "Lax", true);
+            setCookie("jwt", data.token);
+            setCookie("id", data.userId.toString());
 
             //dispatch set auth action to set global state
             dispatch(

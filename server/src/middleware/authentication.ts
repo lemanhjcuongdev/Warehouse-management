@@ -18,7 +18,7 @@ function checkJwt(req: Request, res: Response, next: NextFunction) {
     res.locals.JwtPayload = JwtPayload
   } catch (error) {
     //if token is invalid, respond 401
-    res.status(STATUS.BAD_REQUEST).send({
+    res.status(STATUS.UNAUTHORIZED).send({
       error: 'Đã hết phiên đăng nhập'
     })
     return

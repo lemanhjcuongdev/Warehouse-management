@@ -1,13 +1,23 @@
 import { Dispatch, SetStateAction, memo } from "react";
 import { Table } from "react-bootstrap";
-import DataRow from "./DataRow";
 import { iUserItemProps } from "~/pages/ListData/types";
+import { iModalTypes, iUserDataProps } from "../../Modal/types";
+import UserTableRow from "./UserTableRow";
 
-function DataTable(props: {
+function UserTable(props: {
     listData: iUserItemProps[];
     setListData: Dispatch<SetStateAction<iUserItemProps[]>>;
+    toggleShowModal: () => void;
+    setModalType: Dispatch<SetStateAction<iModalTypes>>;
+    setFormData: Dispatch<React.SetStateAction<iUserDataProps>>;
 }) {
-    const { listData, setListData } = props;
+    const {
+        listData,
+        setListData,
+        toggleShowModal,
+        setModalType,
+        setFormData,
+    } = props;
     return (
         <Table striped bordered hover>
             <thead>
@@ -20,11 +30,14 @@ function DataTable(props: {
             </thead>
             <tbody>
                 {listData.map((item, index) => (
-                    <DataRow
+                    <UserTableRow
                         key={item.idUsers}
                         item={item}
                         index={index}
                         setListData={setListData}
+                        toggleShowModal={toggleShowModal}
+                        setModalType={setModalType}
+                        setFormData={setFormData}
                     />
                 ))}
             </tbody>
@@ -32,4 +45,4 @@ function DataTable(props: {
     );
 }
 
-export default memo(DataTable);
+export default memo(UserTable);
