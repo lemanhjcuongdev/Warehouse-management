@@ -26,11 +26,11 @@ const navbar_items: iNavbarItem[] = [
                 to: "/",
             },
             {
-                label: "Điều chuyển kho",
+                label: "Xử lý hàng",
                 to: "/",
             },
             {
-                label: "Xử lý hàng",
+                label: "Điều chuyển kho",
                 to: "/",
             },
         ],
@@ -40,23 +40,15 @@ const navbar_items: iNavbarItem[] = [
         to: "/",
         children: [
             {
-                label: "Hàng hoá",
-                to: "/list/goods",
-            },
-            {
                 label: "Nhà cung cấp",
                 to: "/",
             },
             {
-                label: "Nhóm hàng",
-                to: "/",
+                label: "Hàng hoá",
+                to: "/list/goods",
             },
             {
-                label: "Loại hàng",
-                to: "/",
-            },
-            {
-                label: "Đơn vị tính",
+                label: "Các thuộc tính hàng hoá",
                 to: "/",
             },
         ],

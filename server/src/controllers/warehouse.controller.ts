@@ -35,7 +35,7 @@ class WarehouseController {
       res.status(STATUS.CREATED).send(warehouse)
     } catch (error) {
       res.status(STATUS.CONFLICT).send({
-        error: 'Lưu thất bại'
+        error: 'Trùng tên kho'
       })
       return
     }
