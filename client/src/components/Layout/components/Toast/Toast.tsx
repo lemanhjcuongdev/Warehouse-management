@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { ToastContainer } from "react-bootstrap";
 import Toast from "react-bootstrap/Toast";
+import { Variant } from "react-bootstrap/esm/types";
 
 interface iToastProps {
     title: string;
     message?: string;
+    variant?: Variant;
 }
 
-function ToastNotification(toastData: iToastProps) {
+function ToastNotification(props: iToastProps) {
+    const { title, message, variant } = props;
     const [show, setShow] = useState(true);
 
     return (
@@ -15,18 +18,19 @@ function ToastNotification(toastData: iToastProps) {
             <ToastContainer position="bottom-start">
                 <Toast
                     className="d-inline-block m-1"
-                    bg={"success"}
+                    bg={variant}
                     delay={3000}
                     autohide
+                    animation
                     onClose={() => setShow(false)}
                     show={show}
                 >
                     <Toast.Header>
                         <i className="fa-solid fa-check"></i>
                         &nbsp;
-                        <strong className="me-auto">{toastData?.title}</strong>
+                        <strong className="me-auto">{title}</strong>
                     </Toast.Header>
-                    <Toast.Body>{toastData?.message}</Toast.Body>
+                    <Toast.Body>{message}</Toast.Body>
                 </Toast>
             </ToastContainer>
         </>

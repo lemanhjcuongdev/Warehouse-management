@@ -11,7 +11,7 @@ const navbar_items: iNavbarItem[] = [
         children: [
             {
                 label: "Danh sách kho hàng",
-                to: "/",
+                to: "/list/warehouses",
             },
             {
                 label: "Đặt hàng từ NCC",

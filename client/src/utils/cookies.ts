@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 const setCookie = (name: string, value: string) => {
     Cookies.set(name, value, {
         expires: 1 / 24,
+        //1/1440 = expire in 1'
         sameSite: "Strict",
         secure: true,
     });

@@ -6,8 +6,12 @@ import { Users } from '~/models/entities/Users'
 import * as jwt from 'jsonwebtoken'
 import { validate } from 'class-validator'
 import STATUS from '~/constants/statusCode'
+import { PermissionDetails } from '~/models/entities/PermissionDetails'
 
 dotenv.config()
+//use datasource
+const userRepository = appDataSource.getRepository(Users)
+const entityManager = appDataSource.createEntityManager()
 
 class AuthController {
   //[POST /login]
@@ -21,7 +25,6 @@ class AuthController {
     }
 
     //Get user from DB
-    const userRepository = appDataSource.getRepository(Users)
     let user: Users
     try {
       user = await userRepository.findOneOrFail({
@@ -53,10 +56,19 @@ class AuthController {
       expiresIn: '1h'
     })
 
+    //get permissions of user
+    const existingPermissions = await entityManager.find(PermissionDetails, {
+      where: {
+        idUsers: user.idUsers
+      }
+    })
+    const idPermissions = existingPermissions.map((permission) => permission.idPermission)
+
     //if OK
     res.send({
       userId: user.idUsers,
       username,
+      idPermissions,
       token
     })
   }

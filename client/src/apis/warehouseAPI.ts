@@ -1,9 +1,9 @@
-import { iUserDataProps } from "~/components/Layout/components/Modal/UserModal";
+import { iWarehouseDataProps } from "~/components/Layout/components/Modal/types";
 import { API_ROOT } from "~/constants";
-import { iUserItemProps } from "~/views/types";
 import { getCookie } from "~/utils/cookies";
+import { iWarehouseItemProps } from "~/views/types";
 
-const getAllUser = async () => {
+const getAllWarehouses = async () => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -17,8 +17,8 @@ const getAllUser = async () => {
             },
         };
 
-        const res = await fetch(`${API_ROOT}/users`, init);
-        const data: iUserItemProps[] = await res.json();
+        const res = await fetch(`${API_ROOT}/warehouses`, init);
+        const data: iWarehouseItemProps[] = await res.json();
 
         return data;
     } catch (error) {
@@ -26,7 +26,7 @@ const getAllUser = async () => {
     }
 };
 
-const getUserById = async (id: number) => {
+const getWarehouseById = async (id: number) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -39,7 +39,7 @@ const getUserById = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/users/${id}`, init);
+        const res = await fetch(`${API_ROOT}/warehouses/${id}`, init);
         const data = await res.json();
         if (data.error) {
             throw new Error(data.error);
@@ -51,7 +51,7 @@ const getUserById = async (id: number) => {
     }
 };
 
-const createUser = async (userInfo: iUserDataProps) => {
+const createWarehouse = async (userInfo: iWarehouseDataProps) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -66,7 +66,7 @@ const createUser = async (userInfo: iUserDataProps) => {
             },
             body: JSON.stringify(userInfo),
         };
-        const res = await fetch(`${API_ROOT}/users/create-user`, init);
+        const res = await fetch(`${API_ROOT}/warehouses`, init);
 
         const data = await res.json();
         if (data.error) {
@@ -79,7 +79,7 @@ const createUser = async (userInfo: iUserDataProps) => {
     }
 };
 
-const updateUser = async (userInfo: iUserDataProps) => {
+const updateWarehouse = async (userInfo: iWarehouseDataProps) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -94,7 +94,7 @@ const updateUser = async (userInfo: iUserDataProps) => {
             },
             body: JSON.stringify(userInfo),
         };
-        const res = await fetch(`${API_ROOT}/users/${userInfo.idUsers}`, init);
+        const res = await fetch(`${API_ROOT}/warehouses/`, init);
 
         const data = await res.json();
         if (data.error) {
@@ -107,7 +107,7 @@ const updateUser = async (userInfo: iUserDataProps) => {
     }
 };
 
-const softDeleteUser = async (id: number) => {
+const softDeleteWarehouse = async (id: number) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -121,7 +121,7 @@ const softDeleteUser = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/users/${id}`, init);
+        const res = await fetch(`${API_ROOT}/warehouses/${id}`, init);
 
         const data = await res.json();
         if (data && data.error) {
@@ -134,4 +134,10 @@ const softDeleteUser = async (id: number) => {
     }
 };
 
-export { getAllUser, getUserById, createUser, softDeleteUser, updateUser };
+export {
+    createWarehouse,
+    getAllWarehouses,
+    getWarehouseById,
+    softDeleteWarehouse,
+    updateWarehouse,
+};

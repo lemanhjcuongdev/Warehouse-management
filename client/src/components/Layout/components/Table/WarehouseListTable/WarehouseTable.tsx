@@ -1,16 +1,15 @@
 import { Dispatch, SetStateAction, memo } from "react";
 import { Table } from "react-bootstrap";
-import { iUserItemProps } from "~/views/types";
-import { iModalTypes, iUserDataProps } from "../../Modal/types";
-import UserTableRow from "./UserTableRow";
+import { iUserItemProps, iWarehouseItemProps } from "~/views/types";
+import { iModalTypes, iWarehouseDataProps } from "../../Modal/types";
+import WarehouseTableRow from "./WarehouseTableRow";
 
 function UserTable(props: {
-    listData: iUserItemProps[];
-    setListData: Dispatch<SetStateAction<iUserItemProps[]>>;
+    listData: iWarehouseItemProps[];
+    setListData: Dispatch<SetStateAction<iWarehouseItemProps[]>>;
     toggleShowModal: () => void;
     setModalType: Dispatch<SetStateAction<iModalTypes>>;
-    setFormData: Dispatch<React.SetStateAction<iUserDataProps>>;
-    setRole: Dispatch<React.SetStateAction<number>>;
+    setFormData: Dispatch<React.SetStateAction<iWarehouseDataProps>>;
 }) {
     const {
         listData,
@@ -18,29 +17,27 @@ function UserTable(props: {
         toggleShowModal,
         setModalType,
         setFormData,
-        setRole,
     } = props;
     return (
         <Table striped bordered hover>
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Họ và tên</th>
-                    <th>Username</th>
+                    <th>Tên kho</th>
+                    <th>Địa chỉ</th>
                     <th>Trạng thái</th>
                 </tr>
             </thead>
             <tbody>
                 {listData.map((item, index) => (
-                    <UserTableRow
-                        key={item.idUsers}
+                    <WarehouseTableRow
+                        key={item.idWarehouse}
                         item={item}
                         index={index}
                         setListData={setListData}
                         toggleShowModal={toggleShowModal}
                         setModalType={setModalType}
                         setFormData={setFormData}
-                        setRole={setRole}
                     />
                 ))}
             </tbody>

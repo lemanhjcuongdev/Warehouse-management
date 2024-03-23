@@ -1,12 +1,13 @@
-import { Button, Col, Container, Form, FormGroup, Row } from "react-bootstrap";
 import classNames from "classnames/bind";
-import styles from "./Login.module.scss";
-import { Link, useNavigate } from "react-router-dom";
 import { ChangeEventHandler, FormEventHandler, useRef, useState } from "react";
+import { Button, Col, Container, Form, FormGroup, Row } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
 import { postLogin } from "~/apis/authAPI";
-import { setCookie } from "~/utils/cookies";
 import useGlobalState from "~/hooks/useGlobalState";
 import { actions } from "~/store";
+import { setCookie } from "~/utils/cookies";
+import roleIdGenerator from "~/utils/role";
+import styles from "./Login.module.scss";
 
 const cx = classNames.bind(styles);
 
@@ -51,6 +52,7 @@ function Login() {
         //call login API
         try {
             const data = await postLogin(loginData);
+
             //store jwt in cookie
             setCookie("jwt", data.token);
             setCookie("id", data.userId.toString());
@@ -60,6 +62,7 @@ function Login() {
                 actions.setAuthentication({
                     userId: data.userId,
                     username: data.username,
+                    role: roleIdGenerator(data.idPermissions),
                 })
             );
 
@@ -139,7 +142,7 @@ function Login() {
                             >
                                 Đăng nhập
                             </Button>
-                            <p className="text-danger text-center">
+                            <p className="mt-3 mb-0 text-danger text-center">
                                 {verifyError}
                             </p>
                         </Form>

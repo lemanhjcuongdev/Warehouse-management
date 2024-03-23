@@ -17,15 +17,14 @@ import {
     Modal,
     Row,
 } from "react-bootstrap";
-import _ from "lodash";
 
 import { createUser, updateUser } from "~/apis/userAPI";
 import ROLES from "~/constants/roles";
-import { iModalTypes, iUserDataProps } from "./types";
-import { iUserItemProps } from "~/pages/ListData/types";
-import { initialUserDataState } from "~/views/UserView/UserView";
+import { iUserItemProps } from "~/views/types";
 import { getCookie } from "~/utils/cookies";
 import stringToDate from "~/utils/stringToDate";
+import { initialUserDataState } from "~/views/UserView/UserView";
+import { iModalTypes, iUserDataProps } from "./types";
 
 function UserModal(props: {
     show: true | false;
@@ -34,30 +33,28 @@ function UserModal(props: {
     modalType: iModalTypes;
     formData: iUserDataProps;
     setFormData: Dispatch<React.SetStateAction<iUserDataProps>>;
+    role: number;
 }) {
-    const { show, onHide, setListData, modalType, formData, setFormData } =
-        props;
-
+    const {
+        show,
+        onHide,
+        setListData,
+        modalType,
+        formData,
+        setFormData,
+        role,
+    } = props;
     const [validated, setValidated] = useState(false);
-
     const startDateRef = useRef<HTMLInputElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
     let title: string;
-    let readOnly: boolean;
-    const role = ROLES.map((role) => {
-        if (role.idPermissions.length === formData.idPermissions.length)
-            return role;
-    })[0]?.id;
-    console.log("ROLE:", role);
 
     switch (modalType.type) {
         case "create":
             title = "Thêm mới";
-            readOnly = false;
             break;
         case "update":
             title = "Xem / Chỉnh sửa thông tin";
-            readOnly = false;
             break;
     }
 
@@ -221,7 +218,6 @@ function UserModal(props: {
                                 value={formData.name}
                                 onChange={handleChange}
                                 autoComplete="off"
-                                readOnly={readOnly}
                             />
                             <Form.Control.Feedback type="invalid">
                                 Bắt buộc nhập
@@ -238,7 +234,6 @@ function UserModal(props: {
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                readOnly={readOnly}
                             />
                             <Form.Control.Feedback type="invalid">
                                 Bắt buộc nhập
@@ -275,7 +270,6 @@ function UserModal(props: {
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handleChange}
-                                readOnly={readOnly}
                             />
                             <Form.Text id="PhoneHelpBlock" muted>
                                 Bắt đầu từ 0 và có 10 số
@@ -295,7 +289,6 @@ function UserModal(props: {
                                 value={formData.startDate}
                                 onChange={handleChange}
                                 onBlur={() => customValidateDate()}
-                                readOnly={readOnly}
                             />
                             <Form.Control.Feedback type="invalid">
                                 Bắt buộc nhập
@@ -310,7 +303,6 @@ function UserModal(props: {
                             name="username"
                             value={formData.username}
                             onChange={handleChange}
-                            readOnly={readOnly}
                         />
                         <Form.Control.Feedback type="invalid">
                             Bắt buộc nhập
@@ -369,19 +361,23 @@ function UserModal(props: {
                     <Alert variant="info">
                         Vui lòng kiểm tra kỹ thông tin!
                     </Alert>
-                    <Form.Text>
-                        {`Tạo lúc ${
-                            formData.createdAt &&
-                            stringToDate(formData.createdAt?.toString())
-                        } bởi ${formData.usernameCreated}`}
-                    </Form.Text>
-                    <br />
-                    <Form.Text>
-                        {`Sửa đổi lần cuối lúc ${
-                            formData.updatedAt &&
-                            stringToDate(formData.updatedAt?.toString())
-                        } bởi ${formData.usernameUpdated}`}
-                    </Form.Text>
+                    {modalType.type === "update" && (
+                        <>
+                            <Form.Text>
+                                {`Tạo lúc ${
+                                    formData.createdAt &&
+                                    stringToDate(formData.createdAt?.toString())
+                                } bởi ${formData.usernameCreated}`}
+                            </Form.Text>
+                            <br />
+                            <Form.Text>
+                                {`Sửa đổi lần cuối lúc ${
+                                    formData.updatedAt &&
+                                    stringToDate(formData.updatedAt?.toString())
+                                } bởi ${formData.usernameUpdated}`}
+                            </Form.Text>
+                        </>
+                    )}
                 </Form>
             </Modal.Body>
             <Modal.Footer>

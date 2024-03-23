@@ -6,6 +6,7 @@ const initialState: iStateProps = {
     isAuthentication: false,
     userId: -1,
     username: "",
+    role: 0,
 };
 
 const reducer = (state: iStateProps, action: iActionProps): iStateProps => {

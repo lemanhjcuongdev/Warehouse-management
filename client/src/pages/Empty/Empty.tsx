@@ -11,7 +11,7 @@ function Empty() {
         if (!isAuthentication) {
             navigate("/login");
         } else navigate("/");
-    }, []);
+    }, [isAuthentication, navigate]);
     return <></>;
 }
 

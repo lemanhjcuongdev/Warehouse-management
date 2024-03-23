@@ -8,10 +8,11 @@ import useGlobalState from "./hooks/useGlobalState";
 import { privateRoutes, publicRoutes } from "./routes/routes";
 import { actions } from "./store";
 import { getCookie } from "./utils/cookies";
+import roleIdGenerator from "./utils/role";
 
 function App() {
     const { state, dispatch } = useGlobalState();
-    const { isAuthentication } = state;
+    const { isAuthentication, role } = state;
     const [isLoading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -27,6 +28,7 @@ function App() {
                                 actions.setAuthentication({
                                     userId: data.idUsers,
                                     username: data.username,
+                                    role: roleIdGenerator(data.idPermissions),
                                 })
                             );
                         return;
@@ -48,6 +50,7 @@ function App() {
     }, [isAuthentication, dispatch]);
 
     const routes = isAuthentication ? publicRoutes : privateRoutes;
+    console.log("CURRENT ROLE: ", role);
 
     return (
         <>

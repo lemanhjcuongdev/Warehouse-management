@@ -14,6 +14,8 @@ const postLogin = async (loginData: { username: string; password: string }) => {
             userId: number;
             username: string;
             token: string;
+            idPermissions: number[];
+            error?: string;
         } = await res.json();
 
         return data;

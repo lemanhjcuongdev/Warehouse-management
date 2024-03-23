@@ -1,18 +1,17 @@
 import { Dispatch, SetStateAction, memo, useCallback } from "react";
 import { Badge, ButtonGroup, Dropdown } from "react-bootstrap";
 import { getUserById, softDeleteUser } from "~/apis/userAPI";
-import { iUserItemProps } from "~/views/types";
-import { iModalTypes, iUserDataProps } from "../../Modal/types";
-import ROLES from "~/constants/roles";
+import { iUserItemProps, iWarehouseItemProps } from "~/views/types";
+import { iModalTypes, iWarehouseDataProps } from "../../Modal/types";
+import { getWarehouseById, softDeleteWarehouse } from "~/apis/warehouseAPI";
 
 function UserTableRow(props: {
-    item: iUserItemProps;
-    setListData: Dispatch<SetStateAction<iUserItemProps[]>>;
+    item: iWarehouseItemProps;
+    setListData: Dispatch<SetStateAction<iWarehouseItemProps[]>>;
     index: number;
     toggleShowModal: () => void;
     setModalType: Dispatch<SetStateAction<iModalTypes>>;
-    setFormData: Dispatch<React.SetStateAction<iUserDataProps>>;
-    setRole: Dispatch<React.SetStateAction<number>>;
+    setFormData: Dispatch<React.SetStateAction<iWarehouseDataProps>>;
 }) {
     const {
         item,
@@ -21,18 +20,13 @@ function UserTableRow(props: {
         toggleShowModal,
         setModalType,
         setFormData,
-        setRole,
     } = props;
 
     const handleReadOrUpdateUser = async () => {
-        const userInfo: iUserDataProps = await getUserById(item.idUsers);
-        setFormData(userInfo);
-        //get role
-        ROLES.forEach((role) => {
-            if (role.idPermissions.length === userInfo.idPermissions.length) {
-                setRole(role.id);
-            }
-        });
+        const warehouseInfo: iWarehouseDataProps = await getWarehouseById(
+            item.idWarehouse
+        );
+        setFormData(warehouseInfo);
 
         toggleShowModal();
         setModalType({ type: "update" });
@@ -42,11 +36,11 @@ function UserTableRow(props: {
         (id: number) => {
             const windowObject = window;
             const message = item.disabled
-                ? `Bạn có chắc muốn kích hoạt lại người dùng "${item.username}"?`
-                : `Bạn có chắc muốn vô hiệu hoá người dùng "${item.username}"?`;
+                ? `Bạn có chắc muốn kích hoạt lại kho hàng "${item.name}"?`
+                : `Bạn có chắc muốn vô hiệu hoá kho hàng "${item.name}"?`;
             const confirmDialog = windowObject.confirm(message);
             if (confirmDialog) {
-                softDeleteUser(id)
+                softDeleteWarehouse(id)
                     .then(() => {
                         setListData((prev) => {
                             //deep clone
@@ -72,9 +66,9 @@ function UserTableRow(props: {
             }}
             onClick={() => handleReadOrUpdateUser()}
         >
-            <td>{item.idUsers}</td>
+            <td>{item.idWarehouse}</td>
             <td>{item.name}</td>
-            <td>{item.username}</td>
+            <td>{item.address}</td>
             <td className="d-flex justify-content-between align-items-center">
                 <div>
                     <Badge
@@ -96,7 +90,7 @@ function UserTableRow(props: {
                     />
                     <Dropdown.Menu>
                         <Dropdown.Item onClick={() => handleReadOrUpdateUser()}>
-                            <i className="fa-solid fa-user"></i>
+                            <i className="fa-solid fa-warehouse"></i>
                             &nbsp; Xem thông tin chi tiết
                         </Dropdown.Item>
                         <Dropdown.Item onClick={() => handleReadOrUpdateUser()}>
@@ -104,7 +98,7 @@ function UserTableRow(props: {
                             &nbsp; Cập nhật thông tin
                         </Dropdown.Item>
                         <Dropdown.Item
-                            onClick={() => handleDelete(item.idUsers)}
+                            onClick={() => handleDelete(item.idWarehouse)}
                         >
                             <i
                                 className={

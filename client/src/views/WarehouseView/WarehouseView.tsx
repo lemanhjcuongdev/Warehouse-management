@@ -1,50 +1,44 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
-import { getAllUser } from "~/apis/userAPI";
-import UserModal from "~/components/Layout/components/Modal/UserModal";
+import { getAllWarehouses } from "~/apis/warehouseAPI";
+import WarehouseModal from "~/components/Layout/components/Modal/WarehouseModal";
 import {
     iModalTypes,
-    iUserDataProps,
+    iWarehouseDataProps,
 } from "~/components/Layout/components/Modal/types";
-import UserTable from "~/components/Layout/components/Table/ListUserTable/UserTable";
-import ROLES from "~/constants/roles";
-import { iUserItemProps } from "~/views/types";
+import WarehouseTable from "~/components/Layout/components/Table/WarehouseListTable/WarehouseTable";
 import { getCookie } from "~/utils/cookies";
+import { iWarehouseItemProps } from "~/views/types";
 
-const managerId = getCookie("id") || 1;
-const initialUserDataState: iUserDataProps = {
+const managerId = getCookie("id");
+const initialWarehouseDataState: iWarehouseDataProps = {
     name: "",
-    email: "",
-    gender: "M",
-    phone: "",
-    startDate: "",
-    username: "",
-    password: "",
+    address: "",
+    totalFloors: 1,
+    totalSlots: 1,
     idCreated: +managerId,
     disabled: 0,
-    idPermissions: ROLES[0].idPermissions,
 };
 
-function UserView() {
+function WarehouseView() {
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
-    const [listData, setListData] = useState<iUserItemProps[]>([
+    const [listData, setListData] = useState<iWarehouseItemProps[]>([
         {
+            idWarehouse: -1,
             name: "",
-            idUsers: -1,
-            username: "",
-            email: "",
+            address: "",
             disabled: 0,
         },
     ]);
-    const [formData, setFormData] =
-        useState<iUserDataProps>(initialUserDataState);
-    const [role, setRole] = useState(0);
+    const [formData, setFormData] = useState<iWarehouseDataProps>(
+        initialWarehouseDataState
+    );
 
     const handleSetListData = useCallback(() => {
         const jwt = getCookie("jwt");
         if (jwt) {
-            getAllUser().then((data) => setListData(data));
+            getAllWarehouses().then((data) => setListData(data));
         }
     }, []);
 
@@ -60,34 +54,32 @@ function UserView() {
 
     return (
         <>
-            <h2>Danh sách nhân viên</h2>
+            <h2>Danh sách kho hàng</h2>
 
             <Button onClick={handleToggleShowModal} className="my-3">
                 <i className="fa-solid fa-plus"></i>
                 &nbsp; Thêm mới
             </Button>
 
-            <UserModal
+            <WarehouseModal
                 show={showModal}
                 onHide={handleToggleShowModal}
                 setListData={setListData}
                 modalType={modalType}
                 formData={formData}
                 setFormData={setFormData}
-                role={role}
             />
 
-            <UserTable
+            <WarehouseTable
                 listData={listData}
                 setListData={setListData}
                 toggleShowModal={handleToggleShowModal}
                 setModalType={setModalType}
                 setFormData={setFormData}
-                setRole={setRole}
             />
         </>
     );
 }
 
-export { initialUserDataState };
-export default UserView;
+export { initialWarehouseDataState };
+export default WarehouseView;

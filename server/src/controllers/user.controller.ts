@@ -1,25 +1,14 @@
 import { validate } from 'class-validator'
 import dotenv from 'dotenv'
 import { NextFunction, Request, Response } from 'express'
-import { In, Repository } from 'typeorm'
+import { In } from 'typeorm'
 import { appDataSource } from '~/constants/appDataSource'
-import { Users } from '~/models/entities/Users'
-import authController from './auth.controller'
 import STATUS from '~/constants/statusCode'
-import { Permissions } from '~/models/entities/Permissions'
 import { PermissionDetails } from '~/models/entities/PermissionDetails'
+import { Permissions } from '~/models/entities/Permissions'
+import { Users } from '~/models/entities/Users'
 
 dotenv.config()
-
-interface iRequestUserInfo {
-  name: string
-  email: string
-  gender: 'M' | 'F' | 'O'
-  phone: string
-  startDate: string
-  username: string
-  disabled: 0 | 1
-}
 
 //use datasource
 const userRepository = appDataSource.getRepository(Users)
@@ -33,7 +22,7 @@ class UserController {
       select: ['idUsers', 'username', 'name', 'email', 'disabled']
     })
 
-    res.send(users)
+    res.status(STATUS.SUCCESS).send(users)
   }
 
   //[GET /users/:id]
@@ -68,7 +57,7 @@ class UserController {
           idUsers: user.idCreated
         }
       })
-      let updatedManager = user
+      let updatedManager = new Users()
       if (user.idUpdated) {
         updatedManager = await userRepository.findOneOrFail({
           select: ['username'],
@@ -138,11 +127,11 @@ class UserController {
       newUser = await userRepository.findOneOrFail({
         select: ['idUsers', 'name', 'gender', 'username', 'phone', 'email', 'startDate', 'disabled'],
         where: {
-          username: username
+          idUsers: user.idUsers
         }
       })
     } catch (error) {
-      res.status(404).send('Không tìm thấy người dùng')
+      res.status(STATUS.NOT_FOUND).send('Không tìm thấy người dùng')
       return
     }
 
@@ -155,7 +144,7 @@ class UserController {
       })
       const userPermissions = permissions.map((permissionId) => {
         const permission_detail = new PermissionDetails()
-        permission_detail.idUsers = newUser.idUsers
+        permission_detail.idUsers = user.idUsers
         permission_detail.idPermission = permissionId.idPermissions
 
         return permission_detail
@@ -166,7 +155,6 @@ class UserController {
       res.status(STATUS.BAD_REQUEST).send('Quyền không hợp lệ')
       return
     }
-
     res.status(STATUS.CREATED).send(newUser)
   }
 
@@ -265,6 +253,7 @@ class UserController {
       res.status(STATUS.BAD_REQUEST).send({
         error: 'Cập nhật quyền thất bại'
       })
+      return
     }
 
     //if ok
@@ -273,6 +262,7 @@ class UserController {
     })
   }
 
+  //[DELETE /:id]
   async softDeleteUserById(req: Request, res: Response, next: NextFunction) {
     const id: number = +req.params.id
 
@@ -294,11 +284,12 @@ class UserController {
     const isDisabled = user.disabled
 
     try {
-      userRepository.update(
+      await userRepository.update(
         {
           idUsers: id
         },
         {
+          // updatedAt: new Date(),
           disabled: isDisabled ? 0 : 1
         }
       )

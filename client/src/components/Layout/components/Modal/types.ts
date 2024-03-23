@@ -20,4 +20,19 @@ interface iUserDataProps {
     updatedAt?: Date;
 }
 
-export type { iModalTypes, iUserDataProps };
+interface iWarehouseDataProps {
+    idWarehouses?: number;
+    name: string;
+    address: string;
+    totalFloors: number;
+    totalSlots: number;
+    idCreated?: number;
+    usernameCreated?: string;
+    createdAt?: Date;
+    disabled: 0;
+    idUpdated?: number;
+    usernameUpdated?: string;
+    updatedAt?: Date;
+}
+
+export type { iModalTypes, iUserDataProps, iWarehouseDataProps };
