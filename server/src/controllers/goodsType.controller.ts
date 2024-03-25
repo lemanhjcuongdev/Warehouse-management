@@ -55,7 +55,8 @@ class GoodsTypeController {
     try {
       const goodsType = await goodsTypeRepo.find({
         select: ['idGoodsTypes', 'name', 'idGoodsGroup2'],
-        relations: ['idGoodsGroup2']
+        relations: ['idGoodsGroup2'],
+        withDeleted: true
       })
       res.status(STATUS.SUCCESS).send(goodsType)
     } catch (error) {
@@ -77,7 +78,8 @@ class GoodsTypeController {
         where: {
           idGoodsTypes: id
         },
-        relations: ['idGoodsGroup2']
+        relations: ['idGoodsGroup2'],
+        withDeleted: true
       })
 
       //if ok

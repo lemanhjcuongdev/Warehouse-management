@@ -37,7 +37,8 @@ class GoodsGroupController {
   async getAllGoodsGroups(req: Request, res: Response, next: NextFunction) {
     //get all goodsGroups from DB
     const goodsGroups = await goodsGroupRepo.find({
-      select: ['idGoodsGroups', 'name']
+      select: ['idGoodsGroups', 'name', 'deletedAt'],
+      withDeleted: true
     })
     res.status(STATUS.SUCCESS).send(goodsGroups)
   }
@@ -49,8 +50,11 @@ class GoodsGroupController {
 
     //get goodsGroup by id from DB
     try {
-      const goodsGroup = await goodsGroupRepo.findOneByOrFail({
-        idGoodsGroups: id
+      const goodsGroup = await goodsGroupRepo.findOneOrFail({
+        where: {
+          idGoodsGroups: id
+        },
+        withDeleted: true
       })
 
       //if ok

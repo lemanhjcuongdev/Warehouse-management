@@ -1,5 +1,4 @@
 import { Nav, NavDropdown } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
 import useGlobalState from "~/hooks/useGlobalState";
 import { actions } from "~/store";
 

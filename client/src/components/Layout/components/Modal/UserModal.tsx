@@ -406,5 +406,4 @@ function UserModal(props: {
     );
 }
 
-export type { iUserDataProps };
 export default memo(UserModal);

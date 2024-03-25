@@ -50,7 +50,6 @@ function WarehouseView() {
         setShowModal(!showModal);
         setModalType({ type: "create" });
     }, [showModal]);
-    console.log(modalType);
 
     return (
         <>

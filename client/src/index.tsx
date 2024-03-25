@@ -14,11 +14,11 @@ const root = ReactDOM.createRoot(
 );
 root.render(
     <React.StrictMode>
-        <GlobalStyles>
-            <StoreProvider>
+        <StoreProvider>
+            <GlobalStyles>
                 <App />
-            </StoreProvider>
-        </GlobalStyles>
+            </GlobalStyles>
+        </StoreProvider>
     </React.StrictMode>
 );
 

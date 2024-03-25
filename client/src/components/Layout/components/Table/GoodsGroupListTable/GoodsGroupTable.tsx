@@ -1,15 +1,15 @@
 import { Dispatch, SetStateAction, memo } from "react";
 import { Table } from "react-bootstrap";
-import { iWarehouseItemProps } from "~/views/types";
-import { iModalTypes, iWarehouseDataProps } from "../../Modal/types";
-import WarehouseTableRow from "./WarehouseTableRow";
+import { iGoodsGroupProps } from "~/views/types";
+import { iModalTypes } from "../../Modal/types";
+import GoodsGroupTableRow from "./GoodsGroupTableRow";
 
-function WarehouseTable(props: {
-    listData: iWarehouseItemProps[];
-    setListData: Dispatch<SetStateAction<iWarehouseItemProps[]>>;
+function GoodsGroupTable(props: {
+    listData: iGoodsGroupProps[];
+    setListData: Dispatch<SetStateAction<iGoodsGroupProps[]>>;
     toggleShowModal: () => void;
     setModalType: Dispatch<SetStateAction<iModalTypes>>;
-    setFormData: Dispatch<React.SetStateAction<iWarehouseDataProps>>;
+    setFormData: Dispatch<React.SetStateAction<iGoodsGroupProps>>;
 }) {
     const {
         listData,
@@ -23,15 +23,14 @@ function WarehouseTable(props: {
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Tên kho</th>
-                    <th>Địa chỉ</th>
+                    <th>Tên nhóm hàng</th>
                     <th>Trạng thái</th>
                 </tr>
             </thead>
             <tbody>
                 {listData.map((item, index) => (
-                    <WarehouseTableRow
-                        key={item.idWarehouse}
+                    <GoodsGroupTableRow
+                        key={item.idGoodsGroups}
                         item={item}
                         index={index}
                         setListData={setListData}
@@ -45,4 +44,4 @@ function WarehouseTable(props: {
     );
 }
 
-export default memo(WarehouseTable);
+export default memo(GoodsGroupTable);

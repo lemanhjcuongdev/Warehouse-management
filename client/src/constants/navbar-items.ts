@@ -49,7 +49,7 @@ const navbar_items: iNavbarItem[] = [
             },
             {
                 label: "Các thuộc tính hàng hoá",
-                to: "/",
+                to: "/list/goods-props",
             },
         ],
     },

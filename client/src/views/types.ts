@@ -13,4 +13,21 @@ interface iWarehouseItemProps {
     disabled: 0 | 1;
 }
 
-export type { iUserItemProps, iWarehouseItemProps };
+interface iGoodsGroupProps {
+    idGoodsGroups: number;
+    name: string;
+    deletedAt?: Date;
+}
+
+interface iGoodsUnitProps {
+    idGoodsUnits: number;
+    name: string;
+    deletedAt?: Date;
+}
+
+export type {
+    iUserItemProps,
+    iWarehouseItemProps,
+    iGoodsGroupProps,
+    iGoodsUnitProps,
+};

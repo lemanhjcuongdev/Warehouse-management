@@ -8,30 +8,21 @@ import {
     useRef,
     useState,
 } from "react";
-import {
-    Alert,
-    Button,
-    Col,
-    Form,
-    FormLabel,
-    Modal,
-    Row,
-} from "react-bootstrap";
+import { Alert, Button, Form, FormLabel, Modal, Row } from "react-bootstrap";
 
-import { createWarehouse, updateWarehouse } from "~/apis/warehouseAPI";
-import { getCookie } from "~/utils/cookies";
+import { createGoodsGroup, updateGoodsGroup } from "~/apis/goodsGroupAPI";
+import { initGoodsGroupData } from "~/views/GoodsPropsView/GoodsPropsView";
+import { iGoodsGroupProps } from "~/views/types";
+import { iModalTypes } from "./types";
 import stringToDate from "~/utils/stringToDate";
-import { initialWarehouseDataState } from "~/views/WarehouseView/WarehouseView";
-import { iWarehouseItemProps } from "~/views/types";
-import { iModalTypes, iWarehouseDataProps } from "./types";
 
-function WarehouseModal(props: {
+function GoodsGroupModal(props: {
     show: true | false;
     onHide: () => void;
-    setListData: Dispatch<SetStateAction<iWarehouseItemProps[]>>;
+    setListData: Dispatch<SetStateAction<iGoodsGroupProps[]>>;
     modalType: iModalTypes;
-    formData: iWarehouseDataProps;
-    setFormData: Dispatch<React.SetStateAction<iWarehouseDataProps>>;
+    formData: iGoodsGroupProps;
+    setFormData: Dispatch<React.SetStateAction<iGoodsGroupProps>>;
 }) {
     const { show, onHide, setListData, modalType, formData, setFormData } =
         props;
@@ -64,9 +55,6 @@ function WarehouseModal(props: {
 
         //trim()
         formData.name = formData.name.trim();
-        formData.address = formData.address.trim();
-        formData.totalFloors = +formData.totalFloors;
-        formData.totalSlots = +formData.totalSlots;
 
         if (form && form.checkValidity() === false) {
             setValidated(true);
@@ -84,7 +72,7 @@ function WarehouseModal(props: {
 
             //call API
             isValidated &&
-                createWarehouse(formData)
+                createGoodsGroup(formData)
                     .then((data) => {
                         data &&
                             setListData((prev) => [
@@ -105,21 +93,12 @@ function WarehouseModal(props: {
         e.preventDefault();
         e.stopPropagation();
         if (!isValidated) return;
-        const managerId = +getCookie("id");
 
-        setFormData(
-            (prev) =>
-                (prev = {
-                    ...prev,
-                    idUpdated: managerId,
-                })
-        );
-
-        updateWarehouse(formData);
+        updateGoodsGroup(formData);
     };
 
     const handleCancel = () => {
-        setFormData(initialWarehouseDataState);
+        setFormData(initGoodsGroupData);
         setValidated(false);
         onHide();
     };
@@ -133,7 +112,7 @@ function WarehouseModal(props: {
             fullscreen="sm-down"
         >
             <Modal.Header>
-                <Modal.Title>{`${title} kho hàng`}</Modal.Title>
+                <Modal.Title>{`${title} nhóm hàng`}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form
@@ -145,58 +124,13 @@ function WarehouseModal(props: {
                 >
                     <Row className="mb-3">
                         <Form.Group controlId="formGridName">
-                            <FormLabel>Tên kho hàng</FormLabel>
+                            <FormLabel>Tên nhóm hàng</FormLabel>
                             <Form.Control
                                 required
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
                                 autoComplete="off"
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                Bắt buộc nhập
-                            </Form.Control.Feedback>
-                        </Form.Group>
-                    </Row>
-                    <Row className="mb-3">
-                        <Form.Group controlId="formGridAddress">
-                            <Form.Label>Địa chỉ kho hàng</Form.Label>
-                            <Form.Control
-                                required
-                                name="address"
-                                value={formData.address}
-                                onChange={handleChange}
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                Bắt buộc nhập
-                            </Form.Control.Feedback>
-                        </Form.Group>
-                    </Row>
-                    <Row className="mb-3">
-                        <Form.Group as={Col} controlId="formGridtotalFloors">
-                            <FormLabel>Số tầng chứa</FormLabel>
-                            <Form.Control
-                                required
-                                name="totalFloors"
-                                type="number"
-                                min={1}
-                                value={formData.totalFloors}
-                                onChange={handleChange}
-                                autoComplete="off"
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                Bắt buộc nhập
-                            </Form.Control.Feedback>
-                        </Form.Group>
-                        <Form.Group as={Col} controlId="formGridtotalSlots">
-                            <Form.Label>Số kệ chứa mỗi tầng</Form.Label>
-                            <Form.Control
-                                required
-                                name="totalSlots"
-                                type="number"
-                                min={1}
-                                value={formData.totalSlots}
-                                onChange={handleChange}
                             />
                             <Form.Control.Feedback type="invalid">
                                 Bắt buộc nhập
@@ -214,20 +148,12 @@ function WarehouseModal(props: {
                     <Alert variant="info">
                         Vui lòng kiểm tra kỹ thông tin!
                     </Alert>
-                    {modalType.type === "update" && (
+                    {modalType.type === "update" && formData.deletedAt && (
                         <>
                             <Form.Text>
-                                {`Tạo lúc ${
-                                    formData.createdAt &&
-                                    stringToDate(formData.createdAt?.toString())
-                                } bởi ${formData.usernameCreated}`}
-                            </Form.Text>
-                            <br />
-                            <Form.Text>
-                                {`Sửa đổi lần cuối lúc ${
-                                    formData.updatedAt &&
-                                    stringToDate(formData.updatedAt?.toString())
-                                } bởi ${formData.usernameUpdated}`}
+                                {`Đã bị vô hiệu hoá lúc ${stringToDate(
+                                    formData.deletedAt?.toString()
+                                )}`}
                             </Form.Text>
                         </>
                     )}
@@ -259,4 +185,4 @@ function WarehouseModal(props: {
     );
 }
 
-export default memo(WarehouseModal);
+export default memo(GoodsGroupModal);

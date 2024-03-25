@@ -51,7 +51,7 @@ const getWarehouseById = async (id: number) => {
     }
 };
 
-const createWarehouse = async (userInfo: iWarehouseDataProps) => {
+const createWarehouse = async (values: iWarehouseDataProps) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -64,7 +64,7 @@ const createWarehouse = async (userInfo: iWarehouseDataProps) => {
                 "Content-Type": "application/json",
                 authorization: jwt,
             },
-            body: JSON.stringify(userInfo),
+            body: JSON.stringify(values),
         };
         const res = await fetch(`${API_ROOT}/warehouses`, init);
 
@@ -79,7 +79,7 @@ const createWarehouse = async (userInfo: iWarehouseDataProps) => {
     }
 };
 
-const updateWarehouse = async (userInfo: iWarehouseDataProps) => {
+const updateWarehouse = async (values: iWarehouseDataProps) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -92,7 +92,7 @@ const updateWarehouse = async (userInfo: iWarehouseDataProps) => {
                 "Content-Type": "application/json",
                 authorization: jwt,
             },
-            body: JSON.stringify(userInfo),
+            body: JSON.stringify(values),
         };
         const res = await fetch(`${API_ROOT}/warehouses/`, init);
 
