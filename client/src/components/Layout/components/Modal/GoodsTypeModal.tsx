@@ -10,25 +10,27 @@ import {
 } from "react";
 import { Alert, Button, Form, FormLabel, Modal, Row } from "react-bootstrap";
 
+import { createGoodsType, updateGoodsType } from "~/apis/goodsTypeAPI";
 import stringToDate from "~/utils/stringToDate";
-import { initGoodsUnitData } from "~/views/GoodsPropsView/GoodsPropsView";
-import { iGoodsUnitProps } from "~/views/types";
+import { initGoodsTypeData } from "~/views/GoodsPropsView/GoodsPropsView";
+import { iGoodsGroupProps, iGoodsTypeProps } from "~/views/types";
 import { iModalTypes } from "./types";
-import { createGoodsUnit, updateGoodsUnit } from "~/apis/goodsUnitAPI";
 
-function GoodsUnitModal(props: {
+function GoodsTypeModal(props: {
     show: true | false;
     onHide: () => void;
-    listData: iGoodsUnitProps[];
-    setListData: Dispatch<SetStateAction<iGoodsUnitProps[]>>;
+    groupListData: iGoodsGroupProps[];
+    typeListData: iGoodsTypeProps[];
+    setListData: Dispatch<SetStateAction<iGoodsTypeProps[]>>;
     modalType: iModalTypes;
-    formData: iGoodsUnitProps;
-    setFormData: Dispatch<React.SetStateAction<iGoodsUnitProps>>;
+    formData: iGoodsTypeProps;
+    setFormData: Dispatch<React.SetStateAction<iGoodsTypeProps>>;
 }) {
     const {
         show,
         onHide,
-        listData,
+        typeListData,
+        groupListData,
         setListData,
         modalType,
         formData,
@@ -47,8 +49,11 @@ function GoodsUnitModal(props: {
             break;
     }
 
-    const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const handleChange: ChangeEventHandler<
+        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    > = (e) => {
         const { value, name } = e.target;
+
         setFormData(
             (prev) =>
                 (prev = {
@@ -80,7 +85,7 @@ function GoodsUnitModal(props: {
 
             //call API
             isValidated &&
-                createGoodsUnit(formData)
+                createGoodsType(formData)
                     .then((data) => {
                         data &&
                             setListData((prev) => [
@@ -102,13 +107,21 @@ function GoodsUnitModal(props: {
         e.stopPropagation();
         if (!isValidated) return;
 
-        updateGoodsUnit(formData).then(() => {
-            listData.forEach((data, index) => {
-                if (data.idGoodsUnits === formData.idGoodsUnits) {
+        updateGoodsType(formData).then(() => {
+            typeListData.forEach((data, index) => {
+                if (data.idGoodsTypes === formData.idGoodsTypes) {
                     //deep clone
-                    const newData = [...listData];
+                    const newData = [...typeListData];
+                    let idGroup2;
+                    groupListData.forEach((group) => {
+                        if (group.idGoodsGroups === +formData.idGoodsGroup) {
+                            idGroup2 = group;
+                        }
+                    });
+
                     newData.splice(index, 1, {
                         ...data,
+                        idGoodsGroup2: idGroup2,
                         name: formData.name,
                     });
                     setListData(newData);
@@ -119,7 +132,7 @@ function GoodsUnitModal(props: {
     };
 
     const handleCancel = () => {
-        setFormData(initGoodsUnitData);
+        setFormData(initGoodsTypeData);
         setValidated(false);
         onHide();
     };
@@ -133,7 +146,7 @@ function GoodsUnitModal(props: {
             fullscreen="sm-down"
         >
             <Modal.Header>
-                <Modal.Title>{`${title} đơn vị tính hàng hoá`}</Modal.Title>
+                <Modal.Title>{`${title} loại hàng`}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form
@@ -145,7 +158,7 @@ function GoodsUnitModal(props: {
                 >
                     <Row className="mb-3">
                         <Form.Group controlId="formGridName">
-                            <FormLabel>Tên đơn vị tính</FormLabel>
+                            <FormLabel>Tên loại hàng</FormLabel>
                             <Form.Control
                                 required
                                 name="name"
@@ -153,6 +166,29 @@ function GoodsUnitModal(props: {
                                 onChange={handleChange}
                                 autoComplete="off"
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Bắt buộc nhập
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                    </Row>
+                    <Row className="mb-3">
+                        <Form.Group controlId="formGridGroup">
+                            <Form.Label>Nhóm hàng</Form.Label>
+                            <Form.Select
+                                required
+                                onChange={handleChange}
+                                name="idGoodsGroup"
+                                value={formData.idGoodsGroup}
+                            >
+                                {groupListData.map((group) => (
+                                    <option
+                                        key={group.idGoodsGroups}
+                                        value={group.idGoodsGroups}
+                                    >
+                                        {group.name}
+                                    </option>
+                                ))}
+                            </Form.Select>
                             <Form.Control.Feedback type="invalid">
                                 Bắt buộc nhập
                             </Form.Control.Feedback>
@@ -206,4 +242,4 @@ function GoodsUnitModal(props: {
     );
 }
 
-export default memo(GoodsUnitModal);
+export default memo(GoodsTypeModal);

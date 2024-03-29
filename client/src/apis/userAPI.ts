@@ -1,7 +1,6 @@
 import { API_ROOT } from "~/constants";
-import { iUserItemProps } from "~/views/types";
+import { iUserDataProps, iUserItemProps } from "~/views/types";
 import { getCookie } from "~/utils/cookies";
-import { iUserDataProps } from "~/components/Layout/components/Modal/types";
 
 const getAllUser = async () => {
     try {

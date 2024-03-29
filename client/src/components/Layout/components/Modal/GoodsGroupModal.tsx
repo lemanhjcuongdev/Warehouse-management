@@ -19,13 +19,21 @@ import stringToDate from "~/utils/stringToDate";
 function GoodsGroupModal(props: {
     show: true | false;
     onHide: () => void;
+    listData: iGoodsGroupProps[];
     setListData: Dispatch<SetStateAction<iGoodsGroupProps[]>>;
     modalType: iModalTypes;
     formData: iGoodsGroupProps;
     setFormData: Dispatch<React.SetStateAction<iGoodsGroupProps>>;
 }) {
-    const { show, onHide, setListData, modalType, formData, setFormData } =
-        props;
+    const {
+        show,
+        onHide,
+        listData,
+        setListData,
+        modalType,
+        formData,
+        setFormData,
+    } = props;
     const [validated, setValidated] = useState(false);
     const formRef = useRef<HTMLFormElement>(null);
     let title: string;
@@ -74,13 +82,7 @@ function GoodsGroupModal(props: {
             isValidated &&
                 createGoodsGroup(formData)
                     .then((data) => {
-                        data &&
-                            setListData((prev) => [
-                                ...prev,
-                                {
-                                    ...data,
-                                },
-                            ]);
+                        data && setListData((prev) => [...prev, data]);
                         !data.error && handleCancel();
                     })
                     .catch((error) => console.log(error));
@@ -94,7 +96,20 @@ function GoodsGroupModal(props: {
         e.stopPropagation();
         if (!isValidated) return;
 
-        updateGoodsGroup(formData);
+        updateGoodsGroup(formData).then(() => {
+            listData.forEach((data, index) => {
+                if (data.idGoodsGroups === formData.idGoodsGroups) {
+                    //deep clone
+                    const newData = [...listData];
+                    newData.splice(index, 1, {
+                        ...data,
+                        name: formData.name,
+                    });
+                    setListData(newData);
+                }
+            });
+        });
+        handleCancel();
     };
 
     const handleCancel = () => {

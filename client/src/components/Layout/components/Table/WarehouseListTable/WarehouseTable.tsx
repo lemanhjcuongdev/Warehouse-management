@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, memo } from "react";
 import { Table } from "react-bootstrap";
-import { iWarehouseItemProps } from "~/views/types";
-import { iModalTypes, iWarehouseDataProps } from "../../Modal/types";
+import { iWarehouseDataProps, iWarehouseItemProps } from "~/views/types";
+import { iModalTypes } from "../../Modal/types";
 import WarehouseTableRow from "./WarehouseTableRow";
 
 function WarehouseTable(props: {
@@ -34,10 +34,7 @@ function WarehouseTable(props: {
                         key={item.idWarehouse}
                         item={item}
                         index={index}
-                        setListData={setListData}
-                        toggleShowModal={toggleShowModal}
-                        setModalType={setModalType}
-                        setFormData={setFormData}
+                        {...props}
                     />
                 ))}
             </tbody>

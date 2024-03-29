@@ -54,7 +54,7 @@ class GoodsTypeController {
     //get all goodsType from DB
     try {
       const goodsType = await goodsTypeRepo.find({
-        select: ['idGoodsTypes', 'name', 'idGoodsGroup2'],
+        select: ['idGoodsTypes', 'name', 'idGoodsGroup', 'idGoodsGroup2', 'deletedAt'],
         relations: ['idGoodsGroup2'],
         withDeleted: true
       })
@@ -74,7 +74,7 @@ class GoodsTypeController {
     //get goodsType by id from DB
     try {
       const goodsType = await goodsTypeRepo.findOneOrFail({
-        select: ['idGoodsTypes', 'name', 'idGoodsGroup2'],
+        select: ['idGoodsTypes', 'name', 'idGoodsGroup', 'idGoodsGroup2', 'deletedAt'],
         where: {
           idGoodsTypes: id
         },

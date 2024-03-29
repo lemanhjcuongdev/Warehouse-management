@@ -2,13 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { getAllUser } from "~/apis/userAPI";
 import UserModal from "~/components/Layout/components/Modal/UserModal";
-import {
-    iModalTypes,
-    iUserDataProps,
-} from "~/components/Layout/components/Modal/types";
+import { iModalTypes } from "~/components/Layout/components/Modal/types";
 import UserTable from "~/components/Layout/components/Table/ListUserTable/UserTable";
 import ROLES from "~/constants/roles";
-import { iUserItemProps } from "~/views/types";
+import { iUserDataProps, iUserItemProps } from "~/views/types";
 import { getCookie } from "~/utils/cookies";
 
 const managerId = getCookie("id") || 1;
@@ -31,9 +28,8 @@ function UserView() {
     const [listData, setListData] = useState<iUserItemProps[]>([
         {
             name: "",
-            idUsers: -1,
+            idUsers: 1,
             username: "",
-            email: "",
             disabled: 0,
         },
     ]);
@@ -69,6 +65,7 @@ function UserView() {
             <UserModal
                 show={showModal}
                 onHide={handleToggleShowModal}
+                listData={listData}
                 setListData={setListData}
                 modalType={modalType}
                 formData={formData}

@@ -37,9 +37,9 @@ const initGoodsTypeData: iGoodsTypeProps = {
     deletedAt: new Date(),
 };
 
-function GoodsPropsView() {
+function ImportOrderView() {
     //SHARED PROPS
-    const [key, setKey] = useState("goods-groups");
+    const [key, setKey] = useState("in-process");
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
 
@@ -67,14 +67,13 @@ function GoodsPropsView() {
         const jwt = getCookie("jwt");
         if (jwt) {
             switch (key) {
-                case "goods-groups":
+                case "in-process":
                     getAllGoodsGroups().then((data) => setGroupListData(data));
                     break;
-                case "goods-units":
-                    getAllGoodsUnits().then((data) => setUnitListData(data));
-                    break;
-                case "goods-types":
+                case "finished":
                     getAllGoodsTypes().then((data) => setTypeListData(data));
+                    break;
+                case "failed":
                     break;
             }
         }
@@ -91,10 +90,10 @@ function GoodsPropsView() {
 
     return (
         <>
-            <h2>Danh sách các thuộc tính hàng hoá</h2>
+            <h2>Danh sách đơn nhập hàng</h2>
 
             <Tabs
-                defaultActiveKey="goods-groups"
+                defaultActiveKey="in-process"
                 activeKey={key}
                 id="fill-tabs"
                 className="my-3"
@@ -105,8 +104,8 @@ function GoodsPropsView() {
                     key && setKey(key);
                 }}
             >
-                <Tab eventKey="goods-groups" title="Nhóm hàng">
-                    {key === "goods-groups" && (
+                <Tab eventKey="in-process" title="Đang xử lý">
+                    {key === "in-process" && (
                         <>
                             <Button
                                 onClick={handleToggleShowModal}
@@ -136,17 +135,9 @@ function GoodsPropsView() {
                         </>
                     )}
                 </Tab>
-                <Tab eventKey="goods-types" title="Loại hàng">
-                    {key === "goods-types" && (
+                <Tab eventKey="finished" title="Đã hoàn thành">
+                    {key === "finished" && (
                         <>
-                            <Button
-                                onClick={handleToggleShowModal}
-                                className="my-3"
-                            >
-                                <i className="fa-solid fa-plus"></i>
-                                &nbsp; Thêm mới
-                            </Button>
-
                             <GoodsTypeModal
                                 show={showModal}
                                 onHide={handleToggleShowModal}
@@ -168,17 +159,9 @@ function GoodsPropsView() {
                         </>
                     )}
                 </Tab>
-                <Tab eventKey="goods-units" title="Đơn vị tính">
-                    {key === "goods-units" && (
+                <Tab eventKey="failed" title="Đơn vị tính">
+                    {key === "failed" && (
                         <>
-                            <Button
-                                onClick={handleToggleShowModal}
-                                className="my-3"
-                            >
-                                <i className="fa-solid fa-plus"></i>
-                                &nbsp; Thêm mới
-                            </Button>
-
                             <GoodsUnitModal
                                 show={showModal}
                                 onHide={handleToggleShowModal}
@@ -205,4 +188,4 @@ function GoodsPropsView() {
 }
 
 export { initGoodsGroupData, initGoodsUnitData, initGoodsTypeData };
-export default GoodsPropsView;
+export default ImportOrderView;

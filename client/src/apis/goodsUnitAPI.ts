@@ -93,7 +93,10 @@ const updateGoodsUnit = async (values: iGoodsUnitProps) => {
             },
             body: JSON.stringify(values),
         };
-        const res = await fetch(`${API_ROOT}/goods/units/`, init);
+        const res = await fetch(
+            `${API_ROOT}/goods/units/${values.idGoodsUnits}`,
+            init
+        );
 
         const data = await res.json();
         if (data.error) {

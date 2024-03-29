@@ -15,6 +15,6 @@ export class GoodsUnits {
   })
   deletedAt: Date
 
-  @OneToMany(() => Goods, (goods) => goods.idUnits2)
+  @OneToMany(() => Goods, (goods) => goods.idUnit2)
   goods: Goods[]
 }

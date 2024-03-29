@@ -14,8 +14,8 @@ const navbar_items: iNavbarItem[] = [
                 to: "/list/warehouses",
             },
             {
-                label: "Đặt hàng từ NCC",
-                to: "/",
+                label: "Nhập hàng từ NCC",
+                to: "/list/import-orders",
             },
             {
                 label: "Nhập kho",
@@ -26,7 +26,7 @@ const navbar_items: iNavbarItem[] = [
                 to: "/",
             },
             {
-                label: "Xử lý hàng",
+                label: "Xử lý đơn hàng",
                 to: "/",
             },
             {
@@ -41,7 +41,7 @@ const navbar_items: iNavbarItem[] = [
         children: [
             {
                 label: "Nhà cung cấp",
-                to: "/",
+                to: "/list/providers",
             },
             {
                 label: "Hàng hoá",

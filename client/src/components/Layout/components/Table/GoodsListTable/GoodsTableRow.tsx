@@ -1,16 +1,17 @@
 import { Dispatch, SetStateAction, memo, useCallback } from "react";
 import { Badge, ButtonGroup, Dropdown } from "react-bootstrap";
-import { getWarehouseById, softDeleteWarehouse } from "~/apis/warehouseAPI";
-import { iWarehouseDataProps, iWarehouseItemProps } from "~/views/types";
 import { iModalTypes } from "../../Modal/types";
+import { iGoodsItemProps, iGoodsProps } from "~/views/types";
+import { getGoodsById, softDeleteGoods } from "~/apis/goodsAPI";
+import stringToDate from "~/utils/stringToDate";
 
-function WarehouseTableRow(props: {
-    item: iWarehouseItemProps;
-    setListData: Dispatch<SetStateAction<iWarehouseItemProps[]>>;
+function GoodsTableRow(props: {
+    item: iGoodsItemProps;
+    setListData: Dispatch<SetStateAction<iGoodsItemProps[]>>;
     index: number;
     toggleShowModal: () => void;
     setModalType: Dispatch<SetStateAction<iModalTypes>>;
-    setFormData: Dispatch<React.SetStateAction<iWarehouseDataProps>>;
+    setFormData: Dispatch<React.SetStateAction<iGoodsProps>>;
 }) {
     const {
         item,
@@ -22,10 +23,8 @@ function WarehouseTableRow(props: {
     } = props;
 
     const handleReadOrUpdate = async () => {
-        const warehouseInfo: iWarehouseDataProps = await getWarehouseById(
-            item.idWarehouse
-        );
-        setFormData(warehouseInfo);
+        const goodsInfo: iGoodsProps = await getGoodsById(item.idGoods);
+        setFormData(goodsInfo);
 
         toggleShowModal();
         setModalType({ type: "update" });
@@ -39,7 +38,7 @@ function WarehouseTableRow(props: {
                 : `Bạn có chắc muốn vô hiệu hoá kho hàng "${item.name}"?`;
             const confirmDialog = windowObject.confirm(message);
             if (confirmDialog) {
-                softDeleteWarehouse(id)
+                softDeleteGoods(id)
                     .then(() => {
                         setListData((prev) => {
                             //deep clone
@@ -65,9 +64,9 @@ function WarehouseTableRow(props: {
             }}
             onClick={() => handleReadOrUpdate()}
         >
-            <td>{item.idWarehouse}</td>
+            <td>{item.idGoods}</td>
             <td>{item.name}</td>
-            <td>{item.address}</td>
+            <td>{stringToDate(item.exp.toString())}</td>
             <td className="d-flex justify-content-between align-items-center">
                 <div>
                     <Badge
@@ -89,7 +88,7 @@ function WarehouseTableRow(props: {
                     />
                     <Dropdown.Menu>
                         <Dropdown.Item onClick={() => handleReadOrUpdate()}>
-                            <i className="fa-solid fa-warehouse"></i>
+                            <i className="fa-solid fa-box"></i>
                             &nbsp; Xem thông tin chi tiết
                         </Dropdown.Item>
                         <Dropdown.Item onClick={() => handleReadOrUpdate()}>
@@ -97,7 +96,7 @@ function WarehouseTableRow(props: {
                             &nbsp; Cập nhật thông tin
                         </Dropdown.Item>
                         <Dropdown.Item
-                            onClick={() => handleDelete(item.idWarehouse)}
+                            onClick={() => handleDelete(item.idGoods)}
                         >
                             <i
                                 className={
@@ -116,4 +115,4 @@ function WarehouseTableRow(props: {
     );
 }
 
-export default memo(WarehouseTableRow);
+export default memo(GoodsTableRow);

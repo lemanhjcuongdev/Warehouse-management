@@ -9,7 +9,7 @@ import { ImportOrderDetails } from './ImportOrderDetails'
 import { StocktakingDetails } from './StocktakingDetails'
 
 @Index('FK_goods_type_idx', ['idType'], {})
-@Index('FK_goods_unit_idx', ['idUnits'], {})
+@Index('FK_goods_unit_idx', ['idUnit'], {})
 @Index('FK_goods_warehouse_idx', ['idWarehouse'], {})
 @Entity('goods', { schema: 'quanlykho' })
 export class Goods {
@@ -19,8 +19,8 @@ export class Goods {
   @Column('int', { name: 'id_type' })
   idType: number
 
-  @Column('int', { name: 'id_units' })
-  idUnits: number
+  @Column('int', { name: 'id_unit' })
+  idUnit: number
 
   @Column('int', { name: 'id_warehouse' })
   idWarehouse: number
@@ -85,8 +85,8 @@ export class Goods {
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION'
   })
-  @JoinColumn([{ name: 'id_units', referencedColumnName: 'idGoodsUnits' }])
-  idUnits2: GoodsUnits
+  @JoinColumn([{ name: 'id_unit', referencedColumnName: 'idGoodsUnits' }])
+  idUnit2: GoodsUnits
 
   @ManyToOne(() => Warehouses, (warehouses) => warehouses.goods, {
     onDelete: 'NO ACTION',

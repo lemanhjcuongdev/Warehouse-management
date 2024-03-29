@@ -46,9 +46,7 @@ function GoodsUnitTableRow(props: {
                             data.splice(index, 1, {
                                 ...item,
                                 deletedAt:
-                                    item.deletedAt === null
-                                        ? new Date()
-                                        : undefined,
+                                    item.deletedAt === null ? new Date() : null,
                             });
                             return data;
                         });
@@ -105,9 +103,7 @@ function GoodsUnitTableRow(props: {
                                 }
                             ></i>
                             &nbsp;
-                            {item.deletedAt !== null
-                                ? "Kích hoạt lại"
-                                : "Vô hiệu hoá"}
+                            {item.deletedAt ? "Kích hoạt lại" : "Vô hiệu hoá"}
                         </Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>

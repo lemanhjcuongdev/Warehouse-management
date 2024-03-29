@@ -1,41 +1,31 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
-import { getAllWarehouses } from "~/apis/warehouseAPI";
-import WarehouseModal from "~/components/Layout/components/Modal/WarehouseModal";
+import ProviderModal from "~/components/Layout/components/Modal/ProviderModal";
 import { iModalTypes } from "~/components/Layout/components/Modal/types";
-import WarehouseTable from "~/components/Layout/components/Table/WarehouseListTable/WarehouseTable";
 import { getCookie } from "~/utils/cookies";
-import { iWarehouseDataProps, iWarehouseItemProps } from "~/views/types";
+import { iProviderProps } from "../types";
+import { getAllProviders } from "~/apis/providerAPI";
+import ProviderTable from "~/components/Layout/components/Table/ProviderListTable/ProviderTable";
 
-const managerId = getCookie("id");
-const initialWarehouseDataState: iWarehouseDataProps = {
+const initProviderData: iProviderProps = {
+    idProviders: 1,
     name: "",
     address: "",
-    totalFloors: 1,
-    totalSlots: 1,
-    idCreated: +managerId,
-    disabled: 0,
+    deletedAt: new Date(),
 };
 
-function WarehouseView() {
+function ProviderView() {
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
-    const [listData, setListData] = useState<iWarehouseItemProps[]>([
-        {
-            idWarehouse: -1,
-            name: "",
-            address: "",
-            disabled: 0,
-        },
+    const [listData, setListData] = useState<iProviderProps[]>([
+        initProviderData,
     ]);
-    const [formData, setFormData] = useState<iWarehouseDataProps>(
-        initialWarehouseDataState
-    );
+    const [formData, setFormData] = useState<iProviderProps>(initProviderData);
 
     const handleSetListData = useCallback(() => {
         const jwt = getCookie("jwt");
         if (jwt) {
-            getAllWarehouses().then((data) => setListData(data));
+            getAllProviders().then((data) => setListData(data));
         }
     }, []);
 
@@ -50,14 +40,14 @@ function WarehouseView() {
 
     return (
         <>
-            <h2>Danh sách kho hàng</h2>
+            <h2>Danh sách nhà cung cấp</h2>
 
             <Button onClick={handleToggleShowModal} className="my-3">
                 <i className="fa-solid fa-plus"></i>
                 &nbsp; Thêm mới
             </Button>
 
-            <WarehouseModal
+            <ProviderModal
                 show={showModal}
                 onHide={handleToggleShowModal}
                 listData={listData}
@@ -67,7 +57,7 @@ function WarehouseView() {
                 setFormData={setFormData}
             />
 
-            <WarehouseTable
+            <ProviderTable
                 listData={listData}
                 setListData={setListData}
                 toggleShowModal={handleToggleShowModal}
@@ -78,5 +68,5 @@ function WarehouseView() {
     );
 }
 
-export { initialWarehouseDataState };
-export default WarehouseView;
+export { initProviderData };
+export default ProviderView;

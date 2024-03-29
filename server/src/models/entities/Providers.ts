@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { ImportOrders } from './ImportOrders'
 import { ImportReceipts } from './ImportReceipts'
 
@@ -12,6 +12,12 @@ export class Providers {
 
   @Column('varchar', { name: 'address', nullable: true, length: 200 })
   address: string | null
+
+  @DeleteDateColumn({
+    type: 'datetime',
+    name: 'deleted_at'
+  })
+  deletedAt: Date
 
   @OneToMany(() => ImportOrders, (importOrders) => importOrders.idProvider2)
   importOrders: ImportOrders[]

@@ -11,19 +11,19 @@ import {
 import { Alert, Button, Form, FormLabel, Modal, Row } from "react-bootstrap";
 
 import stringToDate from "~/utils/stringToDate";
-import { initGoodsUnitData } from "~/views/GoodsPropsView/GoodsPropsView";
-import { iGoodsUnitProps } from "~/views/types";
 import { iModalTypes } from "./types";
-import { createGoodsUnit, updateGoodsUnit } from "~/apis/goodsUnitAPI";
+import { iProviderProps } from "~/views/types";
+import { createProvider, updateProvider } from "~/apis/providerAPI";
+import { initProviderData } from "~/views/ProviderView/ProviderView";
 
-function GoodsUnitModal(props: {
+function ProviderModal(props: {
     show: true | false;
     onHide: () => void;
-    listData: iGoodsUnitProps[];
-    setListData: Dispatch<SetStateAction<iGoodsUnitProps[]>>;
+    listData: iProviderProps[];
+    setListData: Dispatch<SetStateAction<iProviderProps[]>>;
     modalType: iModalTypes;
-    formData: iGoodsUnitProps;
-    setFormData: Dispatch<React.SetStateAction<iGoodsUnitProps>>;
+    formData: iProviderProps;
+    setFormData: Dispatch<React.SetStateAction<iProviderProps>>;
 }) {
     const {
         show,
@@ -63,6 +63,7 @@ function GoodsUnitModal(props: {
 
         //trim()
         formData.name = formData.name.trim();
+        formData.address = formData.address.trim();
 
         if (form && form.checkValidity() === false) {
             setValidated(true);
@@ -80,15 +81,9 @@ function GoodsUnitModal(props: {
 
             //call API
             isValidated &&
-                createGoodsUnit(formData)
+                createProvider(formData)
                     .then((data) => {
-                        data &&
-                            setListData((prev) => [
-                                ...prev,
-                                {
-                                    ...data,
-                                },
-                            ]);
+                        data && setListData((prev) => [...prev, data]);
                         !data.error && handleCancel();
                     })
                     .catch((error) => console.log(error));
@@ -102,14 +97,15 @@ function GoodsUnitModal(props: {
         e.stopPropagation();
         if (!isValidated) return;
 
-        updateGoodsUnit(formData).then(() => {
+        updateProvider(formData).then(() => {
             listData.forEach((data, index) => {
-                if (data.idGoodsUnits === formData.idGoodsUnits) {
+                if (data.idProviders === formData.idProviders) {
                     //deep clone
                     const newData = [...listData];
                     newData.splice(index, 1, {
                         ...data,
                         name: formData.name,
+                        address: formData.address,
                     });
                     setListData(newData);
                 }
@@ -119,7 +115,7 @@ function GoodsUnitModal(props: {
     };
 
     const handleCancel = () => {
-        setFormData(initGoodsUnitData);
+        setFormData(initProviderData);
         setValidated(false);
         onHide();
     };
@@ -145,11 +141,26 @@ function GoodsUnitModal(props: {
                 >
                     <Row className="mb-3">
                         <Form.Group controlId="formGridName">
-                            <FormLabel>Tên đơn vị tính</FormLabel>
+                            <FormLabel>Tên nhà cung cấp</FormLabel>
                             <Form.Control
                                 required
                                 name="name"
                                 value={formData.name}
+                                onChange={handleChange}
+                                autoComplete="off"
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                Bắt buộc nhập
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                    </Row>
+                    <Row className="mb-3">
+                        <Form.Group controlId="formGridAddress">
+                            <FormLabel>Địa chỉ nhà cung cấp</FormLabel>
+                            <Form.Control
+                                required
+                                name="address"
+                                value={formData.address}
                                 onChange={handleChange}
                                 autoComplete="off"
                             />
@@ -206,4 +217,4 @@ function GoodsUnitModal(props: {
     );
 }
 
-export default memo(GoodsUnitModal);
+export default memo(ProviderModal);

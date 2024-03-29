@@ -1,4 +1,5 @@
 import express from 'express'
+import goodsController from '~/controllers/goods.controller'
 import goodsGroupController from '~/controllers/goodsGroup.controller'
 import goodsTypeController from '~/controllers/goodsType.controller'
 import goodsUnitController from '~/controllers/goodsUnit.controller'
@@ -27,4 +28,10 @@ goodsRouter.get('/units/:id', [checkJwt], goodsUnitController.getGoodsUnitById)
 goodsRouter.patch('/units/:id', [checkJwt], goodsUnitController.editGoodsUnitById)
 goodsRouter.delete('/units/:id', [checkJwt], goodsUnitController.softDeleteGoodsUnitById)
 
+//goods
+goodsRouter.post('/', goodsController.createGoods)
+goodsRouter.get('/', goodsController.getAllGoods)
+goodsRouter.get('/:id', goodsController.getGoodsById)
+goodsRouter.patch('/:id', goodsController.editGoodsById)
+goodsRouter.delete('/:id', goodsController.softDeleteGoodsById)
 export default goodsRouter

@@ -44,11 +44,32 @@ class WarehouseController {
   async getAllWarehouses(req: Request, res: Response, next: NextFunction) {
     //get all warehouses from DB
     const warehouses = await whRepo.find({
-      select: ['idWarehouse', 'name', 'address', 'disabled']
+      select: ['idWarehouse', 'name', 'address', 'totalFloors', 'totalSlots', 'disabled']
     })
     res.status(STATUS.SUCCESS).send(warehouses)
   }
 
+  //[GET /warehouses/empty-slots/:id]
+  async getWarehouseSlots(req: Request, res: Response, next: NextFunction) {
+    //get id from query string
+    const id = +req.params.id
+    //get warehouse by id from DB
+    try {
+      const warehouse = await whRepo.findOneOrFail({
+        select: ['idWarehouse', 'totalFloors', 'totalSlots', 'goods'],
+        where: {
+          idWarehouse: id
+        },
+        relations: ['goods']
+      })
+      //if ok
+      res.status(STATUS.SUCCESS).send(warehouse)
+    } catch (error) {
+      res.status(STATUS.NOT_FOUND).send({
+        error: 'Không tìm thấy kho'
+      })
+    }
+  }
   //[GET /warehouses/:id]
   async getWarehouseById(req: Request, res: Response, next: NextFunction) {
     //get id from query string

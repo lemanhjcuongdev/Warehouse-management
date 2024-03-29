@@ -1,30 +1,31 @@
 import { Dispatch, SetStateAction, memo } from "react";
 import { Table } from "react-bootstrap";
-import { iGoodsUnitProps } from "~/views/types";
+import { iGoodsItemProps, iGoodsProps } from "~/views/types";
 import { iModalTypes } from "../../Modal/types";
-import GoodsUnitTableRow from "./GoodsUnitTableRow";
+import GoodsTableRow from "./GoodsTableRow";
 
-function GoodsUnitTable(props: {
-    listData: iGoodsUnitProps[];
-    setListData: Dispatch<SetStateAction<iGoodsUnitProps[]>>;
+function GoodsTable(props: {
+    listData: iGoodsItemProps[];
+    setListData: Dispatch<SetStateAction<iGoodsItemProps[]>>;
     toggleShowModal: () => void;
     setModalType: Dispatch<SetStateAction<iModalTypes>>;
-    setFormData: Dispatch<React.SetStateAction<iGoodsUnitProps>>;
+    setFormData: Dispatch<React.SetStateAction<iGoodsProps>>;
 }) {
     const { listData } = props;
     return (
-        <Table striped bordered hover>
+        <Table striped bordered hover responsive="md">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Tên đơn vị tính</th>
+                    <th>Tên hàng</th>
+                    <th>Hạn sử dụng</th>
                     <th>Trạng thái</th>
                 </tr>
             </thead>
             <tbody>
                 {listData.map((item, index) => (
-                    <GoodsUnitTableRow
-                        key={item.idGoodsUnits}
+                    <GoodsTableRow
+                        key={item.idGoods}
                         item={item}
                         index={index}
                         {...props}
@@ -35,4 +36,4 @@ function GoodsUnitTable(props: {
     );
 }
 
-export default memo(GoodsUnitTable);
+export default memo(GoodsTable);

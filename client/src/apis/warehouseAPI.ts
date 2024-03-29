@@ -1,7 +1,10 @@
-import { iWarehouseDataProps } from "~/components/Layout/components/Modal/types";
 import { API_ROOT } from "~/constants";
 import { getCookie } from "~/utils/cookies";
-import { iWarehouseItemProps } from "~/views/types";
+import {
+    iGoodsProps,
+    iWarehouseDataProps,
+    iWarehouseItemProps,
+} from "~/views/types";
 
 const getAllWarehouses = async () => {
     try {
@@ -41,6 +44,37 @@ const getWarehouseById = async (id: number) => {
         };
         const res = await fetch(`${API_ROOT}/warehouses/${id}`, init);
         const data = await res.json();
+        if (data.error) {
+            throw new Error(data.error);
+        }
+
+        return data;
+    } catch (error) {
+        return error;
+    }
+};
+
+const getWarehouseSlotsById = async (id: number) => {
+    try {
+        const jwt = getCookie("jwt");
+        if (!jwt) {
+            throw new Error("Hết phiên đăng nhập");
+        }
+        const init: RequestInit = {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: jwt,
+            },
+        };
+        const res = await fetch(`${API_ROOT}/warehouses/slots/${id}`, init);
+        const data: {
+            idWarehouse: number;
+            totalFloors: number;
+            totalSlots: number;
+            goods: iGoodsProps[];
+            error?: string;
+        } = await res.json();
         if (data.error) {
             throw new Error(data.error);
         }
@@ -94,7 +128,10 @@ const updateWarehouse = async (values: iWarehouseDataProps) => {
             },
             body: JSON.stringify(values),
         };
-        const res = await fetch(`${API_ROOT}/warehouses/`, init);
+        const res = await fetch(
+            `${API_ROOT}/warehouses/${values.idWarehouse}`,
+            init
+        );
 
         const data = await res.json();
         if (data.error) {
@@ -138,6 +175,7 @@ export {
     createWarehouse,
     getAllWarehouses,
     getWarehouseById,
+    getWarehouseSlotsById,
     softDeleteWarehouse,
     updateWarehouse,
 };

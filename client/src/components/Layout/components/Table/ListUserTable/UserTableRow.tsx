@@ -1,8 +1,8 @@
 import { Dispatch, SetStateAction, memo, useCallback } from "react";
 import { Badge, ButtonGroup, Dropdown } from "react-bootstrap";
 import { getUserById, softDeleteUser } from "~/apis/userAPI";
-import { iUserItemProps } from "~/views/types";
-import { iModalTypes, iUserDataProps } from "../../Modal/types";
+import { iUserDataProps, iUserItemProps } from "~/views/types";
+import { iModalTypes } from "../../Modal/types";
 import ROLES from "~/constants/roles";
 
 function UserTableRow(props: {

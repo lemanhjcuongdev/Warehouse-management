@@ -22,19 +22,27 @@ import { createWarehouse, updateWarehouse } from "~/apis/warehouseAPI";
 import { getCookie } from "~/utils/cookies";
 import stringToDate from "~/utils/stringToDate";
 import { initialWarehouseDataState } from "~/views/WarehouseView/WarehouseView";
-import { iWarehouseItemProps } from "~/views/types";
-import { iModalTypes, iWarehouseDataProps } from "./types";
+import { iWarehouseItemProps, iWarehouseDataProps } from "~/views/types";
+import { iModalTypes } from "./types";
 
 function WarehouseModal(props: {
     show: true | false;
     onHide: () => void;
+    listData: iWarehouseItemProps[];
     setListData: Dispatch<SetStateAction<iWarehouseItemProps[]>>;
     modalType: iModalTypes;
     formData: iWarehouseDataProps;
     setFormData: Dispatch<React.SetStateAction<iWarehouseDataProps>>;
 }) {
-    const { show, onHide, setListData, modalType, formData, setFormData } =
-        props;
+    const {
+        show,
+        onHide,
+        listData,
+        setListData,
+        modalType,
+        formData,
+        setFormData,
+    } = props;
     const [validated, setValidated] = useState(false);
     const formRef = useRef<HTMLFormElement>(null);
     let title: string;
@@ -115,7 +123,22 @@ function WarehouseModal(props: {
                 })
         );
 
-        updateWarehouse(formData);
+        updateWarehouse(formData).then(() => {
+            listData.forEach((data, index) => {
+                if (data.idWarehouse === formData.idWarehouse) {
+                    //deep clone
+                    const newData = [...listData];
+                    newData.splice(index, 1, {
+                        ...data,
+                        name: formData.name,
+                        address: formData.address,
+                        disabled: formData.disabled,
+                    });
+                    setListData(newData);
+                }
+            });
+        });
+        handleCancel();
     };
 
     const handleCancel = () => {

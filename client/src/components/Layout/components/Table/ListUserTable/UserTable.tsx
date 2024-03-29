@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, memo } from "react";
 import { Table } from "react-bootstrap";
-import { iUserItemProps } from "~/views/types";
-import { iModalTypes, iUserDataProps } from "../../Modal/types";
+import { iUserItemProps, iUserDataProps } from "~/views/types";
+import { iModalTypes } from "../../Modal/types";
 import UserTableRow from "./UserTableRow";
 
 function UserTable(props: {

@@ -1,8 +1,8 @@
 import { API_ROOT } from "~/constants";
 import { getCookie } from "~/utils/cookies";
-import { iGoodsGroupProps } from "~/views/types";
+import { iGoodsItemProps, iGoodsProps } from "~/views/types";
 
-const getAllGoodsGroups = async () => {
+const getAllGoods = async () => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -16,8 +16,8 @@ const getAllGoodsGroups = async () => {
             },
         };
 
-        const res = await fetch(`${API_ROOT}/goods/groups`, init);
-        const data: iGoodsGroupProps[] = await res.json();
+        const res = await fetch(`${API_ROOT}/goods`, init);
+        const data: iGoodsItemProps[] = await res.json();
 
         return data;
     } catch (error) {
@@ -25,7 +25,7 @@ const getAllGoodsGroups = async () => {
     }
 };
 
-const getGoodsGroupById = async (id: number) => {
+const getGoodsById = async (id: number) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -38,7 +38,7 @@ const getGoodsGroupById = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/goods/groups/${id}`, init);
+        const res = await fetch(`${API_ROOT}/goods/${id}`, init);
         const data = await res.json();
         if (data.error) {
             throw new Error(data.error);
@@ -50,7 +50,7 @@ const getGoodsGroupById = async (id: number) => {
     }
 };
 
-const createGoodsGroup = async (values: iGoodsGroupProps) => {
+const createGoods = async (values: iGoodsProps) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -65,7 +65,7 @@ const createGoodsGroup = async (values: iGoodsGroupProps) => {
             },
             body: JSON.stringify(values),
         };
-        const res = await fetch(`${API_ROOT}/goods/groups`, init);
+        const res = await fetch(`${API_ROOT}/goods`, init);
 
         const data = await res.json();
         if (data.error) {
@@ -78,7 +78,7 @@ const createGoodsGroup = async (values: iGoodsGroupProps) => {
     }
 };
 
-const updateGoodsGroup = async (values: iGoodsGroupProps) => {
+const updateGoods = async (values: iGoodsProps) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -93,10 +93,7 @@ const updateGoodsGroup = async (values: iGoodsGroupProps) => {
             },
             body: JSON.stringify(values),
         };
-        const res = await fetch(
-            `${API_ROOT}/goods/groups/${values.idGoodsGroups}`,
-            init
-        );
+        const res = await fetch(`${API_ROOT}/goods/${values.idGoods}`, init);
 
         const data = await res.json();
         if (data.error) {
@@ -109,7 +106,7 @@ const updateGoodsGroup = async (values: iGoodsGroupProps) => {
     }
 };
 
-const softDeleteGoodsGroup = async (id: number) => {
+const softDeleteGoods = async (id: number) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -123,7 +120,7 @@ const softDeleteGoodsGroup = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/goods/groups/${id}`, init);
+        const res = await fetch(`${API_ROOT}/goods/${id}`, init);
 
         const data = await res.json();
         if (data && data.error) {
@@ -136,10 +133,4 @@ const softDeleteGoodsGroup = async (id: number) => {
     }
 };
 
-export {
-    createGoodsGroup,
-    getAllGoodsGroups,
-    getGoodsGroupById,
-    softDeleteGoodsGroup,
-    updateGoodsGroup,
-};
+export { createGoods, getAllGoods, getGoodsById, softDeleteGoods, updateGoods };

@@ -20,15 +20,16 @@ import {
 
 import { createUser, updateUser } from "~/apis/userAPI";
 import ROLES from "~/constants/roles";
-import { iUserItemProps } from "~/views/types";
+import { iUserDataProps, iUserItemProps } from "~/views/types";
 import { getCookie } from "~/utils/cookies";
 import stringToDate from "~/utils/stringToDate";
 import { initialUserDataState } from "~/views/UserView/UserView";
-import { iModalTypes, iUserDataProps } from "./types";
+import { iModalTypes } from "./types";
 
 function UserModal(props: {
     show: true | false;
     onHide: () => void;
+    listData: iUserItemProps[];
     setListData: Dispatch<SetStateAction<iUserItemProps[]>>;
     modalType: iModalTypes;
     formData: iUserDataProps;
@@ -38,6 +39,7 @@ function UserModal(props: {
     const {
         show,
         onHide,
+        listData,
         setListData,
         modalType,
         formData,
@@ -91,7 +93,7 @@ function UserModal(props: {
                     (prev) =>
                         (prev = {
                             ...prev,
-                            idPermissions: idPermissions,
+                            idPermissions,
                         })
                 );
             }
@@ -181,7 +183,22 @@ function UserModal(props: {
                 })
         );
 
-        updateUser(formData);
+        updateUser(formData).then(() => {
+            listData.forEach((data, index) => {
+                if (data.idUsers === formData.idUsers) {
+                    //deep clone
+                    const newData = [...listData];
+                    newData.splice(index, 1, {
+                        ...data,
+                        name: formData.name,
+                        username: formData.username,
+                        disabled: formData.disabled,
+                    });
+                    setListData(newData);
+                }
+            });
+        });
+        handleCancel();
     };
 
     const handleCancel = () => {
@@ -369,13 +386,19 @@ function UserModal(props: {
                                     stringToDate(formData.createdAt?.toString())
                                 } bởi ${formData.usernameCreated}`}
                             </Form.Text>
-                            <br />
-                            <Form.Text>
-                                {`Sửa đổi lần cuối lúc ${
-                                    formData.updatedAt &&
-                                    stringToDate(formData.updatedAt?.toString())
-                                } bởi ${formData.usernameUpdated}`}
-                            </Form.Text>
+                            {formData.usernameUpdated && (
+                                <>
+                                    <br />
+                                    <Form.Text>
+                                        {`Sửa đổi lần cuối lúc ${
+                                            formData.updatedAt &&
+                                            stringToDate(
+                                                formData.updatedAt?.toString()
+                                            )
+                                        } bởi ${formData.usernameUpdated}`}
+                                    </Form.Text>
+                                </>
+                            )}
                         </>
                     )}
                 </Form>
