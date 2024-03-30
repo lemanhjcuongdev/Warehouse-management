@@ -248,8 +248,6 @@ function GoodsModal(props: {
             e.preventDefault();
             e.stopPropagation();
 
-            isValidated && console.log(formData);
-
             //call API
             isValidated &&
                 createGoods(formData)

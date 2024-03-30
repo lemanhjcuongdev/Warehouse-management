@@ -1,40 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button, Tab, Tabs } from "react-bootstrap";
-import { getAllGoodsGroups } from "~/apis/goodsGroupAPI";
-import { getAllGoodsTypes } from "~/apis/goodsTypeAPI";
-import { getAllGoodsUnits } from "~/apis/goodsUnitAPI";
-import GoodsGroupModal from "~/components/Layout/components/Modal/GoodsGroupModal";
-import GoodsTypeModal from "~/components/Layout/components/Modal/GoodsTypeModal";
-import GoodsUnitModal from "~/components/Layout/components/Modal/GoodsUnitModal";
+import { getAllImportOrderByStatus } from "~/apis/importOrderAPI";
+import ImportOrderModal from "~/components/Layout/components/Modal/ImportOrderModal";
 import { iModalTypes } from "~/components/Layout/components/Modal/types";
-import GoodsGroupTable from "~/components/Layout/components/Table/GoodsGroupListTable/GoodsGroupTable";
-import GoodsTypeTable from "~/components/Layout/components/Table/GoodsTypeListTable/GoodsTypeTable";
-import GoodsUnitTable from "~/components/Layout/components/Table/GoodsUnitListTable/GoodsUnitTable";
 
-import { getCookie } from "~/utils/cookies";
-import {
-    iGoodsGroupProps,
-    iGoodsTypeProps,
-    iGoodsUnitProps,
-} from "~/views/types";
+import { iImportOrderProps } from "~/views/types";
 
-const initGoodsGroupData: iGoodsGroupProps = {
-    idGoodsGroups: 1,
-    name: "",
-    deletedAt: new Date(),
-};
-
-const initGoodsUnitData: iGoodsUnitProps = {
-    idGoodsUnits: 1,
-    name: "",
-    deletedAt: new Date(),
-};
-const initGoodsTypeData: iGoodsTypeProps = {
-    idGoodsTypes: 1,
-    idGoodsGroup: 1,
-    idGoodsGroup2: initGoodsGroupData,
-    name: "",
-    deletedAt: new Date(),
+const initImportOrderData: iImportOrderProps = {
+    idImportOrders: 1,
+    orderDate: "",
+    idProvider: 1,
+    status: 1,
 };
 
 function ImportOrderView() {
@@ -42,46 +18,32 @@ function ImportOrderView() {
     const [key, setKey] = useState("in-process");
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
-
-    //GOODS GROUPS
-    const [groupListData, setGroupListData] = useState<iGoodsGroupProps[]>([
-        initGoodsGroupData,
+    const [listData, setListData] = useState<iImportOrderProps[]>([
+        initImportOrderData,
     ]);
-    const [groupFormData, setGroupFormData] =
-        useState<iGoodsGroupProps>(initGoodsGroupData);
-    //GOODS UNITS
-    const [unitListData, setUnitListData] = useState<iGoodsUnitProps[]>([
-        initGoodsUnitData,
-    ]);
-    const [unitFormData, setUnitFormData] =
-        useState<iGoodsUnitProps>(initGoodsUnitData);
-    //GOODS TYPES
-    const [typeListData, setTypeListData] = useState<iGoodsTypeProps[]>([
-        initGoodsTypeData,
-    ]);
-    const [typeFormData, setTypeFormData] =
-        useState<iGoodsTypeProps>(initGoodsTypeData);
+    const [formData, setFormData] =
+        useState<iImportOrderProps>(initImportOrderData);
 
     //HANDLER
-    const handleSetListData = useCallback(() => {
-        const jwt = getCookie("jwt");
-        if (jwt) {
-            switch (key) {
-                case "in-process":
-                    getAllGoodsGroups().then((data) => setGroupListData(data));
-                    break;
-                case "finished":
-                    getAllGoodsTypes().then((data) => setTypeListData(data));
-                    break;
-                case "failed":
-                    break;
-            }
+    const handleSelected = useCallback(() => {
+        let statusCode: number = 0;
+        switch (key) {
+            case "in-process":
+                statusCode = 0;
+                break;
+            case "finished":
+                statusCode = 1;
+                break;
+            case "failed":
+                statusCode = 2;
+                break;
         }
+        getAllImportOrderByStatus(statusCode).then((data) => setListData(data));
     }, [key]);
 
     useEffect(() => {
-        handleSetListData();
-    }, [handleSetListData]);
+        handleSelected();
+    }, [handleSelected]);
 
     const handleToggleShowModal = () => {
         setShowModal(!showModal);
@@ -90,8 +52,7 @@ function ImportOrderView() {
 
     return (
         <>
-            <h2>Danh sách đơn nhập hàng</h2>
-
+            <h2>Danh sách đơn nhập kho</h2>
             <Tabs
                 defaultActiveKey="in-process"
                 activeKey={key}
@@ -107,85 +68,41 @@ function ImportOrderView() {
                 <Tab eventKey="in-process" title="Đang xử lý">
                     {key === "in-process" && (
                         <>
+                            <hr />
                             <Button
                                 onClick={handleToggleShowModal}
-                                className="my-3"
+                                className="mb-3"
                             >
                                 <i className="fa-solid fa-plus"></i>
                                 &nbsp; Thêm mới
                             </Button>
 
-                            <GoodsGroupModal
+                            <ImportOrderModal
                                 show={showModal}
                                 onHide={handleToggleShowModal}
-                                listData={groupListData}
-                                setListData={setGroupListData}
+                                listData={listData}
+                                setListData={setListData}
                                 modalType={modalType}
-                                formData={groupFormData}
-                                setFormData={setGroupFormData}
+                                formData={formData}
+                                setFormData={setFormData}
                             />
 
-                            <GoodsGroupTable
-                                listData={groupListData}
-                                setListData={setGroupListData}
+                            {/* <GoodsGroupTable
+                                l={l}
+                                setListData={setListData}
                                 toggleShowModal={handleToggleShowModal}
                                 setModalType={setModalType}
-                                setFormData={setGroupFormData}
-                            />
+                                setFormData={setFormData}
+                            /> */}
                         </>
                     )}
                 </Tab>
-                <Tab eventKey="finished" title="Đã hoàn thành">
-                    {key === "finished" && (
-                        <>
-                            <GoodsTypeModal
-                                show={showModal}
-                                onHide={handleToggleShowModal}
-                                typeListData={typeListData}
-                                groupListData={groupListData}
-                                setListData={setTypeListData}
-                                modalType={modalType}
-                                formData={typeFormData}
-                                setFormData={setTypeFormData}
-                            />
-
-                            <GoodsTypeTable
-                                listData={typeListData}
-                                setListData={setTypeListData}
-                                toggleShowModal={handleToggleShowModal}
-                                setModalType={setModalType}
-                                setFormData={setTypeFormData}
-                            />
-                        </>
-                    )}
-                </Tab>
-                <Tab eventKey="failed" title="Đơn vị tính">
-                    {key === "failed" && (
-                        <>
-                            <GoodsUnitModal
-                                show={showModal}
-                                onHide={handleToggleShowModal}
-                                listData={unitListData}
-                                setListData={setUnitListData}
-                                modalType={modalType}
-                                formData={unitFormData}
-                                setFormData={setUnitFormData}
-                            />
-
-                            <GoodsUnitTable
-                                listData={unitListData}
-                                setListData={setUnitListData}
-                                toggleShowModal={handleToggleShowModal}
-                                setModalType={setModalType}
-                                setFormData={setUnitFormData}
-                            />
-                        </>
-                    )}
-                </Tab>
+                <Tab eventKey="finished" title="Đã hoàn thành"></Tab>
+                <Tab eventKey="failed" title="Đã huỷ bỏ"></Tab>
             </Tabs>
         </>
     );
 }
 
-export { initGoodsGroupData, initGoodsUnitData, initGoodsTypeData };
+export { initImportOrderData };
 export default ImportOrderView;

@@ -5,10 +5,10 @@ import { checkJwt } from '~/middleware/authentication'
 
 const providerRouter = express.Router()
 
-providerRouter.post('/', providerController.createProvider)
-providerRouter.get('/', providerController.getAllProviders)
-providerRouter.get('/:id', providerController.getProviderById)
-providerRouter.patch('/:id', providerController.editProviderById)
-providerRouter.delete('/:id', providerController.softDeleteProviderById)
+providerRouter.post('/', [checkJwt], providerController.createProvider)
+providerRouter.get('/', [checkJwt], providerController.getAllProviders)
+providerRouter.get('/:id', [checkJwt], providerController.getProviderById)
+providerRouter.patch('/:id', [checkJwt], providerController.editProviderById)
+providerRouter.delete('/:id', [checkJwt], providerController.softDeleteProviderById)
 
 export default providerRouter

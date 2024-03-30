@@ -103,6 +103,26 @@ interface iGoodsItemProps {
     disabled: 0 | 1;
 }
 
+// IMPORT ORDERS
+interface iImportOrderProps {
+    idImportOrders: number;
+    orderDate: string;
+    idProvider: number;
+    status: number;
+    importOrderDetails?: {
+        idImportOrderDetails?: number;
+        idImportOrder: number;
+        idGoods: number;
+        amount: number;
+    }[];
+    idProvider2?: {
+        idProviders: number;
+        name: string;
+        address: string;
+        deletedAt: string | null;
+    };
+}
+
 export type {
     iUserDataProps,
     iUserItemProps,
@@ -114,4 +134,5 @@ export type {
     iProviderProps,
     iGoodsItemProps,
     iGoodsProps,
+    iImportOrderProps,
 };

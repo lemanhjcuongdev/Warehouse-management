@@ -75,6 +75,9 @@ function WarehouseDiagram(props: {
                                 variant={"outline-primary"}
                                 name="radio"
                                 className="me-2 mb-2"
+                                style={{
+                                    fontWeight: "bold",
+                                }}
                                 value={`${radio.floor}-${radio.slot}`}
                                 checked={
                                     radioValue ===

@@ -6,6 +6,7 @@ import { iGoodsItemProps, iGoodsProps } from "../types";
 import { getAllGoods } from "~/apis/goodsAPI";
 import GoodsModal from "~/components/Layout/components/Modal/GoodsModal";
 import GoodsTable from "~/components/Layout/components/Table/GoodsListTable/GoodsTable";
+import { Link } from "react-router-dom";
 
 const initGoodsItem: iGoodsItemProps = {
     idGoods: 1,
@@ -58,12 +59,16 @@ function GoodsView() {
     return (
         <>
             <h2>Danh sách hàng hoá</h2>
-
-            <Button onClick={handleToggleShowModal} className="my-3">
+            <Button onClick={handleToggleShowModal} className="my-sm-3 me-3">
                 <i className="fa-solid fa-plus"></i>
-                &nbsp; Thêm mới
+                &nbsp; Thêm mặt hàng mới
             </Button>
-
+            <Link to={"/list/import-orders"}>
+                <Button className="my-3">
+                    <i className="fa-solid fa-arrow-right-to-bracket"></i>&nbsp;
+                    Đặt đơn nhập kho mới
+                </Button>
+            </Link>
             <GoodsModal
                 show={showModal}
                 onHide={handleToggleShowModal}
@@ -73,7 +78,6 @@ function GoodsView() {
                 formData={formData}
                 setFormData={setFormData}
             />
-
             <GoodsTable
                 listData={listData}
                 setListData={setListData}
