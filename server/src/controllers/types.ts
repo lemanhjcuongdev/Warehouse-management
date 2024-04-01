@@ -1,6 +1,7 @@
 interface iCreateOrderRequestBody {
   idProvider: number
-  orderDetails: iCreateOrderDetail[]
+  importOrderDetails: iCreateOrderDetail[]
+  idCreated: number
 }
 
 interface iCreateOrderDetail {
@@ -10,8 +11,10 @@ interface iCreateOrderDetail {
 
 interface iUpdateOrderRequestBody {
   idProvider?: number
-  orderDetails?: iOrderDetail[]
+  importOrderDetails?: iOrderDetail[]
   status?: number
+  idUpdated: number
+  reasonFailed?: string
 }
 
 interface iOrderDetail {

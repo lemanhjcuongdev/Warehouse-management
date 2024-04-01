@@ -101,26 +101,29 @@ interface iGoodsItemProps {
     exp: Date;
     amount: number;
     disabled: 0 | 1;
+    idUnit2?: iGoodsUnitProps;
 }
 
 // IMPORT ORDERS
 interface iImportOrderProps {
+    idCreated: number;
     idImportOrders: number;
     orderDate: string;
     idProvider: number;
     status: number;
-    importOrderDetails?: {
-        idImportOrderDetails?: number;
-        idImportOrder: number;
-        idGoods: number;
-        amount: number;
-    }[];
-    idProvider2?: {
-        idProviders: number;
-        name: string;
-        address: string;
-        deletedAt: string | null;
-    };
+    importOrderDetails: iImportOrderDetailProps[];
+    idProvider2?: iProviderProps;
+    reasonFailed?: string;
+    idUpdated?: number;
+    updatedAt?: string;
+    usernameCreated?: string;
+    usernameUpdated?: string;
+}
+interface iImportOrderDetailProps {
+    idImportOrderDetails?: number;
+    idImportOrder?: number;
+    idGoods: number;
+    amount: number;
 }
 
 export type {
@@ -135,4 +138,5 @@ export type {
     iGoodsItemProps,
     iGoodsProps,
     iImportOrderProps,
+    iImportOrderDetailProps,
 };

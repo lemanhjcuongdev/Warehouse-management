@@ -6,6 +6,7 @@ import { getCookie } from "~/utils/cookies";
 import { iProviderProps } from "../types";
 import { getAllProviders } from "~/apis/providerAPI";
 import ProviderTable from "~/components/Layout/components/Table/ProviderListTable/ProviderTable";
+import { Link } from "react-router-dom";
 
 const initProviderData: iProviderProps = {
     idProviders: 1,
@@ -41,12 +42,16 @@ function ProviderView() {
     return (
         <>
             <h2>Danh sách nhà cung cấp</h2>
-
-            <Button onClick={handleToggleShowModal} className="my-3">
+            <Button onClick={handleToggleShowModal} className="my-sm-3 me-3">
                 <i className="fa-solid fa-plus"></i>
-                &nbsp; Thêm mới
+                &nbsp; Thêm NCC mới
             </Button>
-
+            <Link to={"/list/import-orders"}>
+                <Button className="my-3">
+                    <i className="fa-solid fa-arrow-right-to-bracket"></i>&nbsp;
+                    Đặt đơn nhập kho mới
+                </Button>
+            </Link>
             <ProviderModal
                 show={showModal}
                 onHide={handleToggleShowModal}
@@ -56,7 +61,6 @@ function ProviderView() {
                 formData={formData}
                 setFormData={setFormData}
             />
-
             <ProviderTable
                 listData={listData}
                 setListData={setListData}

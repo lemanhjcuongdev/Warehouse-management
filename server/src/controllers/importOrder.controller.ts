@@ -6,25 +6,47 @@ import STATUS from '~/constants/statusCode'
 import { ImportOrderDetails } from '~/models/entities/ImportOrderDetails'
 import { ImportOrders } from '~/models/entities/ImportOrders'
 import { iCreateOrderRequestBody, iUpdateOrderRequestBody } from './types'
+import IMPORT_STATUS from '~/constants/ImportOrderStatusCode'
+import { Users } from '~/models/entities/Users'
 
 dotenv.config()
 
 //use datasource
 const importOrderRepo = appDataSource.getRepository(ImportOrders)
 const importOrderDetailRepo = appDataSource.getRepository(ImportOrderDetails)
+const userRepository = appDataSource.getRepository(Users)
 
 class ImportOrderController {
   //[GET /ImportOrder/:status]
   async getAllImportOrdersByStatus(req: Request, res: Response, next: NextFunction) {
     //get status from query string
     const status: number = +req.params.status
+    let clientStatusToServerStatus: { status: number }[] = []
+    switch (status) {
+      case 0:
+        clientStatusToServerStatus = [{ status: 0 }, { status: 1 }, { status: 2 }]
+        break
+      case 1:
+        clientStatusToServerStatus = [{ status: 3 }]
+        break
+      case 2:
+        clientStatusToServerStatus = [{ status: 4 }]
+        break
+      default:
+        res.status(STATUS.BAD_REQUEST).send({
+          error: 'Trạng thái đơn nhập không đúng'
+        })
+        return
+    }
     try {
       //get all ImportOrder from DB
       const importOrder = await importOrderRepo.find({
-        where: { status },
+        select: ['idImportOrders', 'idProvider', 'orderDate', 'status', 'idProvider2', 'reasonFailed'],
+        where: clientStatusToServerStatus,
         order: {
           orderDate: 'DESC'
-        }
+        },
+        relations: ['idProvider2']
       })
       res.status(STATUS.SUCCESS).send(importOrder)
     } catch (error) {
@@ -40,13 +62,44 @@ class ImportOrderController {
     //get ImportOrder by id from DB
     try {
       const importOrder = await importOrderRepo.findOneOrFail({
-        select: ['idImportOrders', 'orderDate', 'idProvider', 'status', 'idProvider2', 'importOrderDetails'],
+        select: [
+          'idImportOrders',
+          'orderDate',
+          'idProvider',
+          'status',
+          'idProvider2',
+          'importOrderDetails',
+          'idUpdated',
+          'idCreated',
+          'updatedAt'
+        ],
         where: {
           idImportOrders: id
         },
         relations: ['importOrderDetails', 'idProvider2']
       })
-      res.status(STATUS.SUCCESS).send(importOrder)
+
+      //get user info
+      const createdManager = await userRepository.findOneOrFail({
+        select: ['username'],
+        where: {
+          idUsers: importOrder.idCreated
+        }
+      })
+      let updatedManager = new Users()
+      if (importOrder.idUpdated) {
+        updatedManager = await userRepository.findOneOrFail({
+          select: ['username'],
+          where: {
+            idUsers: importOrder.idUpdated
+          }
+        })
+      }
+      res.status(STATUS.SUCCESS).send({
+        ...importOrder,
+        usernameCreated: createdManager.username,
+        usernameUpdated: updatedManager.username
+      })
     } catch (error) {
       console.log(error)
       res.status(STATUS.NOT_FOUND).send({
@@ -58,11 +111,12 @@ class ImportOrderController {
   //[POST /ImportOrder/create-ImportOrder]
   async createImportOrder(req: Request, res: Response, next: NextFunction) {
     //get params from request body
-    const { idProvider, orderDetails }: iCreateOrderRequestBody = req.body
+    const { idProvider, importOrderDetails, idCreated }: iCreateOrderRequestBody = req.body
 
     let importOrder = new ImportOrders()
     importOrder.orderDate = new Date()
     importOrder.idProvider = idProvider
+    importOrder.idCreated = idCreated
     importOrder.status = 0
 
     //validate type of params
@@ -84,7 +138,7 @@ class ImportOrderController {
 
     //push order details
     try {
-      const orderDetailObjects = orderDetails.map((detail) => {
+      const orderDetailObjects = importOrderDetails.map((detail) => {
         const newOrderDetail = new ImportOrderDetails()
         newOrderDetail.idImportOrder = importOrder.idImportOrders
         newOrderDetail.idGoods = detail.idGoods
@@ -96,6 +150,8 @@ class ImportOrderController {
       //try to save order details
       importOrderDetailRepo.save(orderDetailObjects)
     } catch (error) {
+      console.log(error)
+
       res.status(STATUS.BAD_REQUEST).send('Chi tiết đơn nhập không hợp lệ')
       return
     }
@@ -108,7 +164,7 @@ class ImportOrderController {
     //get id from query string
     const id: number = +req.params.id
     //get params from body request
-    const { idProvider, orderDetails, status }: iUpdateOrderRequestBody = req.body
+    const { idProvider, importOrderDetails, status, idUpdated }: iUpdateOrderRequestBody = req.body
 
     let importOrder: ImportOrders
     //get ImportOrder by id from DB
@@ -137,55 +193,174 @@ class ImportOrderController {
       return
     }
 
-    //update order details
     try {
-      const existingDetails = await importOrderDetailRepo.find({
-        where: {
-          idImportOrder: id
-        }
-      })
-      //loop new details
-      if (orderDetails) {
-        orderDetails.forEach(async (newDetail) => {
-          //find if this details exist in DB
-          const existingDetail = existingDetails.find(
-            (existDetail) => existDetail.idImportOrderDetails === newDetail.idImportOrderDetails
-          )
-          //if exist => update
-          if (existingDetail) {
-            importOrderDetailRepo.update(
+      //update by status
+      switch (status) {
+        case 0: //UPDATE INFO
+          {
+            //update order details
+            const existingDetails = await importOrderDetailRepo.find({
+              where: {
+                idImportOrder: id
+              }
+            })
+            //loop new details
+            if (importOrderDetails) {
+              importOrderDetails.forEach(async (newDetail) => {
+                //find if this details exist in DB
+                const existingDetail = existingDetails.find(
+                  (existDetail) => existDetail.idImportOrderDetails === newDetail.idImportOrderDetails
+                )
+                //if exist => update
+                if (existingDetail) {
+                  importOrderDetailRepo.update(
+                    {
+                      idImportOrderDetails: newDetail.idImportOrderDetails
+                    },
+                    {
+                      idGoods: newDetail.idGoods,
+                      amount: newDetail.amount
+                    }
+                  )
+                } else {
+                  //if not exist, create new details
+                  const newOrderDetail = new ImportOrderDetails()
+                  newOrderDetail.idImportOrder = id
+                  newOrderDetail.idGoods = newDetail.idGoods
+                  newOrderDetail.amount = newDetail.amount
+                  await importOrderDetailRepo.save(newOrderDetail)
+                }
+              })
+            }
+          }
+          break
+        case 1: //ACCOUNTANT VERIFIED OR UPDATE
+          {
+            const updateResult = await importOrderRepo.update(
               {
-                idImportOrderDetails: newDetail.idImportOrderDetails
+                idImportOrders: id,
+                status: IMPORT_STATUS.IN_PROCESS_CREATED
               },
               {
-                idGoods: newDetail.idGoods,
-                amount: newDetail.amount
+                idProvider,
+                status
               }
             )
-          } else {
-            //if not exist, create new details
-            const newOrderDetail = new ImportOrderDetails()
-            newOrderDetail.idImportOrder = id
-            newOrderDetail.idGoods = newDetail.idGoods
-            newOrderDetail.amount = newDetail.amount
-            await importOrderDetailRepo.save(newOrderDetail)
+            if (updateResult.affected === 0) {
+              res.status(STATUS.BAD_REQUEST).send({
+                error: 'Không thể cập nhật đơn nhập kho đã hoàn thành hoặc bị huỷ'
+              })
+              return
+            }
           }
-        })
+          break
+        case 2: //DIRECTOR VERIFIED OR UPDATE
+          {
+            const updateResult0 = await importOrderRepo.update(
+              {
+                idImportOrders: id,
+                status: IMPORT_STATUS.IN_PROCESS_CREATED
+              },
+              {
+                idProvider,
+                status
+              }
+            )
+            const updateResult1 = await importOrderRepo.update(
+              {
+                idImportOrders: id,
+                status: IMPORT_STATUS.IN_PROCESS_ACCOUNTANT_VERIFIED
+              },
+              {
+                idProvider,
+                status
+              }
+            )
+            if (updateResult0.affected === 0 && updateResult1.affected === 0) {
+              res.status(STATUS.BAD_REQUEST).send({
+                error: 'Không thể cập nhật đơn nhập kho đã hoàn thành hoặc bị huỷ'
+              })
+              return
+            }
+          }
+          break
+        case 3: //FINISHED
+          {
+            const updateResult = await importOrderRepo.update(
+              {
+                idImportOrders: id,
+                status: IMPORT_STATUS.IN_PROCESS_DIRECTOR_VERIFIED
+              },
+              {
+                idProvider,
+                status
+              }
+            )
+            if (updateResult.affected === 0) {
+              res.status(STATUS.BAD_REQUEST).send({
+                error: 'Không thể cập nhật đơn nhập kho chưa được duyệt'
+              })
+              return
+            }
+          }
+          break
+        case 4: //FAILED
+          {
+            const updateResult0 = await importOrderRepo.update(
+              {
+                idImportOrders: id,
+                status: IMPORT_STATUS.IN_PROCESS_CREATED
+              },
+              {
+                status: IMPORT_STATUS.FAILED
+              }
+            )
+            const updateResult1 = await importOrderRepo.update(
+              {
+                idImportOrders: id,
+                status: IMPORT_STATUS.IN_PROCESS_ACCOUNTANT_VERIFIED
+              },
+              {
+                status: IMPORT_STATUS.FAILED
+              }
+            )
+            const updateResult2 = await importOrderRepo.update(
+              {
+                idImportOrders: id,
+                status: IMPORT_STATUS.IN_PROCESS_DIRECTOR_VERIFIED
+              },
+              {
+                status: IMPORT_STATUS.FAILED
+              }
+            )
+            if (updateResult0.affected === 0 && updateResult1.affected === 0 && updateResult2.affected === 0) {
+              res.status(STATUS.BAD_REQUEST).send({
+                error: 'Không thể huỷ đơn nhập kho đã hoàn thành'
+              })
+              return
+            }
+          }
+          break
+        default:
+          res.status(STATUS.BAD_REQUEST).send({
+            error: 'Không thể cập nhật đơn nhập kho'
+          })
+          return
       }
 
-      const updateResult = await importOrderRepo.update(
+      //update update_at, id_updated fields
+      const updateDateResult = await importOrderRepo.update(
         {
-          idImportOrders: id,
-          status: 0
+          idImportOrders: id
         },
         {
-          idProvider,
-          status
+          idUpdated: idUpdated,
+          updatedAt: new Date()
         }
       )
-      if (updateResult.affected === 0) {
+      if (updateDateResult.affected === 0) {
         res.status(STATUS.BAD_REQUEST).send({
-          error: 'Không thể cập nhật đơn nhập kho đã hoàn thành hoặc bị huỷ'
+          error: 'Không thể cập nhật ngày & người chỉnh sửa đơn nhập kho'
         })
         return
       }
@@ -195,30 +370,52 @@ class ImportOrderController {
       res.status(STATUS.BAD_REQUEST).send({
         error: 'Không thể cập nhật đơn nhập kho'
       })
+      return
     }
     //if ok
-    res.status(STATUS.NO_CONTENT).send({
-      // error: 'Cập nhật người dùng thành công'
-    })
+    res.status(STATUS.NO_CONTENT).send()
   }
 
   //[DELETE /:id]
   async softDeleteImportOrderById(req: Request, res: Response, next: NextFunction) {
     const id: number = +req.params.id
 
+    const { reasonFailed } = req.body
+
     try {
-      const updateResult = await importOrderRepo.update(
+      const updateResult0 = await importOrderRepo.update(
         {
           idImportOrders: id,
-          status: 0
+          status: IMPORT_STATUS.IN_PROCESS_CREATED
         },
         {
-          status: 2
+          status: IMPORT_STATUS.FAILED,
+          reasonFailed
         }
       )
-      if (updateResult.affected === 0) {
+      const updateResult1 = await importOrderRepo.update(
+        {
+          idImportOrders: id,
+          status: IMPORT_STATUS.IN_PROCESS_ACCOUNTANT_VERIFIED
+        },
+        {
+          status: IMPORT_STATUS.FAILED,
+          reasonFailed
+        }
+      )
+      const updateResult2 = await importOrderRepo.update(
+        {
+          idImportOrders: id,
+          status: IMPORT_STATUS.IN_PROCESS_DIRECTOR_VERIFIED
+        },
+        {
+          status: IMPORT_STATUS.FAILED,
+          reasonFailed
+        }
+      )
+      if (updateResult0.affected === 0 && updateResult1.affected === 0 && updateResult2.affected === 0) {
         res.status(STATUS.BAD_REQUEST).send({
-          error: 'Không thể cập nhật đơn nhập kho đã hoàn thành hoặc bị huỷ'
+          error: 'Không thể huỷ đơn nhập kho đã hoàn thành'
         })
         return
       }

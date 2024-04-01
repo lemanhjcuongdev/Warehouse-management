@@ -112,7 +112,7 @@ const updateImportOrder = async (values: iImportOrderProps) => {
     }
 };
 
-const softDeleteImportOrder = async (id: number) => {
+const softDeleteImportOrder = async (id: number, reason: string) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -125,6 +125,9 @@ const softDeleteImportOrder = async (id: number) => {
                 "Content-Type": "application/json",
                 authorization: jwt,
             },
+            body: JSON.stringify({
+                reasonFailed: reason,
+            }),
         };
         const res = await fetch(`${API_ROOT}/import-orders/${id}`, init);
 

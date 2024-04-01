@@ -19,6 +19,22 @@ export class ImportOrders {
   @Column('int', { name: 'status' })
   status: number
 
+  @Column('varchar', { name: 'reason_failed', length: 200, nullable: true })
+  reasonFailed: string
+
+  @Column('datetime', {
+    name: 'updated_at',
+    nullable: true,
+    default: () => 'CURRENT_TIMESTAMP'
+  })
+  updatedAt: Date | null
+
+  @Column('int', { name: 'id_created' })
+  idCreated: number
+
+  @Column('int', { name: 'id_updated', nullable: true })
+  idUpdated: number | null
+
   @OneToMany(() => DefectiveRecords, (defectiveRecords) => defectiveRecords.idImportOrder2)
   defectiveRecords: DefectiveRecords[]
 

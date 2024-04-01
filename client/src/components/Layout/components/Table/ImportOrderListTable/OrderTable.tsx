@@ -1,42 +1,36 @@
 import { Dispatch, SetStateAction, memo } from "react";
 import { Table } from "react-bootstrap";
-import { iGoodsGroupProps } from "~/views/types";
 import { iModalTypes } from "../../Modal/types";
-import GoodsGroupTableRow from "./OrderTableRow";
+import OrderTableRow from "./OrderTableRow";
+import { iImportOrderProps } from "~/views/types";
 
-function GoodsGroupTable(props: {
-    listData: iGoodsGroupProps[];
-    setListData: Dispatch<SetStateAction<iGoodsGroupProps[]>>;
+function OrderTable(props: {
+    tabKey: "in-process" | "finished" | "failed" | string;
+    listData: iImportOrderProps[];
+    setListData: Dispatch<SetStateAction<iImportOrderProps[]>>;
     toggleShowModal: () => void;
     setModalType: Dispatch<SetStateAction<iModalTypes>>;
-    setFormData: Dispatch<React.SetStateAction<iGoodsGroupProps>>;
+    setFormData: Dispatch<React.SetStateAction<iImportOrderProps>>;
 }) {
-    const {
-        listData,
-        setListData,
-        toggleShowModal,
-        setModalType,
-        setFormData,
-    } = props;
+    const { listData, tabKey } = props;
     return (
-        <Table striped bordered hover>
+        <Table striped bordered hover responsive>
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Tên nhóm hàng</th>
-                    <th>Trạng thái</th>
+                    <th>Nhà cung cấp</th>
+                    <th>Ngày lập</th>
+                    {tabKey === "in-process" && <th>Trạng thái</th>}
+                    {tabKey === "failed" && <th>Lý do huỷ</th>}
                 </tr>
             </thead>
             <tbody>
                 {listData.map((item, index) => (
-                    <GoodsGroupTableRow
-                        key={item.idGoodsGroups}
+                    <OrderTableRow
+                        key={item.idImportOrders}
                         item={item}
                         index={index}
-                        setListData={setListData}
-                        toggleShowModal={toggleShowModal}
-                        setModalType={setModalType}
-                        setFormData={setFormData}
+                        {...props}
                     />
                 ))}
             </tbody>
@@ -44,4 +38,4 @@ function GoodsGroupTable(props: {
     );
 }
 
-export default memo(GoodsGroupTable);
+export default memo(OrderTable);

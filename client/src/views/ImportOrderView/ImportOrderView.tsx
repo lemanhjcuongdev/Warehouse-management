@@ -1,17 +1,26 @@
-import { useCallback, useEffect, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import { Button, Tab, Tabs } from "react-bootstrap";
 import { getAllImportOrderByStatus } from "~/apis/importOrderAPI";
 import ImportOrderModal from "~/components/Layout/components/Modal/ImportOrderModal";
 import { iModalTypes } from "~/components/Layout/components/Modal/types";
+import OrderTable from "~/components/Layout/components/Table/ImportOrderListTable/OrderTable";
+import { IMPORT_ORDER_DETAIL_KEY } from "~/constants/localStorage";
 
 import { iImportOrderProps } from "~/views/types";
 
-const initImportOrderData: iImportOrderProps = {
+let initImportOrderData: iImportOrderProps = {
+    idCreated: 0,
     idImportOrders: 1,
     orderDate: "",
     idProvider: 1,
     status: 1,
+    importOrderDetails: [],
 };
+
+interface iTabProps {
+    eventKey: string;
+    title: ReactNode;
+}
 
 function ImportOrderView() {
     //SHARED PROPS
@@ -23,6 +32,27 @@ function ImportOrderView() {
     ]);
     const [formData, setFormData] =
         useState<iImportOrderProps>(initImportOrderData);
+    //get continousData from session storage
+    useEffect(() => {
+        const continousOrder = sessionStorage.getItem(IMPORT_ORDER_DETAIL_KEY);
+        if (continousOrder) {
+            setFormData(JSON.parse(continousOrder));
+        }
+    }, []);
+    const tabs: iTabProps[] = [
+        {
+            eventKey: "in-process",
+            title: "Đang xử lý",
+        },
+        {
+            eventKey: "finished",
+            title: "Đã hoàn thành",
+        },
+        {
+            eventKey: "failed",
+            title: "Đã huỷ bỏ",
+        },
+    ];
 
     //HANDLER
     const handleSelected = useCallback(() => {
@@ -50,6 +80,8 @@ function ImportOrderView() {
         setModalType({ type: "create" });
     };
 
+    console.log("FORM DATA: ", formData);
+
     return (
         <>
             <h2>Danh sách đơn nhập kho</h2>
@@ -61,44 +93,58 @@ function ImportOrderView() {
                 variant="pills"
                 fill
                 justify
+                style={{
+                    fontWeight: "bold",
+                }}
                 onSelect={(key) => {
                     key && setKey(key);
                 }}
             >
-                <Tab eventKey="in-process" title="Đang xử lý">
-                    {key === "in-process" && (
-                        <>
-                            <hr />
-                            <Button
-                                onClick={handleToggleShowModal}
-                                className="mb-3"
-                            >
-                                <i className="fa-solid fa-plus"></i>
-                                &nbsp; Thêm mới
-                            </Button>
+                {tabs.map((tab) => (
+                    <Tab
+                        key={tab.eventKey}
+                        eventKey={tab.eventKey}
+                        title={tab.title}
+                    >
+                        {key === tab.eventKey && (
+                            <>
+                                <hr />
+                                {key === "in-process" && (
+                                    <Button
+                                        onClick={handleToggleShowModal}
+                                        className="mb-3"
+                                        variant="outline-primary"
+                                        style={{
+                                            fontWeight: "bold",
+                                        }}
+                                    >
+                                        <i className="fa-solid fa-plus"></i>
+                                        &nbsp; Thêm mới
+                                    </Button>
+                                )}
 
-                            <ImportOrderModal
-                                show={showModal}
-                                onHide={handleToggleShowModal}
-                                listData={listData}
-                                setListData={setListData}
-                                modalType={modalType}
-                                formData={formData}
-                                setFormData={setFormData}
-                            />
+                                <ImportOrderModal
+                                    show={showModal}
+                                    onHide={handleToggleShowModal}
+                                    listData={listData}
+                                    setListData={setListData}
+                                    modalType={modalType}
+                                    formData={formData}
+                                    setFormData={setFormData}
+                                />
 
-                            {/* <GoodsGroupTable
-                                l={l}
-                                setListData={setListData}
-                                toggleShowModal={handleToggleShowModal}
-                                setModalType={setModalType}
-                                setFormData={setFormData}
-                            /> */}
-                        </>
-                    )}
-                </Tab>
-                <Tab eventKey="finished" title="Đã hoàn thành"></Tab>
-                <Tab eventKey="failed" title="Đã huỷ bỏ"></Tab>
+                                <OrderTable
+                                    tabKey={key}
+                                    listData={listData}
+                                    setListData={setListData}
+                                    toggleShowModal={handleToggleShowModal}
+                                    setModalType={setModalType}
+                                    setFormData={setFormData}
+                                />
+                            </>
+                        )}
+                    </Tab>
+                ))}
             </Tabs>
         </>
     );

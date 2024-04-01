@@ -1,63 +1,35 @@
 import { Dispatch, SetStateAction, memo, useCallback } from "react";
-import { Badge, ButtonGroup, Dropdown } from "react-bootstrap";
+import { Badge, Button, ButtonGroup, Dropdown } from "react-bootstrap";
 import { getGoodsGroupById, softDeleteGoodsGroup } from "~/apis/goodsGroupAPI";
-import { iGoodsGroupProps } from "~/views/types";
 import { iModalTypes } from "../../Modal/types";
+import {
+    iGoodsItemProps,
+    iImportOrderDetailProps,
+    iImportOrderProps,
+} from "~/views/types";
 
-function GoodsGroupTableRow(props: {
-    item: iGoodsGroupProps;
-    setListData: Dispatch<SetStateAction<iGoodsGroupProps[]>>;
+function OrderDetailTableRow(props: {
+    formData: iImportOrderProps;
+    goods: iGoodsItemProps[];
+    item: iImportOrderDetailProps;
+    setListData: Dispatch<SetStateAction<iImportOrderDetailProps[]>>;
     index: number;
-    toggleShowModal: () => void;
-    setModalType: Dispatch<SetStateAction<iModalTypes>>;
-    setFormData: Dispatch<React.SetStateAction<iGoodsGroupProps>>;
+    setFormData: Dispatch<React.SetStateAction<iImportOrderProps>>;
 }) {
-    const {
-        item,
-        setListData,
-        index,
-        toggleShowModal,
-        setModalType,
-        setFormData,
-    } = props;
+    const { item, setListData, index, setFormData, formData, goods } = props;
 
-    const handleReadOrUpdate = async () => {
-        const goodsGroupInfo: iGoodsGroupProps = await getGoodsGroupById(
-            item.idGoodsGroups
-        );
-        setFormData(goodsGroupInfo);
+    const good = goods.find((good) => good.idGoods === item.idGoods);
 
-        toggleShowModal();
-        setModalType({ type: "update" });
-    };
-
-    const handleDelete = useCallback(
-        (id: number) => {
-            const windowObject = window;
-            const message = item.deletedAt
-                ? `Bạn có chắc muốn kích hoạt lại nhóm hàng "${item.name}"?`
-                : `Bạn có chắc muốn vô hiệu hoá nhóm hàng "${item.name}"?`;
-            const confirmDialog = windowObject.confirm(message);
-            if (confirmDialog) {
-                softDeleteGoodsGroup(id)
-                    .then(() => {
-                        setListData((prev) => {
-                            //deep clone
-                            const data = [...prev];
-                            data.splice(index, 1, {
-                                ...item,
-                                deletedAt:
-                                    item.deletedAt === null ? new Date() : null,
-                            });
-
-                            return data;
-                        });
-                    })
-                    .catch((error) => console.log(error));
-            }
-        },
-        [index, item, setListData]
-    );
+    const handleDelete = useCallback(() => {
+        const newDetails = [...formData.importOrderDetails];
+        newDetails.splice(index, 1);
+        setFormData((prev) => {
+            return {
+                ...prev,
+                importOrderDetails: newDetails,
+            };
+        });
+    }, [index, item, setListData]);
 
     return (
         <tr
@@ -65,53 +37,23 @@ function GoodsGroupTableRow(props: {
             style={{
                 cursor: "pointer",
             }}
-            onClick={() => handleReadOrUpdate()}
         >
-            <td>{item.idGoodsGroups}</td>
-            <td>{item.name}</td>
+            <td>{item.idGoods}</td>
+            <td>{good?.name}</td>
+            <td>{good?.idUnit2?.name}</td>
             <td className="d-flex justify-content-between align-items-center">
-                <div>
-                    <Badge pill bg={!item.deletedAt ? "success" : "secondary"}>
-                        {!item.deletedAt ? "Hoạt động" : "Vô hiệu hoá"}
-                    </Badge>
-                </div>
-                &nbsp;
-                <Dropdown
-                    as={ButtonGroup}
-                    drop="start"
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <Dropdown.Toggle
-                        variant="outline-secondary"
-                        className="px-3"
-                    />
-                    <Dropdown.Menu>
-                        <Dropdown.Item onClick={() => handleReadOrUpdate()}>
-                            <i className="fa-solid fa-layer-group"></i>
-                            &nbsp; Xem thông tin chi tiết
-                        </Dropdown.Item>
-                        <Dropdown.Item onClick={() => handleReadOrUpdate()}>
-                            <i className="fa-solid fa-pen-to-square"></i>
-                            &nbsp; Cập nhật thông tin
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                            onClick={() => handleDelete(item.idGoodsGroups)}
-                        >
-                            <i
-                                className={
-                                    item.deletedAt
-                                        ? "fa-solid fa-check"
-                                        : "fa-solid fa-ban"
-                                }
-                            ></i>
-                            &nbsp;
-                            {item.deletedAt ? "Kích hoạt lại" : "Vô hiệu hoá"}
-                        </Dropdown.Item>
-                    </Dropdown.Menu>
-                </Dropdown>
+                {item.amount}
+                {formData.status === 0 && (
+                    <>
+                        &nbsp;
+                        <Button size="sm" onClick={() => handleDelete()}>
+                            <i className="fa-solid fa-trash"></i>
+                        </Button>
+                    </>
+                )}
             </td>
         </tr>
     );
 }
 
-export default memo(GoodsGroupTableRow);
+export default memo(OrderDetailTableRow);

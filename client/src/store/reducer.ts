@@ -19,6 +19,8 @@ const reducer = (state: iStateProps, action: iActionProps): iStateProps => {
         case SET_UNAUTHENTICATION:
             removeCookie("id");
             removeCookie("jwt");
+            removeCookie("id_expired_at");
+            removeCookie("id_expired_at");
             return (state = initialState);
         default:
             throw new Error("Invalid action!");

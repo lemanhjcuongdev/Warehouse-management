@@ -10,10 +10,8 @@ interface iDefaultLayout {
 function DefaultLayout({ children }: iDefaultLayout) {
     return (
         <>
-            <Container>
-                <Header />
-                <Container className="container-fluid">{children}</Container>
-            </Container>
+            <Header />
+            <Container>{children}</Container>
             <Footer />
         </>
     );

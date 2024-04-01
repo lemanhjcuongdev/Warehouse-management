@@ -41,10 +41,7 @@ function GoodsView() {
     const [formData, setFormData] = useState<iGoodsProps>(initGoodsInfo);
 
     const handleSetListData = useCallback(() => {
-        const jwt = getCookie("jwt");
-        if (jwt) {
-            getAllGoods().then((data) => setListData(data));
-        }
+        getAllGoods().then((data) => setListData(data));
     }, []);
 
     useEffect(() => {

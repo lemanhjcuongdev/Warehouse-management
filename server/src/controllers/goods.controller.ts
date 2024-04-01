@@ -1,7 +1,6 @@
 import { validate } from 'class-validator'
 import dotenv from 'dotenv'
 import { NextFunction, Request, Response } from 'express'
-import { In } from 'typeorm'
 import { appDataSource } from '~/constants/appDataSource'
 import STATUS from '~/constants/statusCode'
 import { Goods } from '~/models/entities/Goods'
@@ -12,14 +11,14 @@ dotenv.config()
 //use datasource
 const goodsRepository = appDataSource.getRepository(Goods)
 const userRepository = appDataSource.getRepository(Users)
-const entityManager = appDataSource.createEntityManager()
 
 class GoodsController {
   //[GET /Goods]
   async getAllGoods(req: Request, res: Response, next: NextFunction) {
     //get all Goods from DB
     const goods = await goodsRepository.find({
-      select: ['idGoods', 'name', 'exp', 'amount', 'disabled']
+      select: ['idGoods', 'name', 'exp', 'amount', 'disabled', 'idUnit2'],
+      relations: ['idUnit2']
     })
 
     res.status(STATUS.SUCCESS).send(goods)

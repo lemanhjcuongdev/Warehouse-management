@@ -38,12 +38,17 @@ function App() {
                     })
                     .finally(() => setLoading(false));
             } else setLoading(false);
+            return;
         }
+        const timeStamp = getCookie("id_expired_at");
+        const currentTime = Date.now();
+        const timeLeft = +timeStamp - currentTime;
+
         //set expire in 1h
         const expireTime = setTimeout(() => {
             alert("Đã hết phiên đăng nhập, vui lòng đăng nhập lại");
             dispatch(actions.setUnauthentication());
-        }, 3600000);
+        }, timeLeft);
 
         //cleanup function
         return () => clearTimeout(expireTime);
