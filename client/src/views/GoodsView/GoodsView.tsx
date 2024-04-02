@@ -9,24 +9,24 @@ import GoodsTable from "~/components/Layout/components/Table/GoodsListTable/Good
 import { Link } from "react-router-dom";
 
 const initGoodsItem: iGoodsItemProps = {
-    idGoods: 1,
+    idGoods: 0,
     name: "",
-    exp: new Date(),
+    exp: "",
     amount: 0,
     disabled: 0,
 };
 const initGoodsInfo: iGoodsProps = {
-    idGoods: 1,
-    idType: 1,
-    idUnit: 1,
-    idWarehouse: 1,
+    idGoods: 0,
+    idType: 0,
+    idUnit: 0,
+    idWarehouse: 0,
     name: "",
-    floor: 1,
-    slot: 1,
+    floor: 0,
+    slot: 0,
     importDate: "",
     exp: "",
     amount: 0,
-    idCreated: 1,
+    idCreated: 0,
     usernameCreated: "",
     createdAt: new Date(),
     disabled: 0,

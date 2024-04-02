@@ -65,9 +65,6 @@ export class Goods {
   @Column('tinyint', { name: 'disabled' })
   disabled: number
 
-  @OneToMany(() => DefectiveRecords, (defectiveRecords) => defectiveRecords.idGoods2)
-  defectiveRecords: DefectiveRecords[]
-
   @OneToMany(() => ExportOrderDetails, (exportOrderDetails) => exportOrderDetails.idGoods2)
   exportOrderDetails: ExportOrderDetails[]
 

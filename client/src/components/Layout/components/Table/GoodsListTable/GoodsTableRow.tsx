@@ -4,6 +4,7 @@ import { iModalTypes } from "../../Modal/types";
 import { iGoodsItemProps, iGoodsProps } from "~/views/types";
 import { getGoodsById, softDeleteGoods } from "~/apis/goodsAPI";
 import stringToDate from "~/utils/stringToDate";
+import convertUTCToVNTime from "~/utils/convertUTCToVNTime";
 
 function GoodsTableRow(props: {
     item: iGoodsItemProps;
@@ -24,7 +25,12 @@ function GoodsTableRow(props: {
 
     const handleReadOrUpdate = async () => {
         const goodsInfo: iGoodsProps = await getGoodsById(item.idGoods);
-        setFormData(goodsInfo);
+
+        const importDate = convertUTCToVNTime(goodsInfo.importDate);
+        setFormData({
+            ...goodsInfo,
+            importDate: importDate,
+        });
 
         toggleShowModal();
         setModalType({ type: "update" });

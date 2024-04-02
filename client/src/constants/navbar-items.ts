@@ -56,6 +56,12 @@ const navbar_items: iNavbarItem[] = [
     {
         label: "Báo cáo / Kiểm kê",
         to: "/",
+        children: [
+            {
+                label: "Biên bản hàng lỗi, hỏng",
+                to: "/list/defective-records",
+            },
+        ],
     },
     {
         label: "Quản lý nhân sự",

@@ -22,7 +22,11 @@ import {
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { getAllGoods } from "~/apis/goodsAPI";
-import { createImportOrder, updateImportOrder } from "~/apis/importOrderAPI";
+import {
+    createImportOrder,
+    updateImportOrder,
+    updateOrderStatus,
+} from "~/apis/importOrderAPI";
 import { getAllProviders } from "~/apis/providerAPI";
 import { initImportOrderData } from "~/views/ImportOrderView/ImportOrderView";
 import {
@@ -36,6 +40,7 @@ import { iModalTypes } from "./types";
 import { IMPORT_ORDER_DETAIL_KEY } from "~/constants/localStorage";
 import { getCookie } from "~/utils/cookies";
 import stringToDate from "~/utils/stringToDate";
+import { QR_API_ROOT } from "~/constants";
 
 function ImportOrderModal(props: {
     show: true | false;
@@ -63,7 +68,7 @@ function ImportOrderModal(props: {
     const [goods, setGoods] = useState<iGoodsItemProps[]>([]);
     const [providers, setProviders] = useState<iProviderProps[]>([]);
     const initDetail = {
-        idGoods: 1,
+        idGoods: 0,
         amount: 1,
     };
     const [currentDetail, setCurrentDetail] =
@@ -95,9 +100,19 @@ function ImportOrderModal(props: {
                         >
                             Cập nhật chỉnh sửa
                         </Button>
-                        <Button variant="dark">Huỷ đơn</Button>
-                        <Button>KT duyệt</Button>
-                        <Button variant="info">
+                        <Button
+                            variant="dark"
+                            onClick={() => handleUpdateStatus(4)}
+                        >
+                            Huỷ đơn
+                        </Button>
+                        <Button onClick={() => handleUpdateStatus(1)}>
+                            KT duyệt
+                        </Button>
+                        <Button
+                            variant="info"
+                            onClick={() => handleUpdateStatus(2)}
+                        >
                             GĐ duyệt - Gửi đơn đặt hàng cho nhà cung cấp
                         </Button>
                     </>
@@ -105,8 +120,16 @@ function ImportOrderModal(props: {
             case 1:
                 return (
                     <>
-                        <Button variant="dark">Huỷ đơn</Button>
-                        <Button variant="info">
+                        <Button
+                            variant="dark"
+                            onClick={() => handleUpdateStatus(4)}
+                        >
+                            Huỷ đơn
+                        </Button>
+                        <Button
+                            variant="info"
+                            onClick={() => handleUpdateStatus(2)}
+                        >
                             GĐ duyệt - Gửi đơn đặt hàng cho nhà cung cấp
                         </Button>
                     </>
@@ -114,8 +137,18 @@ function ImportOrderModal(props: {
             case 2:
                 return (
                     <>
-                        <Button variant="success">Hoàn thành</Button>
-                        <Button variant="dark">Huỷ đơn</Button>
+                        <Button
+                            variant="success"
+                            onClick={() => handleUpdateStatus(3)}
+                        >
+                            Hoàn thành
+                        </Button>
+                        <Button
+                            variant="dark"
+                            onClick={() => handleUpdateStatus(4)}
+                        >
+                            Huỷ đơn
+                        </Button>
                     </>
                 );
             default:
@@ -146,28 +179,35 @@ function ImportOrderModal(props: {
     };
 
     const handleAddOrderDetail = () => {
-        const isExisted = formData.importOrderDetails.find(
-            (detail) => detail.idGoods === currentDetail.idGoods
-        );
+        if (currentDetail.idGoods !== 0) {
+            const isExisted = formData.importOrderDetails.find(
+                (detail) => detail.idGoods === currentDetail.idGoods
+            );
 
-        if (!isExisted) {
-            setFormData((prev) => ({
-                ...prev,
-                importOrderDetails: [...prev.importOrderDetails, currentDetail],
-            }));
-            sessionStorage.setItem(
-                IMPORT_ORDER_DETAIL_KEY,
-                JSON.stringify({
-                    ...formData,
+            if (!isExisted) {
+                setFormData((prev) => ({
+                    ...prev,
                     importOrderDetails: [
-                        ...formData.importOrderDetails,
+                        ...prev.importOrderDetails,
                         currentDetail,
                     ],
-                })
-            );
-            setCurrentDetail(initDetail);
+                }));
+                sessionStorage.setItem(
+                    IMPORT_ORDER_DETAIL_KEY,
+                    JSON.stringify({
+                        ...formData,
+                        importOrderDetails: [
+                            ...formData.importOrderDetails,
+                            currentDetail,
+                        ],
+                    })
+                );
+                setCurrentDetail(initDetail);
+            } else {
+                alert("Hàng trùng trong danh sách, không thể thêm!");
+            }
         } else {
-            alert("Hàng trùng trong danh sách, không thể thêm!");
+            alert("Vui lòng chọn mặt hàng");
         }
     };
 
@@ -250,6 +290,38 @@ function ImportOrderModal(props: {
         [formData, setListData]
     );
 
+    const handleUpdateStatus = (status: number) => {
+        const idUpdated = +getCookie("id");
+        setFormData((prev) => {
+            return {
+                ...prev,
+                status,
+                idUpdated,
+            };
+        });
+        updateOrderStatus({
+            idImportOrders: formData.idImportOrders,
+            status,
+            idUpdated,
+        }).then(() => {
+            listData.forEach((data, index) => {
+                if (data.idImportOrders === formData.idImportOrders) {
+                    //deep clone
+                    const newData = [...listData];
+                    if (status < 3)
+                        newData.splice(index, 1, {
+                            ...formData,
+                            status,
+                            idUpdated,
+                        });
+                    else newData.splice(index, 1);
+                    setListData(newData);
+                }
+            });
+        });
+        handleCancel();
+    };
+
     const handleSubmitUpdate: FormEventHandler<HTMLButtonElement> = (e) => {
         const isValidated = validateForm();
         e.preventDefault();
@@ -270,10 +342,41 @@ function ImportOrderModal(props: {
     };
 
     const handleCancel = () => {
+        setCurrentDetail(initDetail);
         sessionStorage.removeItem(IMPORT_ORDER_DETAIL_KEY);
         setFormData(initImportOrderData);
         setValidated(false);
         onHide();
+    };
+
+    const handlePrintORCode = () => {
+        formData.importOrderDetails.forEach((detail) => {
+            const data = encodeURIComponent(
+                JSON.stringify({
+                    idImportOrder: formData.idImportOrders,
+                    idGoods: detail?.idGoods,
+                    amount: detail?.amount,
+                })
+            );
+            const newWindow = window.open(
+                "",
+                "_blank",
+                "left=0,top=0,width=552,height=477,toolbar=0,scrollbars=0,status=0"
+            );
+            if (newWindow) {
+                newWindow?.document.write(
+                    `<img src="${QR_API_ROOT}&data=${data}" />`
+                );
+                newWindow.document.title = `ID đơn: ${formData.idImportOrders} - ID hàng:${detail?.idGoods} - SL:${detail?.amount}`;
+                const img = newWindow?.document.querySelector("img");
+                if (img) {
+                    img.onload = () => {
+                        newWindow.print();
+                        newWindow.close();
+                    };
+                }
+            }
+        });
     };
 
     return (
@@ -293,7 +396,6 @@ function ImportOrderModal(props: {
                     noValidate
                     validated={validated}
                     ref={formRef}
-                    autoComplete="off"
                     onSubmit={(e) => e.preventDefault()}
                 >
                     <Row className="mb-3">
@@ -301,21 +403,27 @@ function ImportOrderModal(props: {
                             <Form.Group>
                                 {formData.status === 0 ? (
                                     <>
-                                        <FormLabel className="d-flex justify-content-between">
+                                        <FormLabel>
                                             Nhà cung cấp &nbsp;
-                                            <Link to={"/list/providers"}>
-                                                <Button size="sm">
-                                                    Thêm nhà cung cấp mới
-                                                </Button>
-                                            </Link>
                                         </FormLabel>
+                                        <Link to={"/list/providers"}>
+                                            <Button
+                                                size="sm"
+                                                variant="outline-primary"
+                                                className="mb-2"
+                                            >
+                                                Thêm nhà cung cấp mới
+                                            </Button>
+                                        </Link>
                                         <Form.Select
                                             required
                                             name="idProvider"
                                             value={formData.idProvider}
                                             onChange={handleChangeOrderInput}
-                                            autoComplete="off"
                                         >
+                                            <option value="">
+                                                ------Chọn nhà cung cấp------
+                                            </option>
                                             {providers.map((provider) => (
                                                 <option
                                                     key={provider.idProviders}
@@ -329,9 +437,7 @@ function ImportOrderModal(props: {
                                     </>
                                 ) : (
                                     <>
-                                        <FormLabel className="d-flex justify-content-between">
-                                            Nhà cung cấp
-                                        </FormLabel>
+                                        <FormLabel>Nhà cung cấp</FormLabel>
                                         <Form.Control
                                             name="idProvider"
                                             value={`${formData.idProvider2?.name} - Đ/c: ${formData.idProvider2?.address}`}
@@ -340,7 +446,7 @@ function ImportOrderModal(props: {
                                     </>
                                 )}
                                 <Form.Control.Feedback type="invalid">
-                                    Bắt buộc nhập
+                                    Bắt buộc chọn
                                 </Form.Control.Feedback>
                             </Form.Group>
                             <hr />
@@ -365,19 +471,19 @@ function ImportOrderModal(props: {
                                             </Accordion.Header>
                                             <Accordion.Body>
                                                 <Form.Group className="mb-3">
-                                                    <FormLabel className="d-flex justify-content-between">
-                                                        Tên mặt hàng&nbsp;
-                                                        <Link
-                                                            to={"/list/goods"}
-                                                        >
-                                                            <Button size="sm">
-                                                                Thêm mặt hàng
-                                                                mới
-                                                            </Button>
-                                                        </Link>
+                                                    <FormLabel>
+                                                        Tên mặt hàng &nbsp;{" "}
                                                     </FormLabel>
+                                                    <Link to={"/list/goods"}>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline-primary"
+                                                            className="mb-2"
+                                                        >
+                                                            Thêm mặt hàng mới
+                                                        </Button>
+                                                    </Link>
                                                     <Form.Select
-                                                        required
                                                         name="idGoods"
                                                         value={
                                                             currentDetail.idGoods
@@ -385,8 +491,11 @@ function ImportOrderModal(props: {
                                                         onChange={
                                                             handleChangeOrderInput
                                                         }
-                                                        autoComplete="off"
                                                     >
+                                                        <option value="">
+                                                            ------Chọn mặt
+                                                            hàng------
+                                                        </option>
                                                         {goods.map((good) => (
                                                             <option
                                                                 key={
@@ -406,7 +515,7 @@ function ImportOrderModal(props: {
                                                         ))}
                                                     </Form.Select>
                                                     <Form.Control.Feedback type="invalid">
-                                                        Bắt buộc nhập
+                                                        Bắt buộc chọn
                                                     </Form.Control.Feedback>
                                                 </Form.Group>
                                                 <Form.Group className="my-3">
@@ -414,7 +523,6 @@ function ImportOrderModal(props: {
                                                         Số lượng
                                                     </FormLabel>
                                                     <Form.Control
-                                                        required
                                                         name="amount"
                                                         value={
                                                             currentDetail.amount
@@ -422,7 +530,6 @@ function ImportOrderModal(props: {
                                                         onChange={
                                                             handleChangeOrderInput
                                                         }
-                                                        autoComplete="off"
                                                         type="number"
                                                         min={1}
                                                     />
@@ -436,7 +543,12 @@ function ImportOrderModal(props: {
                                                 </Form.Group>
                                                 <Form.Group>
                                                     <Button
-                                                        variant="outline-success"
+                                                        variant={
+                                                            currentDetail.idGoods !==
+                                                            0
+                                                                ? "primary"
+                                                                : "outline-primary"
+                                                        }
                                                         style={{
                                                             width: "100%",
                                                             fontWeight: "bold",
@@ -457,7 +569,16 @@ function ImportOrderModal(props: {
                         </Col>
 
                         <Col lg={6}>
-                            <h4 className="mb-3">Chi tiết đơn hàng</h4>
+                            <h4>Chi tiết đơn hàng</h4>
+                            {formData.status === 3 && (
+                                <Button
+                                    onClick={handlePrintORCode}
+                                    className="mb-3"
+                                >
+                                    <i className="fa-solid fa-print"></i>
+                                    &nbsp; In mã QR
+                                </Button>
+                            )}
                             <OrderDetailTable
                                 goods={goods}
                                 listData={formData.importOrderDetails}

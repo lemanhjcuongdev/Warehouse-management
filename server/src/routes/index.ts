@@ -5,6 +5,7 @@ import warehouseRouter from './warehouse.route'
 import goodsRouter from './goods.route'
 import providerRouter from './provider.route'
 import importingRouter from './importing.route'
+import defectiveRecordRouter from './defectiveRecord.route'
 
 function route(app: Express) {
   app.use('/users', userRouter)
@@ -12,7 +13,8 @@ function route(app: Express) {
   app.use('/warehouses', warehouseRouter)
   app.use('/goods', goodsRouter)
   app.use('/providers', providerRouter)
-  app.use('/import-orders', importingRouter)
+  app.use('/import', importingRouter)
+  app.use('/defective-records', defectiveRecordRouter)
 }
 
 export default route

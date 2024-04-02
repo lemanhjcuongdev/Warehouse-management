@@ -1,4 +1,10 @@
-import { Dispatch, SetStateAction, memo, useCallback } from "react";
+import {
+    Dispatch,
+    MouseEventHandler,
+    SetStateAction,
+    memo,
+    useCallback,
+} from "react";
 import { Badge, Button, ButtonGroup, Dropdown } from "react-bootstrap";
 import { getGoodsGroupById, softDeleteGoodsGroup } from "~/apis/goodsGroupAPI";
 import { iModalTypes } from "../../Modal/types";
@@ -7,6 +13,7 @@ import {
     iImportOrderDetailProps,
     iImportOrderProps,
 } from "~/views/types";
+import { QR_API_ROOT } from "~/constants";
 
 function OrderDetailTableRow(props: {
     formData: iImportOrderProps;
@@ -31,12 +38,45 @@ function OrderDetailTableRow(props: {
         });
     }, [index, item, setListData]);
 
+    const handlePrintORCode: MouseEventHandler<HTMLTableRowElement> = async (
+        e
+    ) => {
+        e.stopPropagation();
+        const data = encodeURIComponent(
+            JSON.stringify({
+                idImportOrder: formData.idImportOrders,
+                idGoods: good?.idGoods,
+                name: good?.name,
+                amount: item.amount,
+            })
+        );
+        const newWindow = window.open(
+            "",
+            "_blank",
+            "left=0,top=0,width=552,height=477,toolbar=0,scrollbars=0,status=0"
+        );
+        if (newWindow) {
+            newWindow?.document.write(
+                `<img src="${QR_API_ROOT}&data=${data}" />`
+            );
+            newWindow.document.title = `ID đơn: ${formData.idImportOrders} - ID hàng:${item?.idGoods} - SL:${item?.amount}`;
+            const img = newWindow?.document.querySelector("img");
+            if (img) {
+                img.onload = () => {
+                    newWindow.print();
+                    newWindow.close();
+                };
+            }
+        }
+    };
+
     return (
         <tr
             title="Click để xem thông tin"
             style={{
                 cursor: "pointer",
             }}
+            onClick={formData.status === 3 ? handlePrintORCode : () => {}}
         >
             <td>{item.idGoods}</td>
             <td>{good?.name}</td>
@@ -46,7 +86,13 @@ function OrderDetailTableRow(props: {
                 {formData.status === 0 && (
                     <>
                         &nbsp;
-                        <Button size="sm" onClick={() => handleDelete()}>
+                        <Button
+                            size="sm"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete();
+                            }}
+                        >
                             <i className="fa-solid fa-trash"></i>
                         </Button>
                     </>

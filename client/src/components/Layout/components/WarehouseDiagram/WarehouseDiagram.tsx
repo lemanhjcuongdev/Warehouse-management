@@ -53,58 +53,60 @@ function WarehouseDiagram(props: {
             <br />
             <Form.Label>Tầng 1</Form.Label>
             <br />
-            {radios.map((radio, index) => {
-                if (!radio.good) {
-                    const isNewFloor =
-                        index === 0 || radios[index - 1].floor !== radio.floor;
-                    return (
-                        <>
-                            {index !== 0 && isNewFloor && (
-                                <>
-                                    <br />
-                                    <Form.Label className="my-2">
-                                        Tầng {radio.floor}
-                                    </Form.Label>
-                                    <br />
-                                </>
-                            )}
-                            <ToggleButton
-                                key={index}
-                                id={`radio-${index}`}
-                                type="radio"
-                                variant={"outline-primary"}
-                                name="radio"
-                                className="me-2 mb-2"
-                                style={{
-                                    fontWeight: "bold",
-                                }}
-                                value={`${radio.floor}-${radio.slot}`}
-                                checked={
-                                    radioValue ===
-                                    `${radio.floor}-${radio.slot}`
-                                }
-                                onChange={(e) => {
-                                    setRadioValue(e.currentTarget.value);
-                                }}
-                            >
-                                {radio.floor}-{radio.slot}
-                            </ToggleButton>
-                        </>
-                    );
-                } else
-                    return (
-                        <>
-                            <Button
-                                key={index}
-                                variant="secondary"
-                                className="me-2 mb-2"
-                                onClick={(e) => handleClick(radio, e)}
-                            >
-                                {`${radio.floor}-${radio.slot}`}
-                            </Button>
-                        </>
-                    );
-            })}
+            {radios &&
+                radios.map((radio, index) => {
+                    if (!radio.good) {
+                        const isNewFloor =
+                            index === 0 ||
+                            radios[index - 1].floor !== radio.floor;
+                        return (
+                            <>
+                                {index !== 0 && isNewFloor && (
+                                    <>
+                                        <br />
+                                        <Form.Label className="my-2">
+                                            Tầng {radio.floor}
+                                        </Form.Label>
+                                        <br />
+                                    </>
+                                )}
+                                <ToggleButton
+                                    key={index}
+                                    id={`radio-${index}`}
+                                    type="radio"
+                                    variant={"outline-primary"}
+                                    name="radio"
+                                    className="me-2 mb-2"
+                                    style={{
+                                        fontWeight: "bold",
+                                    }}
+                                    value={`${radio.floor}-${radio.slot}`}
+                                    checked={
+                                        radioValue ===
+                                        `${radio.floor}-${radio.slot}`
+                                    }
+                                    onChange={(e) => {
+                                        setRadioValue(e.currentTarget.value);
+                                    }}
+                                >
+                                    {radio.floor}-{radio.slot}
+                                </ToggleButton>
+                            </>
+                        );
+                    } else
+                        return (
+                            <>
+                                <Button
+                                    key={index}
+                                    variant="secondary"
+                                    className="me-2 mb-2"
+                                    onClick={(e) => handleClick(radio, e)}
+                                >
+                                    {`${radio.floor}-${radio.slot}`}
+                                </Button>
+                            </>
+                        );
+                })}
             <Overlay target={target} show={show} placement="top">
                 {({
                     placement: _placement,

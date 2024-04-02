@@ -10,10 +10,10 @@ import { iImportOrderProps } from "~/views/types";
 
 let initImportOrderData: iImportOrderProps = {
     idCreated: 0,
-    idImportOrders: 1,
+    idImportOrders: 0,
     orderDate: "",
-    idProvider: 1,
-    status: 1,
+    idProvider: 0,
+    status: 0,
     importOrderDetails: [],
 };
 

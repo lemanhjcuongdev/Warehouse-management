@@ -35,6 +35,7 @@ function UserModal(props: {
     formData: iUserDataProps;
     setFormData: Dispatch<React.SetStateAction<iUserDataProps>>;
     role: number;
+    setRole: Dispatch<React.SetStateAction<number>>;
 }) {
     const {
         show,
@@ -45,6 +46,7 @@ function UserModal(props: {
         formData,
         setFormData,
         role,
+        setRole,
     } = props;
     const [validated, setValidated] = useState(false);
     const startDateRef = useRef<HTMLInputElement>(null);
@@ -85,9 +87,11 @@ function UserModal(props: {
                 }
                 break;
             case "id_permissions": {
-                const idPermissions = ROLES.filter(
+                const currentRole = ROLES.filter(
                     (role) => role.id === +value
-                )[0].idPermissions;
+                )[0];
+                const idPermissions = currentRole?.idPermissions || [];
+                const roleId = currentRole?.id || 0;
 
                 setFormData(
                     (prev) =>
@@ -96,6 +100,7 @@ function UserModal(props: {
                             idPermissions,
                         })
                 );
+                setRole(roleId);
             }
         }
     };
@@ -262,14 +267,18 @@ function UserModal(props: {
                             <Form.Select
                                 required
                                 name="gender"
+                                value={formData.gender}
                                 onChange={handleSelectedChange}
                             >
+                                <option value="">
+                                    ------Chọn giới tính------
+                                </option>
                                 <option value="M">Nam</option>
                                 <option value="F">Nữ</option>
                                 <option value="O">Khác</option>
                             </Form.Select>
                             <Form.Control.Feedback type="invalid">
-                                Bắt buộc nhập
+                                Bắt buộc chọn
                             </Form.Control.Feedback>
                         </Form.Group>
                     </Row>
@@ -357,6 +366,7 @@ function UserModal(props: {
                             name="id_permissions"
                             value={role}
                         >
+                            <option value="">------Chọn phòng ban------</option>
                             {ROLES.map((role) => (
                                 <option key={role.id} value={role.id}>
                                     {role.roleName}
@@ -364,7 +374,7 @@ function UserModal(props: {
                             ))}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
-                            Bắt buộc nhập
+                            Bắt buộc chọn
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group className="mb-3">

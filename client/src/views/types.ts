@@ -3,7 +3,7 @@ interface iUserDataProps {
     idUsers?: number;
     name: string;
     email: string;
-    gender: "M" | "F" | "O";
+    gender: "M" | "F" | "O" | "";
     phone: string;
     startDate: string;
     username: string;
@@ -98,7 +98,7 @@ interface iGoodsProps {
 interface iGoodsItemProps {
     idGoods: number;
     name: string;
-    exp: Date;
+    exp: string;
     amount: number;
     disabled: 0 | 1;
     idUnit2?: iGoodsUnitProps;
@@ -126,6 +126,35 @@ interface iImportOrderDetailProps {
     amount: number;
 }
 
+//IMPORT RECEIPTS
+interface iImportReceiptProps {
+    idImportReceipts: number;
+    idWarehouse: number;
+    idProvider: number;
+    idImportOrder: number;
+    idUserImport: number;
+    importDate: string;
+    palletCode: number;
+    status: number;
+    idUpdated: number;
+    updatedAt: string;
+}
+
+//DEFECTIVE RECORDS
+interface iDefectiveRecordProps {
+    idDefectiveRecords: number;
+    date: string;
+    idWarehouse?: number;
+    idUser?: number;
+    idImportOrder: number;
+    quality?: string;
+    defectiveRating?: number;
+    solution?: string;
+    updatedAt?: string;
+    idUpdated?: number;
+    usernameUpdated?: string;
+}
+
 export type {
     iUserDataProps,
     iUserItemProps,
@@ -139,4 +168,6 @@ export type {
     iGoodsProps,
     iImportOrderProps,
     iImportOrderDetailProps,
+    iImportReceiptProps,
+    iDefectiveRecordProps,
 };

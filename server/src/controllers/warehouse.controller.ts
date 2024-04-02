@@ -132,7 +132,7 @@ class WarehouseController {
     }
 
     try {
-      await whRepo.update(
+      whRepo.update(
         {
           idWarehouse: id
         },

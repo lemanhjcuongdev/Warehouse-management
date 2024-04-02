@@ -34,7 +34,7 @@ import {
 } from "~/views/types";
 import WarehouseDiagram from "../WarehouseDiagram/WarehouseDiagram";
 import { iModalTypes } from "./types";
-import { createGoods } from "~/apis/goodsAPI";
+import { createGoods, updateGoods } from "~/apis/goodsAPI";
 
 interface iWarehouseSlots {
     warehouse: {
@@ -60,6 +60,13 @@ interface iSlotsProp {
         slot: number;
     };
 }
+const initWarehouseSlots = {
+    warehouse: {
+        totalFloors: 0,
+        totalSlotsPerFloor: 0,
+    },
+    goodsSlots: [],
+};
 
 function GoodsModal(props: {
     show: true | false;
@@ -87,14 +94,10 @@ function GoodsModal(props: {
     const [goodsTypes, setGoodsTypes] = useState<iGoodsTypeProps[]>([]);
     const [warehouses, setWarehouses] = useState<iWarehouseItemProps[]>([]);
     const [goodsUnits, setGoodsUnits] = useState<iGoodsUnitProps[]>([]);
-    const [goodsGroup, setGoodGroup] = useState("");
-    const [warehouseSlots, setWarehouseSlots] = useState<iWarehouseSlots>({
-        warehouse: {
-            totalFloors: 1,
-            totalSlotsPerFloor: 1,
-        },
-        goodsSlots: [],
-    });
+    const initGroup = "------Chưa xác định------";
+    const [goodsGroup, setGoodGroup] = useState(initGroup);
+    const [warehouseSlots, setWarehouseSlots] =
+        useState<iWarehouseSlots>(initWarehouseSlots);
     const [slots, setSlots] = useState<iSlotsProp[]>([
         {
             floor: 0,
@@ -121,10 +124,13 @@ function GoodsModal(props: {
 
     useEffect(() => {
         getAllGoodsTypes().then((data) => {
-            const groupName = data.find((item) => item.idGoodsTypes === 1)
-                ?.idGoodsGroup2?.name;
-            groupName && setGoodGroup(groupName);
             setGoodsTypes(data);
+            const currentGroup = data.find(
+                (type) => type.idGoodsTypes === formData.idType
+            )?.idGoodsGroup2?.name;
+            if (currentGroup) {
+                setGoodGroup(currentGroup);
+            }
         });
         getAllWarehouses().then((data) => {
             setWarehouses(data);
@@ -132,31 +138,34 @@ function GoodsModal(props: {
         getAllGoodsUnits().then((data) => {
             setGoodsUnits(data);
         });
-        renderWarehouseDiagram(1);
-    }, []);
+
+        renderWarehouseDiagram(formData.idWarehouse);
+    }, [formData]);
     const renderWarehouseDiagram = useCallback(
         (idWarehouse: number) => {
             getWarehouseSlotsById(idWarehouse).then((data: any) => {
-                const goodsSlots = data.goods.map((good: iGoodsProps) => {
-                    return {
-                        idWarehouse: data.idWarehouse,
-                        floor: good.floor,
-                        slot: good.slot,
-                        idGoods: good.idGoods,
-                        name: good.name,
-                    };
-                });
+                if (!data.error && data.goods) {
+                    const goodsSlots = data.goods.map((good: iGoodsProps) => {
+                        return {
+                            idWarehouse: data.idWarehouse,
+                            floor: good.floor,
+                            slot: good.slot,
+                            idGoods: good.idGoods,
+                            name: good.name,
+                        };
+                    });
 
-                setWarehouseSlots({
-                    warehouse: {
-                        totalFloors: data.totalFloors,
-                        totalSlotsPerFloor: data.totalSlots,
-                    },
-                    goodsSlots,
-                });
+                    setWarehouseSlots({
+                        warehouse: {
+                            totalFloors: data.totalFloors,
+                            totalSlotsPerFloor: data.totalSlots,
+                        },
+                        goodsSlots,
+                    });
+                }
             });
         },
-        [warehouseSlots]
+        [warehouseSlots, warehouses]
     );
     useEffect(
         () => setSlots(findEmptyWarehouseSlots(warehouseSlots)),
@@ -252,13 +261,7 @@ function GoodsModal(props: {
             isValidated &&
                 createGoods(formData)
                     .then((data) => {
-                        data &&
-                            setListData((prev) => [
-                                ...prev,
-                                {
-                                    ...data,
-                                },
-                            ]);
+                        data && setListData((prev) => [...prev, data]);
                         if (!data.error) {
                             handleCancel();
                             setRadioValue("0-0");
@@ -266,8 +269,9 @@ function GoodsModal(props: {
                     })
                     .catch((error) => console.log(error));
         },
-        [formData, setListData]
+        [formData, setListData, radioValue]
     );
+    console.log("FORM DATA: ", formData);
 
     const handleSubmitUpdate: FormEventHandler<HTMLButtonElement> = (e) => {
         const isValidated = validateForm();
@@ -284,25 +288,26 @@ function GoodsModal(props: {
                 })
         );
 
-        // updateGoods(formData).then(() => {
-        //     listData.forEach((data, index) => {
-        //         if (data.idGoods === formData.idGoods) {
-        //             //deep clone
-        //             const newData = [...listData];
-        //             newData.splice(index, 1, {
-        //                 ...data,
-        //                 name: formData.name,
-        //                 username: formData.username,
-        //                 disabled: formData.disabled,
-        //             });
-        //             setListData(newData);
-        //         }
-        //     });
-        // });
+        updateGoods(formData).then(() => {
+            listData.forEach((data, index) => {
+                if (data.idGoods === formData.idGoods) {
+                    //deep clone
+                    const newData = [...listData];
+                    newData.splice(index, 1, {
+                        ...data,
+                        name: formData.name,
+                        exp: formData.exp,
+                    });
+                    setListData(newData);
+                }
+            });
+        });
         handleCancel();
     };
 
     const handleCancel = () => {
+        setRadioValue("0-0");
+        setWarehouseSlots(initWarehouseSlots);
         setFormData(initGoodsInfo);
         setValidated(false);
         onHide();
@@ -312,9 +317,9 @@ function GoodsModal(props: {
         <Modal
             backdrop={modalType.type === "create" ? "static" : undefined}
             show={show}
-            onHide={onHide}
+            onHide={handleCancel}
             keyboard={false}
-            fullscreen={"xl-down"}
+            fullscreen
             size="xl"
         >
             <Modal.Header closeButton>
@@ -328,175 +333,206 @@ function GoodsModal(props: {
                     autoComplete="off"
                     onSubmit={(e) => e.preventDefault()}
                 >
-                    <Row className="mb-3">
-                        <Form.Group as={Col} sm={8}>
-                            <FormLabel>Tên mặt hàng</FormLabel>
-                            <Form.Control
-                                required
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                autoComplete="off"
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                Bắt buộc nhập
-                            </Form.Control.Feedback>
-                        </Form.Group>
-                        <Form.Group as={Col} sm={4}>
-                            <FormLabel>Số lượng</FormLabel>
-                            <Form.Control
-                                required
-                                name="amount"
-                                value={formData.amount}
-                                onChange={handleChange}
-                                autoComplete="off"
-                                type="number"
-                                min={0}
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                Bắt buộc nhập
-                            </Form.Control.Feedback>
-                        </Form.Group>
-                    </Row>
-                    <Row className="mb-3">
-                        <Form.Group as={Col} sm>
-                            <Form.Label>Loại mặt hàng</Form.Label>
-                            <Form.Select
-                                required
-                                name="idType"
-                                value={formData.idType}
-                                onChange={handleChange}
-                            >
-                                {goodsTypes.map((type) => (
-                                    <option
-                                        key={type.idGoodsTypes}
-                                        value={type.idGoodsTypes}
+                    <Row>
+                        <Col lg={6}>
+                            <Row className="mb-3">
+                                <Form.Group as={Col} sm={8}>
+                                    <FormLabel>Tên mặt hàng</FormLabel>
+                                    <Form.Control
+                                        required
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        autoComplete="off"
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        Bắt buộc nhập
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                                <Form.Group as={Col} sm={4}>
+                                    <FormLabel>Số lượng</FormLabel>
+                                    <Form.Control
+                                        required
+                                        name="amount"
+                                        value={formData.amount}
+                                        onChange={handleChange}
+                                        autoComplete="off"
+                                        type="number"
+                                        min={0}
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        Bắt buộc nhập
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </Row>
+                            <Row className="mb-3">
+                                <Form.Group as={Col} sm>
+                                    <Form.Label>Loại mặt hàng</Form.Label>
+                                    <Form.Select
+                                        required
+                                        name="idType"
+                                        value={formData.idType}
+                                        onChange={handleChange}
                                     >
-                                        {type.name}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                            <Form.Control.Feedback type="invalid">
-                                Bắt buộc nhập
-                            </Form.Control.Feedback>
-                        </Form.Group>
-                        <Form.Group as={Col} sm>
-                            <Form.Label>Nhóm mặt hàng</Form.Label>
-                            <Form.Control
-                                required
-                                readOnly
-                                value={goodsGroup}
-                                aria-describedby="GoodsGroupHelpBlock"
-                            ></Form.Control>
-                            <Form.Control.Feedback type="invalid">
-                                Bắt buộc nhập
-                            </Form.Control.Feedback>
-                            <Form.Text id="GoodsGroupHelpBlock" muted>
-                                Mỗi loại hàng thuộc một nhóm hàng
-                            </Form.Text>
-                        </Form.Group>
-                    </Row>
-                    <Row className="mb-3">
-                        <Form.Group as={Col} sm>
-                            <Form.Label>Kho chứa</Form.Label>
-                            <Form.Select
-                                required
-                                aria-describedby="WarehouseHelpBlock"
-                                name="idWarehouse"
-                                value={formData.idWarehouse}
-                                onChange={handleChange}
-                            >
-                                {warehouses.map((warehouse) => (
-                                    <option
-                                        key={warehouse.idWarehouse}
-                                        value={warehouse.idWarehouse}
+                                        <option value="">
+                                            ------Chọn loại hàng------
+                                        </option>
+                                        {goodsTypes.map((type) => (
+                                            <option
+                                                key={type.idGoodsTypes}
+                                                value={type.idGoodsTypes}
+                                            >
+                                                {type.name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    <Form.Control.Feedback type="invalid">
+                                        Bắt buộc nhập
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                                <Form.Group as={Col} sm>
+                                    <Form.Label>Nhóm mặt hàng</Form.Label>
+                                    <Form.Control
+                                        required
+                                        readOnly
+                                        value={goodsGroup}
+                                        aria-describedby="GoodsGroupHelpBlock"
+                                    ></Form.Control>
+                                    <Form.Control.Feedback type="invalid">
+                                        Bắt buộc chọn
+                                    </Form.Control.Feedback>
+                                    <Form.Text id="GoodsGroupHelpBlock" muted>
+                                        Mỗi loại hàng thuộc một nhóm hàng
+                                    </Form.Text>
+                                </Form.Group>
+                            </Row>
+                            <Row className="mb-3">
+                                <Form.Group as={Col} sm>
+                                    <Form.Label>Kho chứa</Form.Label>
+                                    <Form.Select
+                                        required
+                                        aria-describedby="WarehouseHelpBlock"
+                                        name="idWarehouse"
+                                        value={formData.idWarehouse}
+                                        onChange={handleChange}
                                     >
-                                        {warehouse.name}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                            <Form.Text id="WarehouseHelpBlock" muted>
-                                Việc lựa chọn kho ảnh hưởng tới lựa chọn vị trí
-                                tầng chứa và vị trí kệ chứa
-                            </Form.Text>
-                            <Form.Control.Feedback type="invalid">
-                                Bắt buộc nhập
-                            </Form.Control.Feedback>
-                        </Form.Group>
-                        <Form.Group as={Col} sm>
-                            <Form.Label>Đơn vị tính</Form.Label>
-                            <Form.Select
-                                required
-                                name="startDate"
-                                // value={formData.startDate}
-                                onChange={handleChange}
-                                onBlur={() => customValidateDate()}
-                            >
-                                {goodsUnits.map((unit) => (
-                                    <option
-                                        key={unit.idGoodsUnits}
-                                        value={unit.idGoodsUnits}
+                                        <option value="">
+                                            ------Chọn kho------
+                                        </option>
+                                        {warehouses.map((warehouse) => (
+                                            <option
+                                                key={warehouse.idWarehouse}
+                                                value={warehouse.idWarehouse}
+                                            >
+                                                {warehouse.name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    <Form.Text id="WarehouseHelpBlock" muted>
+                                        Việc lựa chọn kho ảnh hưởng tới lựa chọn
+                                        vị trí tầng chứa và vị trí kệ chứa
+                                    </Form.Text>
+                                    <Form.Control.Feedback type="invalid">
+                                        Bắt buộc chọn
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                                <Form.Group as={Col} sm>
+                                    <Form.Label>Đơn vị tính</Form.Label>
+                                    <Form.Select
+                                        required
+                                        name="idUnit"
+                                        value={formData.idUnit}
+                                        onChange={handleChange}
+                                        onBlur={() => customValidateDate()}
                                     >
-                                        {unit.name}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                            <Form.Control.Feedback type="invalid">
-                                Bắt buộc nhập
-                            </Form.Control.Feedback>
-                        </Form.Group>
-                    </Row>
+                                        <option value="">
+                                            ------Chọn đơn vị tính------
+                                        </option>
+                                        {goodsUnits.map((unit) => (
+                                            <option
+                                                key={unit.idGoodsUnits}
+                                                value={unit.idGoodsUnits}
+                                            >
+                                                {unit.name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    <Form.Control.Feedback type="invalid">
+                                        Bắt buộc chọn
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </Row>
+                            <Row className="mb-3">
+                                <Form.Group as={Col} sm>
+                                    <Form.Label>Ngày giờ nhập kho</Form.Label>
+                                    <Form.Control
+                                        type="datetime-local"
+                                        required
+                                        name="importDate"
+                                        ref={importDateRef}
+                                        value={formData.importDate}
+                                        onChange={handleChange}
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        Bắt buộc chọn
+                                    </Form.Control.Feedback>
+                                </Form.Group>
 
-                    <Row className="mb-3">
-                        <Form.Group as={Col} sm>
-                            <Form.Label>
-                                Chọn vị trí chứa hàng: <b>Số tầng - Số kệ</b>
-                            </Form.Label>
-                            <br />
-                            {slots.length > 0 && (
-                                <WarehouseDiagram
-                                    radios={slots}
-                                    setRadioValue={setRadioValue}
-                                    radioValue={radioValue}
-                                />
+                                <Form.Group as={Col} sm>
+                                    <Form.Label>Hạn sử dụng</Form.Label>
+                                    <Form.Control
+                                        type="date"
+                                        required
+                                        ref={expRef}
+                                        name="exp"
+                                        value={formData.exp}
+                                        onChange={handleChange}
+                                        onBlur={() => customValidateDate()}
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        Bắt buộc chọn
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </Row>
+                            {modalType.type === "update" && (
+                                <Row className="mb-3">
+                                    <Form.Group as={Col} sm>
+                                        <Form.Label>Số tầng ban đầu</Form.Label>
+                                        <Form.Control
+                                            readOnly
+                                            name="floor"
+                                            value={formData.floor}
+                                        />
+                                    </Form.Group>
+
+                                    <Form.Group as={Col} sm>
+                                        <Form.Label>Số kệ ban đầu</Form.Label>
+                                        <Form.Control
+                                            readOnly
+                                            name="slot"
+                                            value={formData.slot}
+                                        />
+                                    </Form.Group>
+                                </Row>
                             )}
-                            <Form.Control.Feedback type="invalid">
-                                Bắt buộc chọn
-                            </Form.Control.Feedback>
-                        </Form.Group>
-                    </Row>
+                        </Col>
 
-                    <Row className="mb-3">
-                        <Form.Group as={Col} sm>
-                            <Form.Label>Ngày giờ nhập kho</Form.Label>
-                            <Form.Control
-                                type="datetime-local"
-                                required
-                                name="importDate"
-                                ref={importDateRef}
-                                value={formData.importDate}
-                                onChange={handleChange}
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                Bắt buộc nhập
-                            </Form.Control.Feedback>
-                        </Form.Group>
-
-                        <Form.Group as={Col} sm>
-                            <Form.Label>Hạn sử dụng</Form.Label>
-                            <Form.Control
-                                type="date"
-                                required
-                                ref={expRef}
-                                name="exp"
-                                value={formData.exp}
-                                onChange={handleChange}
-                                onBlur={() => customValidateDate()}
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                Bắt buộc nhập
-                            </Form.Control.Feedback>
-                        </Form.Group>
+                        <Col lg={6}>
+                            <Row className="mb-3">
+                                <Form.Group as={Col} sm>
+                                    <Form.Label>
+                                        Chọn vị trí chứa hàng: &nbsp;{" "}
+                                    </Form.Label>
+                                    {slots.length > 0 && (
+                                        <WarehouseDiagram
+                                            radios={slots}
+                                            setRadioValue={setRadioValue}
+                                            radioValue={radioValue}
+                                        />
+                                    )}
+                                </Form.Group>
+                            </Row>
+                        </Col>
                     </Row>
 
                     <Form.Group className="mb-3">

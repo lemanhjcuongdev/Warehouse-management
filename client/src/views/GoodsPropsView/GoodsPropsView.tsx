@@ -19,19 +19,19 @@ import {
 } from "~/views/types";
 
 const initGoodsGroupData: iGoodsGroupProps = {
-    idGoodsGroups: 1,
+    idGoodsGroups: 0,
     name: "",
     deletedAt: new Date(),
 };
 
 const initGoodsUnitData: iGoodsUnitProps = {
-    idGoodsUnits: 1,
+    idGoodsUnits: 0,
     name: "",
     deletedAt: new Date(),
 };
 const initGoodsTypeData: iGoodsTypeProps = {
-    idGoodsTypes: 1,
-    idGoodsGroup: 1,
+    idGoodsTypes: 0,
+    idGoodsGroup: 0,
     idGoodsGroup2: initGoodsGroupData,
     name: "",
     deletedAt: new Date(),

@@ -12,14 +12,14 @@ const managerId = getCookie("id") || 1;
 const initialUserDataState: iUserDataProps = {
     name: "",
     email: "",
-    gender: "M",
+    gender: "",
     phone: "",
     startDate: "",
     username: "",
     password: "",
     idCreated: +managerId,
     disabled: 0,
-    idPermissions: ROLES[0].idPermissions,
+    idPermissions: [],
 };
 
 function UserView() {
@@ -38,10 +38,7 @@ function UserView() {
     const [role, setRole] = useState(0);
 
     const handleSetListData = useCallback(() => {
-        const jwt = getCookie("jwt");
-        if (jwt) {
-            getAllUser().then((data) => setListData(data));
-        }
+        getAllUser().then((data) => setListData(data));
     }, []);
 
     useEffect(() => {
@@ -71,6 +68,7 @@ function UserView() {
                 formData={formData}
                 setFormData={setFormData}
                 role={role}
+                setRole={setRole}
             />
 
             <UserTable

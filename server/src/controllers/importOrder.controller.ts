@@ -399,8 +399,7 @@ class ImportOrderController {
           status: IMPORT_STATUS.IN_PROCESS_ACCOUNTANT_VERIFIED
         },
         {
-          status: IMPORT_STATUS.FAILED,
-          reasonFailed
+          status: IMPORT_STATUS.FAILED
         }
       )
       const updateResult2 = await importOrderRepo.update(

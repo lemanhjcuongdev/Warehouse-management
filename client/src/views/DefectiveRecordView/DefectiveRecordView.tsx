@@ -1,39 +1,31 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { getAllWarehouses } from "~/apis/warehouseAPI";
+import DefectiveRecordModal from "~/components/Layout/components/Modal/DefectiveRecordModal";
 import WarehouseModal from "~/components/Layout/components/Modal/WarehouseModal";
 import { iModalTypes } from "~/components/Layout/components/Modal/types";
+import DefectiveRecordTable from "~/components/Layout/components/Table/DefectiveRecordListTable/DefectiveRecordTable";
 import WarehouseTable from "~/components/Layout/components/Table/WarehouseListTable/WarehouseTable";
 import { getCookie } from "~/utils/cookies";
-import { iWarehouseDataProps, iWarehouseItemProps } from "~/views/types";
+import { iDefectiveRecordProps } from "~/views/types";
 
-const managerId = getCookie("id");
-const initialWarehouseDataState: iWarehouseDataProps = {
-    name: "",
-    address: "",
-    totalFloors: 0,
-    totalSlots: 0,
-    idCreated: +managerId,
-    disabled: 0,
+const initRecordData: iDefectiveRecordProps = {
+    idDefectiveRecords: 1,
+    date: "",
+    idImportOrder: 1,
 };
 
-function WarehouseView() {
+function DefectiveRecordView() {
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
-    const [listData, setListData] = useState<iWarehouseItemProps[]>([
-        {
-            idWarehouse: -1,
-            name: "",
-            address: "",
-            disabled: 0,
-        },
+    const [listData, setListData] = useState<iDefectiveRecordProps[]>([
+        initRecordData,
     ]);
-    const [formData, setFormData] = useState<iWarehouseDataProps>(
-        initialWarehouseDataState
-    );
+    const [formData, setFormData] =
+        useState<iDefectiveRecordProps>(initRecordData);
 
     const handleSetListData = useCallback(() => {
-        getAllWarehouses().then((data) => setListData(data));
+        //getAll().then((data) => setListData(data));
     }, []);
 
     useEffect(() => {
@@ -47,14 +39,14 @@ function WarehouseView() {
 
     return (
         <>
-            <h2>Danh sách kho hàng</h2>
+            <h2>Danh sách biên bản hàng lỗi / hỏng</h2>
 
-            <Button onClick={handleToggleShowModal} className="my-3">
+            {/* <Button onClick={handleToggleShowModal} className="my-3">
                 <i className="fa-solid fa-plus"></i>
                 &nbsp; Thêm mới
-            </Button>
+            </Button> */}
 
-            <WarehouseModal
+            <DefectiveRecordModal
                 show={showModal}
                 onHide={handleToggleShowModal}
                 listData={listData}
@@ -64,16 +56,14 @@ function WarehouseView() {
                 setFormData={setFormData}
             />
 
-            <WarehouseTable
+            {/* <DefectiveRecordTable
                 listData={listData}
                 setListData={setListData}
-                toggleShowModal={handleToggleShowModal}
-                setModalType={setModalType}
                 setFormData={setFormData}
-            />
+            /> */}
         </>
     );
 }
 
-export { initialWarehouseDataState };
-export default WarehouseView;
+export { initRecordData };
+export default DefectiveRecordView;

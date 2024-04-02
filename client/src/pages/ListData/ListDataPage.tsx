@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import DefectiveRecordView from "~/views/DefectiveRecordView/DefectiveRecordView";
 import GoodsPropsView from "~/views/GoodsPropsView/GoodsPropsView";
 import GoodsView from "~/views/GoodsView/GoodsView";
 import ImportOrderView from "~/views/ImportOrderView/ImportOrderView";
@@ -22,6 +23,8 @@ function ListData() {
             return <GoodsView />;
         case "import-orders":
             return <ImportOrderView />;
+        case "defective-records":
+            return <DefectiveRecordView />;
         default:
             return <></>;
     }

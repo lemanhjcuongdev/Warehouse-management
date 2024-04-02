@@ -6,8 +6,7 @@ $primary: #ef4d2d;
     color: $color;
 }
 
-.btn-primary,
-.btn-outline-primary:hover {
+.btn-primary {
     @include text-color(#ffffff !important);
 }
 
