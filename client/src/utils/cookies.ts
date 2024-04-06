@@ -9,12 +9,12 @@ const setCookie = (name: string, value: string) => {
         //1/1440 = expire in 1'
         //1 / 24 = expire in 1h
         sameSite: "Strict",
-        secure: true,
+        // secure: true,
     });
     Cookies.set(`${name}_expired_at`, expired.toString(), {
         expires: 1 / 24,
         sameSite: "Strict",
-        secure: true,
+        // secure: true,
     });
 };
 

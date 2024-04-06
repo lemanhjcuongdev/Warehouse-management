@@ -3,9 +3,9 @@ import dotenv from 'dotenv'
 import { NextFunction, Request, Response } from 'express'
 import { appDataSource } from '~/constants/appDataSource'
 import STATUS from '~/constants/statusCode'
-import { iImportReceiptRequestBody } from './types'
-import { Users } from '~/models/entities/Users'
 import { ImportReceipts } from '~/models/entities/ImportReceipts'
+import { Users } from '~/models/entities/Users'
+import { iImportReceiptRequestBody } from './types'
 
 dotenv.config()
 
@@ -21,21 +21,12 @@ class ImportReceiptController {
     try {
       //get all ImportReceipt from DB
       const importReceipt = await importReceiptRepo.find({
-        select: [
-          'idImportReceipts',
-          'idWarehouse',
-          'idWarehouse2',
-          'importDate',
-          'status',
-          'palletCode',
-          'idImportOrder',
-          'idImportOrder2'
-        ],
+        select: ['idImportReceipts', 'idWarehouse2', 'importDate', 'status', 'idImportOrder'],
         where: { status: status },
         order: {
           importDate: 'DESC'
         },
-        relations: ['idWarehouse2', 'idImportOrder2']
+        relations: ['idWarehouse2']
       })
       res.status(STATUS.SUCCESS).send(importReceipt)
     } catch (error) {
@@ -60,9 +51,7 @@ class ImportReceiptController {
           'idImportOrder',
           'idImportOrder2',
           'idUserImport',
-          'idUserImport2',
           'importDate',
-          'palletCode',
           'status',
           'idUpdated',
           'updatedAt'
@@ -70,9 +59,15 @@ class ImportReceiptController {
         where: {
           idImportReceipts: id
         },
-        relations: ['idWarehouse2', 'idProvider2', 'idImportOrder2', 'idUserImport2']
+        relations: ['idWarehouse2', 'idProvider2', 'idImportOrder2.importOrderDetails']
       })
 
+      const createdManager = await userRepository.findOneOrFail({
+        select: ['username'],
+        where: {
+          idUsers: importReceipt.idUserImport
+        }
+      })
       //get user updated receipt
       let updatedManager = new Users()
       if (importReceipt.idUpdated) {
@@ -83,8 +78,10 @@ class ImportReceiptController {
           }
         })
       }
+
       res.status(STATUS.SUCCESS).send({
         ...importReceipt,
+        usernameCreated: createdManager.username,
         usernameUpdated: updatedManager.username
       })
     } catch (error) {
@@ -98,14 +95,8 @@ class ImportReceiptController {
   //[POST /ImportReceipt/create-ImportReceipt]
   async createImportReceipt(req: Request, res: Response, next: NextFunction) {
     //get params from request body
-    const {
-      idImportReceipts,
-      idWarehouse,
-      idProvider,
-      idImportOrder,
-      idUserImport,
-      palletCode
-    }: iImportReceiptRequestBody = req.body
+    const { idImportReceipts, idWarehouse, idProvider, idImportOrder, idUserImport }: iImportReceiptRequestBody =
+      req.body
 
     let importReceipt = new ImportReceipts()
     importReceipt.idImportReceipts = idImportReceipts
@@ -114,7 +105,6 @@ class ImportReceiptController {
     importReceipt.idImportOrder = idImportOrder
     importReceipt.idUserImport = idUserImport
     importReceipt.importDate = new Date()
-    importReceipt.palletCode = palletCode
     importReceipt.status = 0
 
     //validate type of params
@@ -127,6 +117,19 @@ class ImportReceiptController {
     //try to save ImportReceipt
     try {
       importReceipt = await importReceiptRepo.save(importReceipt)
+      const receiptWarehouse = await importReceiptRepo.findOneOrFail({
+        select: ['idWarehouse2'],
+        where: {
+          idImportReceipts: importReceipt.idImportReceipts
+        },
+        relations: ['idWarehouse2']
+      })
+      importReceipt = {
+        ...importReceipt,
+        idWarehouse2: {
+          ...receiptWarehouse.idWarehouse2
+        }
+      }
     } catch (error) {
       res.status(STATUS.BAD_REQUEST).send({
         error: 'Lỗi không xác định'
@@ -148,7 +151,6 @@ class ImportReceiptController {
       idProvider,
       idImportOrder,
       idUserImport,
-      palletCode,
       status,
       idUpdated
     }: iImportReceiptRequestBody = req.body
@@ -198,7 +200,6 @@ class ImportReceiptController {
                 idProvider,
                 idImportOrder,
                 idUserImport,
-                palletCode,
                 status
               }
             )
@@ -255,7 +256,7 @@ class ImportReceiptController {
         status: 0
       },
       {
-        status: 2
+        status: 1
       }
     )
     if (updateResult.affected === 0) {

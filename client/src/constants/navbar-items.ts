@@ -19,7 +19,7 @@ const navbar_items: iNavbarItem[] = [
             },
             {
                 label: "Nhập kho",
-                to: "/",
+                to: "/list/import-receipts",
             },
             {
                 label: "Xuất kho",

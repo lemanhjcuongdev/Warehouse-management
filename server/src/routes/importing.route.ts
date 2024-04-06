@@ -15,8 +15,8 @@ importingRouter.delete('/orders/:id', [checkJwt], importOrderController.softDele
 
 //IMPORT RECEIPT
 importingRouter.post('/receipts/', importReceiptController.createImportReceipt)
-importingRouter.get('/receipts/id/:id', importReceiptController.getAllImportReceiptsByStatus)
-importingRouter.get('/receipts/status/:status', importReceiptController.getImportReceiptById)
+importingRouter.get('/receipts/id/:id', importReceiptController.getImportReceiptById)
+importingRouter.get('/receipts/status/:status', importReceiptController.getAllImportReceiptsByStatus)
 importingRouter.patch('/receipts/:id', importReceiptController.editImportReceiptById)
 importingRouter.delete('/receipts/:id', importReceiptController.softDeleteImportReceiptById)
 

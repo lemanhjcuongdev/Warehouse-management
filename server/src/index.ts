@@ -12,11 +12,15 @@ import route from './routes'
 const app = express()
 dotenv.config()
 const port = process.env.APP_PORT
+const corsOrigin = {
+  origin: '*'
+}
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(morgan('combined'))
-app.use(cors())
+
+app.use(cors(corsOrigin))
 app.use(helmet())
 
 //Routes init

@@ -20,6 +20,7 @@
         }
     ],
     "start_url": ".",
+    "permissions": ["camera"],
     "display": "standalone",
     "theme_color": "#ef4d2d",
     "background_color": "#ef4d2d"

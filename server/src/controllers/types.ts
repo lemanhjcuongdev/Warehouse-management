@@ -1,6 +1,7 @@
 //IMPORT ORDER
 interface iCreateOrderRequestBody {
   idProvider: number
+  palletCode: number
   importOrderDetails: iCreateOrderDetail[]
   idCreated: number
 }
@@ -12,6 +13,7 @@ interface iCreateOrderDetail {
 
 interface iUpdateOrderRequestBody {
   idProvider?: number
+  palletCode: number
   importOrderDetails?: iOrderDetail[]
   status?: number
   idUpdated: number
@@ -31,7 +33,6 @@ interface iImportReceiptRequestBody {
   idImportOrder: number
   idUserImport: number
   importDate: string
-  palletCode: number
   status: number
   idUpdated: number
   updatedAt: string

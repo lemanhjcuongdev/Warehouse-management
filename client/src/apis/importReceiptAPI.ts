@@ -1,6 +1,6 @@
 import { API_ROOT } from "~/constants";
 import { getCookie } from "~/utils/cookies";
-import { iImportReceiptProps } from "~/views/types";
+import { iImportReceiptItemProps, iImportReceiptProps } from "~/views/types";
 
 const getAllImportReceiptByStatus = async (status: number) => {
     try {
@@ -20,7 +20,7 @@ const getAllImportReceiptByStatus = async (status: number) => {
             `${API_ROOT}/import/receipts/status/${status}`,
             init
         );
-        const data: iImportReceiptProps[] = await res.json();
+        const data: iImportReceiptItemProps[] = await res.json();
 
         return data;
     } catch (error) {
@@ -112,7 +112,7 @@ const updateImportReceipt = async (values: iImportReceiptProps) => {
     }
 };
 
-const softDeleteImportReceipt = async (id: number, reason: string) => {
+const softDeleteImportReceipt = async (id: number) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -125,9 +125,6 @@ const softDeleteImportReceipt = async (id: number, reason: string) => {
                 "Content-Type": "application/json",
                 authorization: jwt,
             },
-            body: JSON.stringify({
-                reasonFailed: reason,
-            }),
         };
         const res = await fetch(`${API_ROOT}/import/receipts/${id}`, init);
 

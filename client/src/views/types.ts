@@ -102,6 +102,8 @@ interface iGoodsItemProps {
     amount: number;
     disabled: 0 | 1;
     idUnit2?: iGoodsUnitProps;
+    floor?: number;
+    slot?: number;
 }
 
 // IMPORT ORDERS
@@ -118,26 +120,40 @@ interface iImportOrderProps {
     updatedAt?: string;
     usernameCreated?: string;
     usernameUpdated?: string;
+    palletCode: number;
 }
 interface iImportOrderDetailProps {
     idImportOrderDetails?: number;
     idImportOrder?: number;
     idGoods: number;
     amount: number;
+    checked?: boolean;
 }
 
 //IMPORT RECEIPTS
+interface iImportReceiptItemProps {
+    idImportReceipts: number;
+    idWarehouse: number;
+    idWarehouse2: iWarehouseDataProps;
+    idImportOrder: number;
+    importDate: string;
+    status: number;
+}
 interface iImportReceiptProps {
     idImportReceipts: number;
     idWarehouse: number;
-    idProvider: number;
     idImportOrder: number;
+    idProvider: number;
     idUserImport: number;
     importDate: string;
-    palletCode: number;
     status: number;
-    idUpdated: number;
-    updatedAt: string;
+    idUpdated?: number;
+    updatedAt?: string;
+    idImportOrder2: iImportOrderProps;
+    idProvider2?: iProviderProps;
+    idWarehouse2?: iWarehouseDataProps;
+    usernameCreated: string;
+    usernameUpdated?: string;
 }
 
 //DEFECTIVE RECORDS
@@ -169,5 +185,6 @@ export type {
     iImportOrderProps,
     iImportOrderDetailProps,
     iImportReceiptProps,
+    iImportReceiptItemProps,
     iDefectiveRecordProps,
 };

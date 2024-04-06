@@ -41,12 +41,21 @@ class ImportOrderController {
     try {
       //get all ImportOrder from DB
       const importOrder = await importOrderRepo.find({
-        select: ['idImportOrders', 'idProvider', 'orderDate', 'status', 'idProvider2', 'reasonFailed'],
+        select: [
+          'idImportOrders',
+          'idProvider',
+          'orderDate',
+          'status',
+          'idProvider2',
+          'reasonFailed',
+          'palletCode',
+          'importOrderDetails'
+        ],
         where: clientStatusToServerStatus,
         order: {
           orderDate: 'DESC'
         },
-        relations: ['idProvider2']
+        relations: ['idProvider2', 'importOrderDetails']
       })
       res.status(STATUS.SUCCESS).send(importOrder)
     } catch (error) {
@@ -71,7 +80,8 @@ class ImportOrderController {
           'importOrderDetails',
           'idUpdated',
           'idCreated',
-          'updatedAt'
+          'updatedAt',
+          'palletCode'
         ],
         where: {
           idImportOrders: id
@@ -111,12 +121,13 @@ class ImportOrderController {
   //[POST /ImportOrder/create-ImportOrder]
   async createImportOrder(req: Request, res: Response, next: NextFunction) {
     //get params from request body
-    const { idProvider, importOrderDetails, idCreated }: iCreateOrderRequestBody = req.body
+    const { idProvider, importOrderDetails, idCreated, palletCode }: iCreateOrderRequestBody = req.body
 
     let importOrder = new ImportOrders()
     importOrder.orderDate = new Date()
     importOrder.idProvider = idProvider
     importOrder.idCreated = idCreated
+    importOrder.palletCode = palletCode
     importOrder.status = 0
 
     //validate type of params
@@ -129,6 +140,19 @@ class ImportOrderController {
     //try to save ImportOrder
     try {
       importOrder = await importOrderRepo.save(importOrder)
+      const orderProvider = await importOrderRepo.findOneOrFail({
+        select: ['idProvider2'],
+        where: {
+          idImportOrders: importOrder.idImportOrders
+        },
+        relations: ['idProvider2']
+      })
+      importOrder = {
+        ...importOrder,
+        idProvider2: {
+          ...orderProvider.idProvider2
+        }
+      }
     } catch (error) {
       res.status(STATUS.BAD_REQUEST).send({
         error: 'Lỗi không xác định'
@@ -164,7 +188,7 @@ class ImportOrderController {
     //get id from query string
     const id: number = +req.params.id
     //get params from body request
-    const { idProvider, importOrderDetails, status, idUpdated }: iUpdateOrderRequestBody = req.body
+    const { idProvider, importOrderDetails, status, idUpdated, palletCode }: iUpdateOrderRequestBody = req.body
 
     let importOrder: ImportOrders
     //get ImportOrder by id from DB
@@ -243,6 +267,7 @@ class ImportOrderController {
               },
               {
                 idProvider,
+                palletCode,
                 status
               }
             )
@@ -263,6 +288,7 @@ class ImportOrderController {
               },
               {
                 idProvider,
+                palletCode,
                 status
               }
             )
@@ -273,6 +299,7 @@ class ImportOrderController {
               },
               {
                 idProvider,
+                palletCode,
                 status
               }
             )
@@ -293,6 +320,7 @@ class ImportOrderController {
               },
               {
                 idProvider,
+                palletCode,
                 status
               }
             )

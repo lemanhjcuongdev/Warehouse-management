@@ -13,10 +13,10 @@ import {
     Accordion,
     Alert,
     Button,
-    CloseButton,
     Col,
     Form,
     FormLabel,
+    Image,
     Modal,
     Row,
 } from "react-bootstrap";
@@ -28,6 +28,10 @@ import {
     updateOrderStatus,
 } from "~/apis/importOrderAPI";
 import { getAllProviders } from "~/apis/providerAPI";
+import { QR_API_ROOT } from "~/constants";
+import { IMPORT_ORDER_DETAIL_KEY } from "~/constants/localStorage";
+import { getCookie } from "~/utils/cookies";
+import stringToDate from "~/utils/stringToDate";
 import { initImportOrderData } from "~/views/ImportOrderView/ImportOrderView";
 import {
     iGoodsItemProps,
@@ -37,10 +41,7 @@ import {
 } from "~/views/types";
 import OrderDetailTable from "../Table/ImportOrderListTable/OrderDetailTable";
 import { iModalTypes } from "./types";
-import { IMPORT_ORDER_DETAIL_KEY } from "~/constants/localStorage";
-import { getCookie } from "~/utils/cookies";
-import stringToDate from "~/utils/stringToDate";
-import { QR_API_ROOT } from "~/constants";
+import SPX_Express_Icon from "~/img/SPX_Express_Icon";
 
 function ImportOrderModal(props: {
     show: true | false;
@@ -252,6 +253,7 @@ function ImportOrderModal(props: {
         const form = formRef.current;
         const idCreated = getCookie("id");
         formData.orderDate = new Date().toString();
+        formData.idProvider = +formData.idProvider;
         formData.idCreated = +idCreated;
         formData.idUpdated = +idCreated;
 
@@ -280,14 +282,15 @@ function ImportOrderModal(props: {
             isValidated &&
                 createImportOrder(formData)
                     .then((data) => {
-                        data && setListData((prev) => [...prev, data]);
+                        data && setListData((prev) => [data, ...prev]);
+
                         if (!data.error) {
                             handleCancel();
                         }
                     })
                     .catch((error) => console.log(error));
         },
-        [formData, setListData]
+        [formData, setListData, listData]
     );
 
     const handleUpdateStatus = (status: number) => {
@@ -366,6 +369,14 @@ function ImportOrderModal(props: {
             if (newWindow) {
                 newWindow?.document.write(
                     `<img src="${QR_API_ROOT}&data=${data}" />`
+                );
+                newWindow.document.write(
+                    `<br/>
+                    <div style="margin-left:35px;margin-top:8px"
+                    >
+                        <img src="https://deo.shopeemobile.com/shopee/shopee-spx-live-vn/static/media/spx-express.f3023639.svg" />
+                    </div>
+                    `
                 );
                 newWindow.document.title = `ID đơn: ${formData.idImportOrders} - ID hàng:${detail?.idGoods} - SL:${detail?.amount}`;
                 const img = newWindow?.document.querySelector("img");
@@ -447,6 +458,20 @@ function ImportOrderModal(props: {
                                 )}
                                 <Form.Control.Feedback type="invalid">
                                     Bắt buộc chọn
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Mã pallet chứa hàng</Form.Label>
+                                <Form.Control
+                                    required
+                                    name="palletCode"
+                                    type="number"
+                                    value={formData.palletCode}
+                                    onChange={handleChangeOrderInput}
+                                    min={1}
+                                ></Form.Control>
+                                <Form.Control.Feedback type="invalid">
+                                    Bắt buộc nhập
                                 </Form.Control.Feedback>
                             </Form.Group>
                             <hr />
@@ -571,13 +596,24 @@ function ImportOrderModal(props: {
                         <Col lg={6}>
                             <h4>Chi tiết đơn hàng</h4>
                             {formData.status === 3 && (
-                                <Button
-                                    onClick={handlePrintORCode}
-                                    className="mb-3"
-                                >
-                                    <i className="fa-solid fa-print"></i>
-                                    &nbsp; In mã QR
-                                </Button>
+                                <>
+                                    <Button
+                                        onClick={handlePrintORCode}
+                                        className="mb-3"
+                                    >
+                                        <i className="fa-solid fa-print"></i>
+                                        &nbsp; In mã QR
+                                    </Button>
+                                    <Link to={"/list/import-receipts"}>
+                                        <Button
+                                            className="mb-3"
+                                            variant="success"
+                                        >
+                                            <i className="fa-solid fa-print"></i>
+                                            &nbsp; Nhập kho
+                                        </Button>
+                                    </Link>
+                                </>
                             )}
                             <OrderDetailTable
                                 goods={goods}
@@ -612,12 +648,16 @@ function ImportOrderModal(props: {
                                 } bởi ${formData.usernameCreated}`}
                             </Form.Text>
                             <br />
-                            <Form.Text>
-                                {`Sửa đổi lần cuối lúc ${
-                                    formData.updatedAt &&
-                                    stringToDate(formData.updatedAt?.toString())
-                                } bởi ${formData.usernameUpdated}`}
-                            </Form.Text>
+                            {formData.usernameUpdated && (
+                                <Form.Text>
+                                    {`Sửa đổi lần cuối lúc ${
+                                        formData.updatedAt &&
+                                        stringToDate(
+                                            formData.updatedAt?.toString()
+                                        )
+                                    } bởi ${formData.usernameUpdated}`}
+                                </Form.Text>
+                            )}
                         </>
                     )}
                 </Form>

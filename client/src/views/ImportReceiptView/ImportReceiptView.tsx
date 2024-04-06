@@ -1,21 +1,43 @@
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { Button, Tab, Tabs } from "react-bootstrap";
-import { getAllImportOrderByStatus } from "~/apis/importOrderAPI";
-import ImportOrderModal from "~/components/Layout/components/Modal/ImportOrderModal";
+import { getAllImportReceiptByStatus } from "~/apis/importReceiptAPI";
+import ImportReceiptModal from "~/components/Layout/components/Modal/ImportReceiptModal";
 import { iModalTypes } from "~/components/Layout/components/Modal/types";
-import OrderTable from "~/components/Layout/components/Table/ImportOrderListTable/OrderTable";
-import { IMPORT_ORDER_DETAIL_KEY } from "~/constants/localStorage";
+import ReceiptTable from "~/components/Layout/components/Table/ImportReceiptsTable/ReceiptTable";
+import { IMPORT_RECEIPT_DETAIL_KEY } from "~/constants/localStorage";
 
-import { iImportOrderProps } from "~/views/types";
+import { iImportReceiptItemProps, iImportReceiptProps } from "~/views/types";
+import { initImportOrderData } from "../ImportOrderView/ImportOrderView";
+import { initProviderData } from "../ProviderView/ProviderView";
+import { initialWarehouseDataState } from "../WarehouseView/WarehouseView";
 
-let initImportOrderData: iImportOrderProps = {
-    idCreated: 0,
-    idImportOrders: 0,
-    orderDate: "",
+let initImportReceipt: iImportReceiptProps = {
+    idImportReceipts: 0,
+    idWarehouse: 0,
+    idImportOrder: 0,
     idProvider: 0,
+    idUserImport: 0,
+    importDate: "",
     status: 0,
-    palletCode: 0,
-    importOrderDetails: [],
+    idImportOrder2: initImportOrderData,
+    idProvider2: initProviderData,
+    idWarehouse2: initialWarehouseDataState,
+    usernameCreated: "",
+};
+let initImportReceiptItem: iImportReceiptItemProps = {
+    idImportReceipts: 0,
+    idWarehouse: 0,
+    idWarehouse2: {
+        address: "",
+        idWarehouse: 0,
+        name: "",
+        totalFloors: 0,
+        totalSlots: 0,
+        disabled: 0,
+    },
+    idImportOrder: 0,
+    importDate: "",
+    status: 0,
 };
 
 interface iTabProps {
@@ -23,31 +45,29 @@ interface iTabProps {
     title: ReactNode;
 }
 
-function ImportOrderView() {
+function ImportReceiptView() {
     //SHARED PROPS
-    const [key, setKey] = useState("in-process");
+    const [key, setKey] = useState("finished");
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
-    const [listData, setListData] = useState<iImportOrderProps[]>([
-        initImportOrderData,
+    const [listData, setListData] = useState<iImportReceiptItemProps[]>([
+        initImportReceiptItem,
     ]);
     const [formData, setFormData] =
-        useState<iImportOrderProps>(initImportOrderData);
-    //get continousData from session storage
+        useState<iImportReceiptProps>(initImportReceipt);
+    //get continuousData from session storage
     useEffect(() => {
-        const continousOrder = sessionStorage.getItem(IMPORT_ORDER_DETAIL_KEY);
-        if (continousOrder) {
-            setFormData(JSON.parse(continousOrder));
+        const continuousReceipt = sessionStorage.getItem(
+            IMPORT_RECEIPT_DETAIL_KEY
+        );
+        if (continuousReceipt) {
+            setFormData(JSON.parse(continuousReceipt));
         }
     }, []);
     const tabs: iTabProps[] = [
         {
-            eventKey: "in-process",
-            title: "Đang xử lý",
-        },
-        {
             eventKey: "finished",
-            title: "Đã hoàn thành",
+            title: "Đã nhập kho",
         },
         {
             eventKey: "failed",
@@ -59,17 +79,16 @@ function ImportOrderView() {
     const handleSelected = useCallback(() => {
         let statusCode: number = 0;
         switch (key) {
-            case "in-process":
+            case "finished":
                 statusCode = 0;
                 break;
-            case "finished":
+            case "failed":
                 statusCode = 1;
                 break;
-            case "failed":
-                statusCode = 2;
-                break;
         }
-        getAllImportOrderByStatus(statusCode).then((data) => setListData(data));
+        getAllImportReceiptByStatus(statusCode).then((data) =>
+            setListData(data)
+        );
     }, [key]);
 
     useEffect(() => {
@@ -81,11 +100,13 @@ function ImportOrderView() {
         setModalType({ type: "create" });
     };
 
+    console.log("FORM DATA: ", formData);
+
     return (
         <>
-            <h2>Danh sách đơn nhập kho</h2>
+            <h2>Danh sách phiếu nhập kho</h2>
             <Tabs
-                defaultActiveKey="in-process"
+                defaultActiveKey="finished"
                 activeKey={key}
                 id="fill-tabs"
                 className="my-3"
@@ -108,7 +129,7 @@ function ImportOrderView() {
                         {key === tab.eventKey && (
                             <>
                                 <hr />
-                                {key === "in-process" && (
+                                {key === "finished" && (
                                     <Button
                                         onClick={handleToggleShowModal}
                                         className="mb-3"
@@ -122,7 +143,7 @@ function ImportOrderView() {
                                     </Button>
                                 )}
 
-                                <ImportOrderModal
+                                <ImportReceiptModal
                                     show={showModal}
                                     onHide={handleToggleShowModal}
                                     listData={listData}
@@ -132,7 +153,7 @@ function ImportOrderView() {
                                     setFormData={setFormData}
                                 />
 
-                                <OrderTable
+                                <ReceiptTable
                                     tabKey={key}
                                     listData={listData}
                                     setListData={setListData}
@@ -149,5 +170,5 @@ function ImportOrderView() {
     );
 }
 
-export { initImportOrderData };
-export default ImportOrderView;
+export { initImportReceipt, initImportReceiptItem };
+export default ImportReceiptView;

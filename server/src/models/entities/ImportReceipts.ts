@@ -32,9 +32,6 @@ export class ImportReceipts {
   })
   importDate: Date | null
 
-  @Column('int', { name: 'pallet_code' })
-  palletCode: number
-
   @Column('int', { name: 'status' })
   status: number
 

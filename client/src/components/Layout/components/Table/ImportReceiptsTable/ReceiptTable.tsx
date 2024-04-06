@@ -1,33 +1,32 @@
 import { Dispatch, SetStateAction, memo } from "react";
 import { Table } from "react-bootstrap";
-import { iImportOrderProps } from "~/views/types";
 import { iModalTypes } from "../../Modal/types";
-import OrderTableRow from "./OrderTableRow";
+import ReceiptTableRow from "./ReceiptTableRow";
+import { iImportReceiptItemProps, iImportReceiptProps } from "~/views/types";
 
-function OrderTable(props: {
+function ReceiptTable(props: {
     tabKey: "in-process" | "finished" | "failed" | string;
-    listData: iImportOrderProps[];
-    setListData: Dispatch<SetStateAction<iImportOrderProps[]>>;
+    listData: iImportReceiptItemProps[];
+    setListData: Dispatch<SetStateAction<iImportReceiptItemProps[]>>;
     toggleShowModal: () => void;
     setModalType: Dispatch<SetStateAction<iModalTypes>>;
-    setFormData: Dispatch<React.SetStateAction<iImportOrderProps>>;
+    setFormData: Dispatch<React.SetStateAction<iImportReceiptProps>>;
 }) {
     const { listData, tabKey } = props;
     return (
         <Table striped bordered hover responsive>
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>ID phiếu nhập</th>
+                    <th>ID đơn nhập</th>
                     <th>Nhà cung cấp</th>
-                    <th>Ngày lập</th>
-                    {tabKey === "in-process" && <th>Trạng thái</th>}
-                    {tabKey === "failed" && <th>Lý do huỷ</th>}
+                    <th>Ngày nhập</th>
                 </tr>
             </thead>
             <tbody>
                 {listData.map((item, index) => (
-                    <OrderTableRow
-                        key={item.idImportOrders}
+                    <ReceiptTableRow
+                        key={item.idImportReceipts}
                         item={item}
                         index={index}
                         {...props}
@@ -38,4 +37,4 @@ function OrderTable(props: {
     );
 }
 
-export default memo(OrderTable);
+export default memo(ReceiptTable);

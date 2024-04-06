@@ -35,6 +35,9 @@ export class ImportOrders {
   @Column('int', { name: 'id_updated', nullable: true })
   idUpdated: number | null
 
+  @Column('int', { name: 'pallet_code' })
+  palletCode: number
+
   @OneToMany(() => DefectiveRecords, (defectiveRecords) => defectiveRecords.idImportOrder2)
   defectiveRecords: DefectiveRecords[]
 

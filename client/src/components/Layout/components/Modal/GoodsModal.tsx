@@ -555,12 +555,16 @@ function GoodsModal(props: {
                                 } bởi ${formData.usernameCreated}`}
                             </Form.Text>
                             <br />
-                            <Form.Text>
-                                {`Sửa đổi lần cuối lúc ${
-                                    formData.updatedAt &&
-                                    stringToDate(formData.updatedAt?.toString())
-                                } bởi ${formData.usernameUpdated}`}
-                            </Form.Text>
+                            {formData.usernameUpdated && (
+                                <Form.Text>
+                                    {`Sửa đổi lần cuối lúc ${
+                                        formData.updatedAt &&
+                                        stringToDate(
+                                            formData.updatedAt?.toString()
+                                        )
+                                    } bởi ${formData.usernameUpdated}`}
+                                </Form.Text>
+                            )}
                         </>
                     )}
                 </Form>

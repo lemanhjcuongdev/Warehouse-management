@@ -3,6 +3,7 @@ import DefectiveRecordView from "~/views/DefectiveRecordView/DefectiveRecordView
 import GoodsPropsView from "~/views/GoodsPropsView/GoodsPropsView";
 import GoodsView from "~/views/GoodsView/GoodsView";
 import ImportOrderView from "~/views/ImportOrderView/ImportOrderView";
+import ImportReceiptView from "~/views/ImportReceiptView/ImportReceiptView";
 import ProviderView from "~/views/ProviderView/ProviderView";
 import UserView from "~/views/UserView/UserView";
 import WarehouseView from "~/views/WarehouseView/WarehouseView";
@@ -25,6 +26,8 @@ function ListData() {
             return <ImportOrderView />;
         case "defective-records":
             return <DefectiveRecordView />;
+        case "import-receipts":
+            return <ImportReceiptView />;
         default:
             return <></>;
     }
