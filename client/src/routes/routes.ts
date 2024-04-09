@@ -14,6 +14,7 @@ const publicRoutes: Array<iRoute> = [
     { path: "/", component: Home },
     { path: "/detail", component: Detail },
     { path: "/list/:category", component: ListData },
+    { path: "/list/:category/:action", component: ListData },
     { path: "*", component: Home },
 ];
 

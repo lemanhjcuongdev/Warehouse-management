@@ -6,7 +6,7 @@ import { getCookie } from "~/utils/cookies";
 import { iProviderProps } from "../types";
 import { getAllProviders } from "~/apis/providerAPI";
 import ProviderTable from "~/components/Layout/components/Table/ProviderListTable/ProviderTable";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 const initProviderData: iProviderProps = {
     idProviders: 1,
@@ -16,7 +16,10 @@ const initProviderData: iProviderProps = {
 };
 
 function ProviderView() {
-    const [showModal, setShowModal] = useState(false);
+    const params = useParams();
+    const action = params.action;
+    const initShowModal = action ? true : false;
+    const [showModal, setShowModal] = useState(initShowModal);
     const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
     const [listData, setListData] = useState<iProviderProps[]>([
         initProviderData,
@@ -46,7 +49,7 @@ function ProviderView() {
                 <i className="fa-solid fa-plus"></i>
                 &nbsp; Thêm NCC mới
             </Button>
-            <Link to={"/list/import-orders"}>
+            <Link to={"/list/import-orders/create"}>
                 <Button className="my-3">
                     <i className="fa-solid fa-arrow-right-to-bracket"></i>&nbsp;
                     Đặt đơn nhập kho mới

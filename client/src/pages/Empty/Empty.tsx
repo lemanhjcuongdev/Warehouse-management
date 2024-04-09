@@ -12,7 +12,7 @@ function Empty() {
             navigate("/login");
         } else navigate("/");
     }, [isAuthentication, navigate]);
-    return <></>;
+    return <h1>Trang không tồn tại</h1>;
 }
 
 export default Empty;

@@ -18,6 +18,9 @@ export class ImportOrderDetails {
   @Column('int', { name: 'amount' })
   amount: number
 
+  @Column('date', { name: 'exp', nullable: true })
+  exp: string
+
   @ManyToOne(() => ImportOrders, (importOrders) => importOrders.importOrderDetails, {
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION'

@@ -1,6 +1,7 @@
 import { validate } from 'class-validator'
 import dotenv from 'dotenv'
 import { NextFunction, Request, Response } from 'express'
+import { And, MoreThan, MoreThanOrEqual } from 'typeorm'
 import { appDataSource } from '~/constants/appDataSource'
 import STATUS from '~/constants/statusCode'
 import { Goods } from '~/models/entities/Goods'
@@ -107,15 +108,97 @@ class GoodsController {
 
     //try to save, if fails, the Goodsname is already in use
     try {
+      const isExisted = await goodsRepository.find({
+        where: {
+          name,
+          idUnit
+        }
+      })
+      if (isExisted.length > 0) throw new Error()
       goods = await goodsRepository.save(goods)
     } catch (error) {
       res.status(STATUS.CONFLICT).send({
-        error: 'Tên mặt hàng đã được sử dụng trước đó'
+        error: 'Mặt hàng đã có trong kho trước đó'
       })
       return
     }
 
     res.status(STATUS.CREATED).send(goods)
+  }
+
+  //[POST /Goods/increase]
+  async modifyGoods(req: Request, res: Response, next: NextFunction) {
+    //get params from request body
+    const {
+      goodsArray
+    }: {
+      goodsArray: {
+        id: number
+        amount: number
+        exp: string
+        importDate: string
+      }[]
+    } = req.body
+
+    if (goodsArray.length > 0) {
+      goodsArray.map(async (good) => {
+        const id = good.id
+        const amount = good.amount
+        const exp = good.exp
+        const importDate = good.importDate
+
+        if (amount === 0) {
+          res.status(STATUS.BAD_REQUEST).send({
+            error: 'Không thể cập nhật số lượng = 0'
+          })
+          return
+        }
+
+        //try to save, if fails, the Goodsname is already in use
+        try {
+          const currentGoods = await goodsRepository.findOneOrFail({
+            where: {
+              idGoods: id,
+              disabled: 0,
+              amount: MoreThanOrEqual(0)
+            }
+          })
+          if (amount + currentGoods.amount < 0) {
+            res.status(STATUS.BAD_REQUEST).send({
+              error: 'Số lượng xuất nhỏ hơn tồn trong kho'
+            })
+            return
+          }
+          const updateResult = await goodsRepository.update(
+            {
+              idGoods: id
+            },
+            {
+              amount: currentGoods.amount + +amount,
+              exp,
+              importDate
+            }
+          )
+
+          if (updateResult.affected === 0) {
+            throw new Error()
+          }
+        } catch (error) {
+          res.status(STATUS.BAD_REQUEST).send({
+            error: 'Không thể cập nhật số lượng'
+          })
+          return
+        }
+      })
+    } else {
+      res.status(STATUS.BAD_REQUEST).send({
+        error: 'Không có hàng hoá cần cập nhật số lượng'
+      })
+      return
+    }
+
+    //if ok, return
+    res.status(STATUS.NO_CONTENT).send()
   }
 
   //[PATCH /:id]

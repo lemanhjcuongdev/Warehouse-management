@@ -7,6 +7,9 @@ import ImportReceiptView from "~/views/ImportReceiptView/ImportReceiptView";
 import ProviderView from "~/views/ProviderView/ProviderView";
 import UserView from "~/views/UserView/UserView";
 import WarehouseView from "~/views/WarehouseView/WarehouseView";
+import Empty from "../Empty/Empty";
+import ExportReceiptView from "~/views/ExportReceiptView/ExportReceiptView";
+import ProcessorView from "~/views/ProcessorView/ProcessorView";
 
 function ListData() {
     const params = useParams();
@@ -28,8 +31,12 @@ function ListData() {
             return <DefectiveRecordView />;
         case "import-receipts":
             return <ImportReceiptView />;
+        case "export-receipts":
+            return <ExportReceiptView />;
+        case "processor":
+            return <ProcessorView />;
         default:
-            return <></>;
+            return <Empty />;
     }
 }
 

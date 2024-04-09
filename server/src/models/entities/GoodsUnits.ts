@@ -1,6 +1,6 @@
-import { Column, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, DeleteDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { Goods } from './Goods'
-
+@Index('name_UNIQUE', ['name'], { unique: true })
 @Entity('goods_units', { schema: 'quanlykho' })
 export class GoodsUnits {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id_goods_units' })

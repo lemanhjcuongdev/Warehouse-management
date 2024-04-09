@@ -95,11 +95,9 @@ class ImportReceiptController {
   //[POST /ImportReceipt/create-ImportReceipt]
   async createImportReceipt(req: Request, res: Response, next: NextFunction) {
     //get params from request body
-    const { idImportReceipts, idWarehouse, idProvider, idImportOrder, idUserImport }: iImportReceiptRequestBody =
-      req.body
+    const { idWarehouse, idProvider, idImportOrder, idUserImport }: iImportReceiptRequestBody = req.body
 
     let importReceipt = new ImportReceipts()
-    importReceipt.idImportReceipts = idImportReceipts
     importReceipt.idWarehouse = idWarehouse
     importReceipt.idProvider = idProvider
     importReceipt.idImportOrder = idImportOrder
@@ -145,15 +143,8 @@ class ImportReceiptController {
     //get id from query string
     const id: number = +req.params.id
     //get params from body request
-    const {
-      idImportReceipts,
-      idWarehouse,
-      idProvider,
-      idImportOrder,
-      idUserImport,
-      status,
-      idUpdated
-    }: iImportReceiptRequestBody = req.body
+    const { idWarehouse, idProvider, idImportOrder, idUserImport, status, idUpdated }: iImportReceiptRequestBody =
+      req.body
 
     let importReceipt: ImportReceipts
     //get ImportReceipt by id from DB
@@ -195,7 +186,6 @@ class ImportReceiptController {
                 status: 0
               },
               {
-                idImportReceipts,
                 idWarehouse,
                 idProvider,
                 idImportOrder,

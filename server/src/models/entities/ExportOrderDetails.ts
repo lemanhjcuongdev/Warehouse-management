@@ -1,4 +1,4 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm'
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { ExportOrders } from './ExportOrders'
 import { Goods } from './Goods'
 
@@ -6,7 +6,7 @@ import { Goods } from './Goods'
 @Index('FK_export_goods_idx', ['idGoods'], {})
 @Entity('export_order_details', { schema: 'quanlykho' })
 export class ExportOrderDetails {
-  @Column('int', { primary: true, name: 'id_export_order_details' })
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id_export_order_details' })
   idExportOrderDetails: number
 
   @Column('int', { name: 'id_export_order' })

@@ -4,12 +4,12 @@ import { getAllImportReceiptByStatus } from "~/apis/importReceiptAPI";
 import ImportReceiptModal from "~/components/Layout/components/Modal/ImportReceiptModal";
 import { iModalTypes } from "~/components/Layout/components/Modal/types";
 import ReceiptTable from "~/components/Layout/components/Table/ImportReceiptsTable/ReceiptTable";
-import { IMPORT_RECEIPT_DETAIL_KEY } from "~/constants/localStorage";
 
 import { iImportReceiptItemProps, iImportReceiptProps } from "~/views/types";
 import { initImportOrderData } from "../ImportOrderView/ImportOrderView";
 import { initProviderData } from "../ProviderView/ProviderView";
 import { initialWarehouseDataState } from "../WarehouseView/WarehouseView";
+import { useParams } from "react-router-dom";
 
 let initImportReceipt: iImportReceiptProps = {
     idImportReceipts: 0,
@@ -46,24 +46,17 @@ interface iTabProps {
 }
 
 function ImportReceiptView() {
-    //SHARED PROPS
+    const params = useParams();
+    const action = params.action;
+    const initShowModal = action ? true : false;
     const [key, setKey] = useState("finished");
-    const [showModal, setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState(initShowModal);
     const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
     const [listData, setListData] = useState<iImportReceiptItemProps[]>([
         initImportReceiptItem,
     ]);
     const [formData, setFormData] =
         useState<iImportReceiptProps>(initImportReceipt);
-    //get continuousData from session storage
-    useEffect(() => {
-        const continuousReceipt = sessionStorage.getItem(
-            IMPORT_RECEIPT_DETAIL_KEY
-        );
-        if (continuousReceipt) {
-            setFormData(JSON.parse(continuousReceipt));
-        }
-    }, []);
     const tabs: iTabProps[] = [
         {
             eventKey: "finished",

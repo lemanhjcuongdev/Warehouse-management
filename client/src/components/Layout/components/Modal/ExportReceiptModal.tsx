@@ -10,6 +10,7 @@ import {
     useState,
 } from "react";
 import {
+    Accordion,
     Alert,
     Button,
     Col,
@@ -18,36 +19,40 @@ import {
     Modal,
     Row,
 } from "react-bootstrap";
-import { getAllGoods, modifyGoods } from "~/apis/goodsAPI";
-import { getAllImportOrderByStatus } from "~/apis/importOrderAPI";
+import { getAllExportOrders } from "~/apis/exportOrderAPI";
 import {
-    createImportReceipt,
-    softDeleteImportReceipt,
-} from "~/apis/importReceiptAPI";
+    createExportReceipt,
+    softDeleteExportReceipt,
+} from "~/apis/exportReceiptAPI";
+import { getAllGoods, modifyGoods } from "~/apis/goodsAPI";
 import { getAllWarehouses } from "~/apis/warehouseAPI";
 import { getCookie } from "~/utils/cookies";
 import stringToDate from "~/utils/stringToDate";
-import { initImportOrderData } from "~/views/ImportOrderView/ImportOrderView";
-import { initImportReceipt } from "~/views/ImportReceiptView/ImportReceiptView";
 import {
+    initExportOrder,
+    initExportReceipt,
+} from "~/views/ExportReceiptView/ExportReceiptView";
+import {
+    iExportDetailProps,
+    iExportOrderProps,
+    iExportReceiptItemProps,
+    iExportReceiptProps,
     iGoodsItemProps,
-    iImportOrderDetailProps,
-    iImportOrderProps,
-    iImportReceiptItemProps,
-    iImportReceiptProps,
     iWarehouseItemProps,
 } from "~/views/types";
-import ReceiptDetailTable from "../Table/ImportReceiptsTable/ReceiptDetailTable";
-import { iModalTypes } from "./types";
+import QRCodeScanner from "../QRCodeScanner/QRCodeScanner";
+import ExportReceiptDetailTable from "../Table/ExportReceiptsTable/ExportReceiptDetailTable";
+import { iModalTypes, iPrintExportReceipt } from "./types";
+import { QR_API_ROOT } from "~/constants";
 
-function ImportReceiptModal(props: {
+function ExportReceiptModal(props: {
     show: true | false;
     onHide: () => void;
-    listData: iImportReceiptItemProps[];
-    setListData: Dispatch<SetStateAction<iImportReceiptItemProps[]>>;
+    listData: iExportReceiptItemProps[];
+    setListData: Dispatch<SetStateAction<iExportReceiptItemProps[]>>;
     modalType: iModalTypes;
-    formData: iImportReceiptProps;
-    setFormData: Dispatch<React.SetStateAction<iImportReceiptProps>>;
+    formData: iExportReceiptProps;
+    setFormData: Dispatch<React.SetStateAction<iExportReceiptProps>>;
 }) {
     const {
         show,
@@ -65,11 +70,11 @@ function ImportReceiptModal(props: {
     let title: string;
     const [goods, setGoods] = useState<iGoodsItemProps[]>([]);
     const [warehouses, setWarehouses] = useState<iWarehouseItemProps[]>([]);
-    const [importOrders, setImportOrders] = useState<iImportOrderProps[]>([
-        initImportOrderData,
+    const [exportOrders, setExportOrders] = useState<iExportOrderProps[]>([
+        initExportOrder,
     ]);
     const [currentOrder, setCurrentOrder] =
-        useState<iImportOrderProps>(initImportOrderData);
+        useState<iExportOrderProps>(initExportOrder);
 
     switch (modalType.type) {
         case "create":
@@ -81,14 +86,17 @@ function ImportReceiptModal(props: {
     }
 
     useEffect(() => {
-        getAllImportOrderByStatus(1).then((data) => {
+        getAllExportOrders().then((data) => {
             const ordersWithoutReceipt = [];
             //filter orders have been imported
             for (const order of data) {
                 let hasReceipt = false;
 
                 for (const receipt of listData) {
-                    if (order.idImportOrders === receipt.idImportOrder) {
+                    if (
+                        order.idExportOrders ===
+                        receipt.idExportOrder2.idExportOrders
+                    ) {
                         hasReceipt = true;
                         break;
                     }
@@ -98,7 +106,7 @@ function ImportReceiptModal(props: {
                     ordersWithoutReceipt.push(order);
                 }
             }
-            setImportOrders(ordersWithoutReceipt);
+            setExportOrders(ordersWithoutReceipt);
         });
         getAllGoods().then((data) => setGoods(data));
         getAllWarehouses().then((data) => setWarehouses(data));
@@ -109,21 +117,22 @@ function ImportReceiptModal(props: {
     > = (e) => {
         const { value, name } = e.target;
         switch (name) {
-            case "idImportOrder":
+            case "idExportOrder":
                 {
-                    const order = importOrders.find(
-                        (order) => order.idImportOrders === +value
+                    const order = exportOrders.find(
+                        (order) => order.idExportOrders === +value
                     );
                     if (order) {
                         setCurrentOrder(order);
-                        setFormData((prev) => ({
-                            ...prev,
-                            idImportOrder: order.idImportOrders,
-                            idImportOrder2: {
-                                ...order,
-                            },
-                            idProvider: order.idProvider,
-                        }));
+                        if (order.idExportOrders) {
+                            setFormData((prev) => {
+                                return {
+                                    ...prev,
+                                    idExportOrder: order.idExportOrders || 0,
+                                    idExportOrder2: order,
+                                };
+                            });
+                        }
                     }
                 }
                 break;
@@ -134,14 +143,10 @@ function ImportReceiptModal(props: {
                 }));
         }
     };
-    const handleUpdateListData = (data: iImportOrderDetailProps) => {
-        const newListData = formData.idImportOrder2.importOrderDetails.map(
+    const handleUpdateListData = (data: iExportDetailProps) => {
+        const newListData = formData.idExportOrder2.exportOrderDetails.map(
             (detail) => {
-                if (
-                    detail.idImportOrder === data.idImportOrder &&
-                    detail.idGoods === data.idGoods &&
-                    detail.amount === data.amount
-                ) {
+                if (detail.idGoods === data.idGoods) {
                     detail.checked = true;
                 }
                 return detail;
@@ -150,9 +155,9 @@ function ImportReceiptModal(props: {
         setFormData((prev) => {
             return {
                 ...prev,
-                idImportOrder2: {
-                    ...formData.idImportOrder2,
-                    importOrderDetails: newListData,
+                idExportOrder2: {
+                    ...formData.idExportOrder2,
+                    exportOrderDetails: newListData,
                 },
             };
         });
@@ -169,7 +174,7 @@ function ImportReceiptModal(props: {
 
             if (date > now) {
                 importDate.setCustomValidity(
-                    "Ngày nhập kho không thể trong tương lai"
+                    "Ngày xuất kho không thể trong tương lai"
                 );
                 importDate.reportValidity();
                 return false;
@@ -198,9 +203,9 @@ function ImportReceiptModal(props: {
     const validateForm = () => {
         const form = formRef.current;
         const idCreated = getCookie("id");
-        formData.importDate = new Date().toString();
+        formData.exportDate = new Date().toString();
         formData.idWarehouse = +formData.idWarehouse;
-        formData.idUserImport = +idCreated;
+        formData.idUserExport = +idCreated;
         formData.idUpdated = +idCreated;
 
         if (
@@ -223,18 +228,16 @@ function ImportReceiptModal(props: {
             //call API
             if (isValidated) {
                 const goodsArray =
-                    formData.idImportOrder2.importOrderDetails.map(
+                    formData.idExportOrder2.exportOrderDetails.map(
                         (goodsItem) => {
                             return {
                                 id: goodsItem.idGoods,
-                                amount: goodsItem.amount,
-                                exp: goodsItem.exp,
-                                importDate: new Date().toISOString(),
+                                amount: -goodsItem.amount,
                             };
                         }
                     );
                 modifyGoods(goodsArray).then(() =>
-                    createImportReceipt(formData)
+                    createExportReceipt(formData)
                         .then((data) => {
                             data && setListData((prev) => [data, ...prev]);
                             if (!data.error) {
@@ -249,12 +252,15 @@ function ImportReceiptModal(props: {
     );
 
     const handleSoftDelete = () => {
-        const message = `Bạn có chắc muốn huỷ phiếu nhập kho mã số "${formData.idImportReceipts}"?`;
-        const deleteConfirm = window.confirm(message);
-        if (deleteConfirm) {
-            softDeleteImportReceipt(formData.idImportReceipts).then(() => {
+        const message = `Nhập lý do huỷ phiếu xuất kho mã số "${formData.idExportReceipts}"?`;
+        const reasonFailed = window.prompt(message)?.trim();
+        if (reasonFailed) {
+            softDeleteExportReceipt(
+                formData.idExportReceipts,
+                reasonFailed
+            ).then(() => {
                 listData.forEach((data, index) => {
-                    if (data.idImportReceipts === formData.idImportReceipts) {
+                    if (data.idExportReceipts === formData.idExportReceipts) {
                         const newData = [...listData];
                         newData.splice(index, 1);
                         setListData(newData);
@@ -271,9 +277,9 @@ function ImportReceiptModal(props: {
         e.stopPropagation();
         if (!isValidated) return;
 
-        // updateImportOrder(formData).then(() => {
+        // updateExportOrder(formData).then(() => {
         //     listData.forEach((data, index) => {
-        //         if (data.idImportOrders === formData.idImportOrders) {
+        //         if (data.idExportOrders === formData.idExportOrders) {
         //             //deep clone
         //             const newData = [...listData];
         //             newData.splice(index, 1, formData);
@@ -285,10 +291,47 @@ function ImportReceiptModal(props: {
     };
 
     const handleCancel = () => {
-        setCurrentOrder(initImportOrderData);
-        setFormData(initImportReceipt);
+        setCurrentOrder(initExportOrder);
+        setFormData(initExportReceipt);
         setValidated(false);
         onHide();
+    };
+
+    const handlePrintORCode = () => {
+        const printData: iPrintExportReceipt = {
+            idExportReceipts: formData.idExportReceipts,
+            idExportOrder: formData.idExportOrder,
+        };
+        const data = encodeURIComponent(JSON.stringify(printData));
+        const newWindow = window.open(
+            "",
+            "_blank",
+            "left=0,top=0,width=552,height=477,toolbar=0,scrollbars=0,status=0"
+        );
+        if (newWindow) {
+            newWindow?.document.write(
+                `<img src="${QR_API_ROOT}&data=${data}" />`
+            );
+            newWindow.document.write(
+                `<br/>
+                    <div style="margin-left:35px;margin-top:8px;margin-bottom:8px"
+                    >
+                        <img src="https://deo.shopeemobile.com/shopee/shopee-spx-live-vn/static/media/spx-express.f3023639.svg" />
+                    </div>
+                    `
+            );
+            newWindow.document.title = `ID phiếu: ${formData.idExportReceipts} - ID đơn:${formData.idExportOrder}`;
+            newWindow.document.write(
+                `ID phiếu: ${formData.idExportReceipts} - ID đơn:${formData.idExportOrder}`
+            );
+            const img = newWindow?.document.querySelector("img");
+            if (img) {
+                img.onload = () => {
+                    newWindow.print();
+                    newWindow.close();
+                };
+            }
+        }
     };
 
     return (
@@ -301,7 +344,21 @@ function ImportReceiptModal(props: {
             size="xl"
         >
             <Modal.Header closeButton>
-                <Modal.Title>{`${title} phiếu nhập kho`}</Modal.Title>
+                <Modal.Title>
+                    {`${title} phiếu xuất kho `}
+                    {modalType.type === "update" && formData.status === 0 && (
+                        <>
+                            &nbsp;
+                            <Button
+                                onClick={handlePrintORCode}
+                                className="mt-2"
+                            >
+                                <i className="fa-solid fa-qrcode"></i> &nbsp; In
+                                mã QR phiếu
+                            </Button>
+                        </>
+                    )}
+                </Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form
@@ -316,56 +373,59 @@ function ImportReceiptModal(props: {
                                 {modalType.type === "create" ? (
                                     <>
                                         <FormLabel>
-                                            Đơn nhập kho &nbsp;
+                                            Đơn xuất kho &nbsp;
                                         </FormLabel>
                                         <Form.Select
                                             required
-                                            name="idImportOrder"
-                                            value={formData.idImportOrder}
+                                            name="idExportOrder"
+                                            value={formData.idExportOrder}
                                             onChange={handleChangeReceiptInput}
                                         >
                                             <option value="">
-                                                ------Chọn đơn nhập kho------
+                                                ------Chọn đơn xuất kho------
                                             </option>
-                                            {importOrders.map((order) => (
-                                                <option
-                                                    key={order.idImportOrders}
-                                                    value={order.idImportOrders}
-                                                >
-                                                    ID: {order.idImportOrders} -{" "}
-                                                    NCC:{" "}
-                                                    {order.idProvider2?.name}-{" "}
-                                                    Ngày đặt:{" "}
-                                                    {stringToDate(
-                                                        order.orderDate
-                                                    )}{" "}
-                                                    - SL:{" "}
-                                                    {
-                                                        order.importOrderDetails
-                                                            .length
-                                                    }
-                                                </option>
-                                            ))}
+                                            {exportOrders.length > 0 &&
+                                                exportOrders.map((order) => (
+                                                    <option
+                                                        key={
+                                                            order?.idExportOrders
+                                                        }
+                                                        value={
+                                                            order?.idExportOrders
+                                                        }
+                                                    >
+                                                        ID:{" "}
+                                                        {order?.idExportOrders}{" "}
+                                                        - Ngày đặt:{" "}
+                                                        {stringToDate(
+                                                            order.orderDate
+                                                        )}{" "}
+                                                        - SL:{" "}
+                                                        {
+                                                            order
+                                                                .exportOrderDetails
+                                                                .length
+                                                        }
+                                                    </option>
+                                                ))}
                                         </Form.Select>
                                         <Form.Text muted>
                                             Chỉ những đơn đã hoàn thành mới có
-                                            thể nhập kho
+                                            thể xuất kho
                                         </Form.Text>
                                     </>
                                 ) : (
                                     <>
-                                        <FormLabel>Đơn nhập kho</FormLabel>
+                                        <FormLabel>Đơn xuất kho</FormLabel>
                                         <Form.Control
                                             value={`ID: ${
-                                                formData.idImportOrder
-                                            } - NCC:  ${
-                                                formData.idProvider2?.name
-                                            }- Ngày đặt: ${stringToDate(
-                                                formData.idImportOrder2
+                                                formData.idExportOrder
+                                            } - Ngày đặt: ${stringToDate(
+                                                formData.idExportOrder2
                                                     .orderDate
                                             )} - SL: ${
-                                                formData.idImportOrder2
-                                                    .importOrderDetails.length
+                                                formData.idExportOrder2
+                                                    .exportOrderDetails.length
                                             }`}
                                             readOnly
                                         ></Form.Control>
@@ -376,33 +436,32 @@ function ImportReceiptModal(props: {
                                 </Form.Control.Feedback>
                             </Form.Group>
                             <Form.Group className="mb-3">
-                                <Form.Label>Nhà cung cấp</Form.Label>
+                                <Form.Label>Mã giỏ đựng hàng</Form.Label>
                                 {modalType.type === "create" ? (
-                                    <Form.Control
-                                        name="idProvider"
-                                        placeholder="NCC sẽ hiển thị theo đơn nhập kho"
-                                        value={
-                                            currentOrder.idProvider2
-                                                ? `${currentOrder.idProvider2?.name} - Đ/c: ${currentOrder.idProvider2?.address}`
-                                                : ""
-                                        }
-                                        readOnly
-                                    ></Form.Control>
+                                    <>
+                                        <Form.Control
+                                            required
+                                            name="palletCode"
+                                            type="number"
+                                            value={formData.palletCode}
+                                            onChange={handleChangeReceiptInput}
+                                            min={1}
+                                        ></Form.Control>
+                                        <Form.Control.Feedback type="invalid">
+                                            Bắt buộc nhập
+                                        </Form.Control.Feedback>
+                                    </>
                                 ) : (
                                     <Form.Control
-                                        name="idProvider"
-                                        placeholder="NCC sẽ hiển thị theo đơn nhập kho"
-                                        value={
-                                            formData.idProvider2
-                                                ? `${formData.idProvider2?.name} - Đ/c: ${formData.idProvider2?.address}`
-                                                : ""
-                                        }
+                                        name="palletCode"
+                                        type="number"
+                                        value={formData.palletCode}
                                         readOnly
                                     ></Form.Control>
                                 )}
                             </Form.Group>
                             <Form.Group className="mb-3">
-                                <Form.Label>Kho nhập</Form.Label>
+                                <Form.Label>Kho xuất</Form.Label>
                                 {modalType.type === "create" ? (
                                     <>
                                         <Form.Select
@@ -412,7 +471,7 @@ function ImportReceiptModal(props: {
                                             required
                                         >
                                             <option value="">
-                                                ------Chọn kho nhập------
+                                                ------Chọn kho xuất------
                                             </option>
                                             {warehouses.map((item) => (
                                                 <option
@@ -437,7 +496,7 @@ function ImportReceiptModal(props: {
                                 )}
                             </Form.Group>
                             <hr />
-                            {/* {formData.status === 0 &&
+                            {formData.status === 0 &&
                                 modalType.type === "create" && (
                                     <>
                                         <Accordion
@@ -454,7 +513,8 @@ function ImportReceiptModal(props: {
                                                             fontWeight: "bold",
                                                         }}
                                                     >
-                                                        Nhập hàng vào kho
+                                                        Xuất kho để đóng gói &
+                                                        phân loại
                                                     </span>
                                                 </Accordion.Header>
                                                 <Accordion.Body>
@@ -462,12 +522,12 @@ function ImportReceiptModal(props: {
                                                         <Form.Label>
                                                             <h5>
                                                                 Quét mã QR để
-                                                                nhập hàng
+                                                                xuất kho
                                                             </h5>
                                                         </Form.Label>
                                                     </Form.Group>
                                                     <Form.Group>
-                                                        {formData.idImportOrder !==
+                                                        {formData.idExportOrder !==
                                                             0 && (
                                                             <QRCodeScanner
                                                                 handleUpdateListData={
@@ -478,14 +538,8 @@ function ImportReceiptModal(props: {
                                                         <br />
                                                         <Form.Text muted>
                                                             Mặt hàng và số lượng
-                                                            sẽ tuân theo đơn
-                                                            nhập kho
-                                                            <br />
-                                                            Nếu không thể sử
-                                                            dụng mã QR, vui lòng
-                                                            kiểm tra kỹ và tích
-                                                            vào các chi tiết
-                                                            phiếu!
+                                                            sẽ tuân theo chi
+                                                            tiết phiếu xuất kho
                                                         </Form.Text>
                                                     </Form.Group>
                                                 </Accordion.Body>
@@ -493,25 +547,19 @@ function ImportReceiptModal(props: {
                                         </Accordion>
                                         <hr />
                                     </>
-                                )} */}
+                                )}
                         </Col>
 
                         <Col lg={6}>
-                            <h4>Chi tiết phiếu nhập</h4>
-                            <ReceiptDetailTable
+                            <h4>Chi tiết phiếu xuất</h4>
+                            <ExportReceiptDetailTable
                                 goods={goods}
                                 listData={
-                                    formData.idImportOrder2.importOrderDetails
+                                    formData.idExportOrder2.exportOrderDetails
                                 }
                                 setFormData={setFormData}
                                 modalType={modalType}
                             />
-                            <Form.Text muted>
-                                Mặt hàng và số lượng sẽ tuân theo đơn nhập kho
-                                <br />
-                                Vui lòng kiểm đếm kỹ và tích vào các chi tiết
-                                phiếu!
-                            </Form.Text>
                         </Col>
                     </Row>
                     {modalType.type === "create" && (
@@ -533,9 +581,9 @@ function ImportReceiptModal(props: {
                         <>
                             <Form.Text>
                                 {`Tạo lúc ${
-                                    formData.importDate &&
+                                    formData.exportDate &&
                                     stringToDate(
-                                        formData.importDate?.toString()
+                                        formData.exportDate?.toString()
                                     )
                                 } bởi ${formData.usernameCreated}`}
                             </Form.Text>
@@ -564,7 +612,7 @@ function ImportReceiptModal(props: {
                         type="submit"
                         onClick={handleSubmitCreate}
                     >
-                        Nhập kho
+                        Xuất kho
                     </Button>
                 ) : (
                     formData.status === 0 && (
@@ -578,4 +626,4 @@ function ImportReceiptModal(props: {
     );
 }
 
-export default memo(ImportReceiptModal);
+export default memo(ExportReceiptModal);

@@ -1,22 +1,22 @@
 import { Dispatch, SetStateAction, memo, useCallback } from "react";
 import { ButtonGroup, Dropdown } from "react-bootstrap";
-import {
-    getImportReceiptById,
-    softDeleteImportReceipt,
-} from "~/apis/importReceiptAPI";
 import convertUTCToVNTime from "~/utils/convertUTCToVNTime";
 import stringToDate from "~/utils/stringToDate";
-import { iImportReceiptItemProps, iImportReceiptProps } from "~/views/types";
+import { iExportReceiptItemProps, iExportReceiptProps } from "~/views/types";
 import { iModalTypes } from "../../Modal/types";
+import {
+    getExportReceiptById,
+    softDeleteExportReceipt,
+} from "~/apis/exportReceiptAPI";
 
-function ReceiptTableRow(props: {
+function ProcessorTable(props: {
     tabKey: "finished" | "failed" | string;
-    item: iImportReceiptItemProps;
-    setListData: Dispatch<SetStateAction<iImportReceiptItemProps[]>>;
+    item: iExportReceiptItemProps;
+    setListData: Dispatch<SetStateAction<iExportReceiptItemProps[]>>;
     index: number;
     toggleShowModal: () => void;
     setModalType: Dispatch<SetStateAction<iModalTypes>>;
-    setFormData: Dispatch<React.SetStateAction<iImportReceiptProps>>;
+    setFormData: Dispatch<React.SetStateAction<iExportReceiptProps>>;
 }) {
     const {
         tabKey,
@@ -29,8 +29,8 @@ function ReceiptTableRow(props: {
     } = props;
 
     const handleReadOrUpdate = async () => {
-        const receiptInfo: iImportReceiptProps = await getImportReceiptById(
-            item.idImportReceipts
+        const receiptInfo: iExportReceiptProps = await getExportReceiptById(
+            item.idExportReceipts
         );
         setFormData(receiptInfo);
 
@@ -40,10 +40,10 @@ function ReceiptTableRow(props: {
 
     const handleDelete = useCallback(
         (id: number) => {
-            const message = `Bạn có chắc muốn huỷ phiếu nhập kho mã số "${item.idImportReceipts}"?`;
-            const deleteConfirm = window.confirm(message);
-            if (deleteConfirm) {
-                softDeleteImportReceipt(id)
+            const message = `Nhập lý do huỷ phiếu xuất kho mã số "${item.idExportReceipts}"?`;
+            const reasonFailed = window.prompt(message)?.trim();
+            if (reasonFailed) {
+                softDeleteExportReceipt(id, reasonFailed)
                     .then(() => {
                         setListData((prev) => {
                             //deep clone
@@ -66,12 +66,12 @@ function ReceiptTableRow(props: {
             }}
             onClick={() => handleReadOrUpdate()}
         >
-            <td>{item.idImportReceipts}</td>
-            <td>{item.idImportOrder}</td>
+            <td>{item.idExportReceipts}</td>
+            <td>{item.idExportOrder2.idExportOrders}</td>
             <td>{item.idWarehouse2.name}</td>
             <td className="d-flex justify-content-between align-items-center">
-                {item.importDate &&
-                    stringToDate(convertUTCToVNTime(item.importDate))}
+                {item.exportDate &&
+                    stringToDate(convertUTCToVNTime(item.exportDate))}
                 &nbsp;
                 {tabKey === "finished" && (
                     <Dropdown
@@ -98,11 +98,11 @@ function ReceiptTableRow(props: {
                             )} */}
                             <Dropdown.Item
                                 onClick={() =>
-                                    handleDelete(item.idImportReceipts)
+                                    handleDelete(item.idExportReceipts)
                                 }
                             >
                                 <i className={"fa-solid fa-ban"}></i>
-                                &nbsp; Huỷ phiếu nhập
+                                &nbsp; Huỷ phiếu xuất
                             </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
@@ -112,4 +112,4 @@ function ReceiptTableRow(props: {
     );
 }
 
-export default memo(ReceiptTableRow);
+export default memo(ProcessorTable);

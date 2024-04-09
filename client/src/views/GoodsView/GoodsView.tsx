@@ -6,7 +6,7 @@ import { iGoodsItemProps, iGoodsProps } from "../types";
 import { getAllGoods } from "~/apis/goodsAPI";
 import GoodsModal from "~/components/Layout/components/Modal/GoodsModal";
 import GoodsTable from "~/components/Layout/components/Table/GoodsListTable/GoodsTable";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 const initGoodsItem: iGoodsItemProps = {
     idGoods: 0,
@@ -33,7 +33,10 @@ const initGoodsInfo: iGoodsProps = {
 };
 
 function GoodsView() {
-    const [showModal, setShowModal] = useState(false);
+    const params = useParams();
+    const action = params.action;
+    const initShowModal = action ? true : false;
+    const [showModal, setShowModal] = useState(initShowModal);
     const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
     const [listData, setListData] = useState<iGoodsItemProps[]>([
         initGoodsItem,

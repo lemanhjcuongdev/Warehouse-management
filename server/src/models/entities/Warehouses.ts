@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { DefectiveRecords } from './DefectiveRecords'
 import { ExportReceipts } from './ExportReceipts'
 import { Goods } from './Goods'
@@ -6,6 +6,7 @@ import { ImportReceipts } from './ImportReceipts'
 import { StocktakingReceipts } from './StocktakingReceipts'
 import { TransportReceipts } from './TransportReceipts'
 
+@Index('name_UNIQUE', ['name'], { unique: true })
 @Entity('warehouses', { schema: 'quanlykho' })
 export class Warehouses {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id_warehouse' })

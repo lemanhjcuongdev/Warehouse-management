@@ -5,7 +5,6 @@ import { Users } from './Users'
 import { Warehouses } from './Warehouses'
 import { TransportReceipts } from './TransportReceipts'
 
-@Index('FK_out_receipt_goods_idx', ['idGoods'], {})
 @Index('FK_out_receipt_order_idx', ['idExportOrder'], {})
 @Index('FK_out_receipt_user_idx', ['idUserExport'], {})
 @Index('FK_out_receipt_warehouse_idx', ['idWarehouse'], {})
@@ -33,14 +32,11 @@ export class ExportReceipts {
   @Column('int', { name: 'pallet_code' })
   palletCode: number
 
-  @Column('int', { name: 'id_goods' })
-  idGoods: number
-
-  @Column('int', { name: 'amount' })
-  amount: number
-
   @Column('int', { name: 'status' })
   status: number
+
+  @Column('varchar', { name: 'reason_failed', length: 200, nullable: true })
+  reasonFailed: string
 
   @Column('datetime', {
     name: 'updated_at',
@@ -48,15 +44,8 @@ export class ExportReceipts {
   })
   updatedAt: Date
 
-  @Column('int', { name: 'id_updated' })
+  @Column('int', { name: 'id_updated', nullable: true })
   idUpdated: number
-
-  @ManyToOne(() => Goods, (goods) => goods.exportReceipts, {
-    onDelete: 'NO ACTION',
-    onUpdate: 'NO ACTION'
-  })
-  @JoinColumn([{ name: 'id_goods', referencedColumnName: 'idGoods' }])
-  idGoods2: Goods
 
   @ManyToOne(() => ExportOrders, (exportOrders) => exportOrders.exportReceipts, {
     onDelete: 'NO ACTION',

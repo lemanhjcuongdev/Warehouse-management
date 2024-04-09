@@ -129,7 +129,7 @@ function ProviderModal(props: {
             fullscreen="sm-down"
         >
             <Modal.Header>
-                <Modal.Title>{`${title} đơn vị tính hàng hoá`}</Modal.Title>
+                <Modal.Title>{`${title} nhà cung cấp`}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form

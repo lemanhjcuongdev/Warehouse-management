@@ -1,38 +1,36 @@
 import { Dispatch, SetStateAction, memo } from "react";
 import { Table } from "react-bootstrap";
 import {
+    iExportDetailProps,
+    iExportReceiptProps,
     iGoodsItemProps,
-    iImportOrderDetailProps,
-    iImportOrderProps,
 } from "~/views/types";
-import OrderDetailTableRow from "./OrderDetailTableRow";
 import { iModalTypes } from "../../Modal/types";
+import ExportReceiptDetailTableRow from "./ExportReceiptDetailTableRow";
 
-function OrderDetailTable(props: {
+function ExportReceiptDetailTable(props: {
     goods: iGoodsItemProps[];
-    formData: iImportOrderProps;
-    listData: iImportOrderDetailProps[];
+    listData: iExportDetailProps[];
+    setFormData: Dispatch<SetStateAction<iExportReceiptProps>>;
     modalType: iModalTypes;
-    setListData: Dispatch<SetStateAction<iImportOrderDetailProps[]>>;
-    setFormData: Dispatch<React.SetStateAction<iImportOrderProps>>;
 }) {
-    const { listData, formData } = props;
+    const { listData, modalType } = props;
     return (
         <Table striped bordered hover responsive>
             <thead>
                 <tr>
-                    <th>ID hàng</th>
+                    <th>ID</th>
                     <th>Tên hàng</th>
                     <th>ĐVT</th>
                     <th>SL</th>
-                    {(formData.status === 2 || formData.status === 3) && (
-                        <th>Hạn sử dụng</th>
-                    )}
+                    <th>Tầng</th>
+                    <th>Kệ</th>
+                    {modalType.type === "create" && <th>Đã lấy hàng</th>}
                 </tr>
             </thead>
             <tbody>
                 {listData.map((item, index) => (
-                    <OrderDetailTableRow
+                    <ExportReceiptDetailTableRow
                         key={item.idGoods}
                         item={item}
                         index={index}
@@ -44,4 +42,4 @@ function OrderDetailTable(props: {
     );
 }
 
-export default memo(OrderDetailTable);
+export default memo(ExportReceiptDetailTable);

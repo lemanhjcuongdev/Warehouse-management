@@ -132,6 +132,7 @@ function GoodsModal(props: {
                 setGoodGroup(currentGroup);
             }
         });
+
         getAllWarehouses().then((data) => {
             setWarehouses(data);
         });
@@ -140,7 +141,7 @@ function GoodsModal(props: {
         });
 
         renderWarehouseDiagram(formData.idWarehouse);
-    }, [formData]);
+    }, [formData.idWarehouse]);
     const renderWarehouseDiagram = useCallback(
         (idWarehouse: number) => {
             getWarehouseSlotsById(idWarehouse).then((data: any) => {
@@ -231,15 +232,18 @@ function GoodsModal(props: {
         //trim()
         formData.name = formData.name.trim();
         formData.idType = +formData.idType;
+        formData.idCreated = +getCookie("id");
 
+        //set floor and slot
         if (radioValue === "0-0") {
-            alert("Vui lòng chọn vị trí chứa hàng");
-            return false;
+            alert("Vui lòng chọn vị trí sẽ chứa hàng trong kho!");
+            return;
         } else {
             const locationArray = radioValue.split("-");
             formData.floor = +locationArray[0];
             formData.slot = +locationArray[1];
         }
+
         if (
             (form && form.checkValidity() === false) ||
             customValidateDate() === false
@@ -279,14 +283,7 @@ function GoodsModal(props: {
         e.stopPropagation();
         if (!isValidated) return;
         const managerId = +getCookie("id");
-
-        setFormData(
-            (prev) =>
-                (prev = {
-                    ...prev,
-                    idUpdated: managerId,
-                })
-        );
+        formData.idUpdated = managerId;
 
         updateGoods(formData).then(() => {
             listData.forEach((data, index) => {
@@ -428,10 +425,7 @@ function GoodsModal(props: {
                                             </option>
                                         ))}
                                     </Form.Select>
-                                    <Form.Text id="WarehouseHelpBlock" muted>
-                                        Việc lựa chọn kho ảnh hưởng tới lựa chọn
-                                        vị trí tầng chứa và vị trí kệ chứa
-                                    </Form.Text>
+
                                     <Form.Control.Feedback type="invalid">
                                         Bắt buộc chọn
                                     </Form.Control.Feedback>
@@ -461,38 +455,53 @@ function GoodsModal(props: {
                                         Bắt buộc chọn
                                     </Form.Control.Feedback>
                                 </Form.Group>
+                                <Form.Text id="WarehouseHelpBlock" muted>
+                                    Việc lựa chọn kho ảnh hưởng tới lựa chọn vị
+                                    trí tầng chứa và vị trí kệ chứa
+                                    <br />
+                                    Đỗi với hàng hoá mới, có thể lựa chọn tầng /
+                                    kệ khi nhập hàng
+                                </Form.Text>
                             </Row>
                             <Row className="mb-3">
-                                <Form.Group as={Col} sm>
-                                    <Form.Label>Ngày giờ nhập kho</Form.Label>
-                                    <Form.Control
-                                        type="datetime-local"
-                                        required
-                                        name="importDate"
-                                        ref={importDateRef}
-                                        value={formData.importDate}
-                                        onChange={handleChange}
-                                    />
-                                    <Form.Control.Feedback type="invalid">
-                                        Bắt buộc chọn
-                                    </Form.Control.Feedback>
-                                </Form.Group>
+                                {modalType.type === "update" && (
+                                    <>
+                                        <Form.Group as={Col} sm>
+                                            <Form.Label>
+                                                Ngày giờ nhập kho
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="datetime-local"
+                                                required
+                                                name="importDate"
+                                                ref={importDateRef}
+                                                value={formData.importDate}
+                                                onChange={handleChange}
+                                            />
+                                            <Form.Control.Feedback type="invalid">
+                                                Bắt buộc chọn
+                                            </Form.Control.Feedback>
+                                        </Form.Group>
 
-                                <Form.Group as={Col} sm>
-                                    <Form.Label>Hạn sử dụng</Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        required
-                                        ref={expRef}
-                                        name="exp"
-                                        value={formData.exp}
-                                        onChange={handleChange}
-                                        onBlur={() => customValidateDate()}
-                                    />
-                                    <Form.Control.Feedback type="invalid">
-                                        Bắt buộc chọn
-                                    </Form.Control.Feedback>
-                                </Form.Group>
+                                        <Form.Group as={Col} sm>
+                                            <Form.Label>Hạn sử dụng</Form.Label>
+                                            <Form.Control
+                                                type="date"
+                                                required
+                                                ref={expRef}
+                                                name="exp"
+                                                value={formData.exp}
+                                                onChange={handleChange}
+                                                onBlur={() =>
+                                                    customValidateDate()
+                                                }
+                                            />
+                                            <Form.Control.Feedback type="invalid">
+                                                Bắt buộc chọn
+                                            </Form.Control.Feedback>
+                                        </Form.Group>
+                                    </>
+                                )}
                             </Row>
                             {modalType.type === "update" && (
                                 <Row className="mb-3">

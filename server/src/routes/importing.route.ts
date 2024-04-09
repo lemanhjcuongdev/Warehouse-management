@@ -14,10 +14,10 @@ importingRouter.patch('/orders/:id', [checkJwt], importOrderController.editImpor
 importingRouter.delete('/orders/:id', [checkJwt], importOrderController.softDeleteImportOrderById)
 
 //IMPORT RECEIPT
-importingRouter.post('/receipts/', importReceiptController.createImportReceipt)
-importingRouter.get('/receipts/id/:id', importReceiptController.getImportReceiptById)
-importingRouter.get('/receipts/status/:status', importReceiptController.getAllImportReceiptsByStatus)
-importingRouter.patch('/receipts/:id', importReceiptController.editImportReceiptById)
-importingRouter.delete('/receipts/:id', importReceiptController.softDeleteImportReceiptById)
+importingRouter.post('/receipts/', [checkJwt], importReceiptController.createImportReceipt)
+importingRouter.get('/receipts/id/:id', [checkJwt], importReceiptController.getImportReceiptById)
+importingRouter.get('/receipts/status/:status', [checkJwt], importReceiptController.getAllImportReceiptsByStatus)
+importingRouter.patch('/receipts/:id', [checkJwt], importReceiptController.editImportReceiptById)
+importingRouter.delete('/receipts/:id', [checkJwt], importReceiptController.softDeleteImportReceiptById)
 
 export default importingRouter

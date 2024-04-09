@@ -220,7 +220,7 @@ class ImportOrderController {
     try {
       //update by status
       switch (status) {
-        case 0: //UPDATE INFO
+        case IMPORT_STATUS.IN_PROCESS_CREATED: //UPDATE INFO
           {
             //update order details
             const existingDetails = await importOrderDetailRepo.find({
@@ -258,7 +258,7 @@ class ImportOrderController {
             }
           }
           break
-        case 1: //ACCOUNTANT VERIFIED OR UPDATE
+        case IMPORT_STATUS.IN_PROCESS_ACCOUNTANT_VERIFIED: //ACCOUNTANT VERIFIED OR UPDATE
           {
             const updateResult = await importOrderRepo.update(
               {
@@ -279,9 +279,9 @@ class ImportOrderController {
             }
           }
           break
-        case 2: //DIRECTOR VERIFIED OR UPDATE
+        case IMPORT_STATUS.IN_PROCESS_DIRECTOR_VERIFIED: //DIRECTOR VERIFIED OR UPDATE
           {
-            const updateResult0 = await importOrderRepo.update(
+            importOrderRepo.update(
               {
                 idImportOrders: id,
                 status: IMPORT_STATUS.IN_PROCESS_CREATED
@@ -292,26 +292,47 @@ class ImportOrderController {
                 status
               }
             )
-            const updateResult1 = await importOrderRepo.update(
-              {
-                idImportOrders: id,
-                status: IMPORT_STATUS.IN_PROCESS_ACCOUNTANT_VERIFIED
-              },
-              {
-                idProvider,
-                palletCode,
-                status
-              }
-            )
-            if (updateResult0.affected === 0 && updateResult1.affected === 0) {
-              res.status(STATUS.BAD_REQUEST).send({
-                error: 'Không thể cập nhật đơn nhập kho đã hoàn thành hoặc bị huỷ'
+            {
+              //update order details
+              const existingDetails = await importOrderDetailRepo.find({
+                where: {
+                  idImportOrder: id
+                }
               })
-              return
+              //loop new details
+              if (importOrderDetails) {
+                importOrderDetails.forEach(async (newDetail) => {
+                  //find if this details exist in DB
+                  const existingDetail = existingDetails.find(
+                    (existDetail) => existDetail.idImportOrderDetails === newDetail.idImportOrderDetails
+                  )
+                  //if exist => update
+                  if (existingDetail) {
+                    importOrderDetailRepo.update(
+                      {
+                        idImportOrderDetails: newDetail.idImportOrderDetails
+                      },
+                      {
+                        idGoods: newDetail.idGoods,
+                        amount: newDetail.amount,
+                        exp: newDetail.exp
+                      }
+                    )
+                  } else {
+                    //if not exist, create new details
+                    const newOrderDetail = new ImportOrderDetails()
+                    newOrderDetail.idImportOrder = id
+                    newOrderDetail.idGoods = newDetail.idGoods
+                    newOrderDetail.amount = newDetail.amount
+                    newOrderDetail.exp = newDetail.exp
+                    await importOrderDetailRepo.save(newOrderDetail)
+                  }
+                })
+              }
             }
           }
           break
-        case 3: //FINISHED
+        case IMPORT_STATUS.FINISHED: //FINISHED
           {
             const updateResult = await importOrderRepo.update(
               {
@@ -332,7 +353,7 @@ class ImportOrderController {
             }
           }
           break
-        case 4: //FAILED
+        case IMPORT_STATUS.FAILED: //FAILED
           {
             const updateResult0 = await importOrderRepo.update(
               {

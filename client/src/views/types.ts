@@ -127,6 +127,7 @@ interface iImportOrderDetailProps {
     idImportOrder?: number;
     idGoods: number;
     amount: number;
+    exp?: string;
     checked?: boolean;
 }
 
@@ -171,6 +172,51 @@ interface iDefectiveRecordProps {
     usernameUpdated?: string;
 }
 
+//EXPORT ORDER PROPS
+interface iExportOrderProps {
+    idExportOrders?: number;
+    orderDate: string;
+    provinceCode: string;
+    districtCode: string;
+    wardCode: string;
+    address: string;
+    status?: number;
+    exportOrderDetails: iExportDetailProps[];
+}
+
+interface iExportDetailProps {
+    idExportOrderDetails?: number;
+    idExportOrder?: number;
+    idGoods: number;
+    amount: number;
+    checked?: boolean;
+}
+
+interface iExportReceiptItemProps {
+    idExportReceipts: number;
+    idWarehouse: number;
+    idWarehouse2: iWarehouseDataProps;
+    idExportOrder2: iExportOrderProps;
+    exportDate: string;
+    status: number;
+    reasonFailed?: string;
+}
+interface iExportReceiptProps {
+    idExportReceipts: number;
+    idWarehouse: number;
+    idExportOrder: number;
+    idUserExport: number;
+    exportDate: string;
+    palletCode: number;
+    status: number;
+    idUpdated?: number;
+    updatedAt?: string;
+    idExportOrder2: iExportOrderProps;
+    idWarehouse2?: iWarehouseDataProps;
+    usernameCreated: string;
+    usernameUpdated?: string;
+}
+
 export type {
     iUserDataProps,
     iUserItemProps,
@@ -187,4 +233,8 @@ export type {
     iImportReceiptProps,
     iImportReceiptItemProps,
     iDefectiveRecordProps,
+    iExportOrderProps,
+    iExportDetailProps,
+    iExportReceiptItemProps,
+    iExportReceiptProps,
 };

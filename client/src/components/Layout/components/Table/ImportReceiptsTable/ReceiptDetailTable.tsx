@@ -5,10 +5,10 @@ import {
     iImportOrderDetailProps,
     iImportReceiptProps,
 } from "~/views/types";
-import OrderDetailTableRow from "./ReceiptDetailTableRow";
+import ReceiptDetailTableRow from "./ReceiptDetailTableRow";
 import { iModalTypes } from "../../Modal/types";
 
-function OrderDetailTable(props: {
+function ReceiptDetailTable(props: {
     goods: iGoodsItemProps[];
     listData: iImportOrderDetailProps[];
     setFormData: Dispatch<SetStateAction<iImportReceiptProps>>;
@@ -30,7 +30,7 @@ function OrderDetailTable(props: {
             </thead>
             <tbody>
                 {listData.map((item, index) => (
-                    <OrderDetailTableRow
+                    <ReceiptDetailTableRow
                         key={item.idGoods}
                         item={item}
                         index={index}
@@ -42,4 +42,4 @@ function OrderDetailTable(props: {
     );
 }
 
-export default memo(OrderDetailTable);
+export default memo(ReceiptDetailTable);

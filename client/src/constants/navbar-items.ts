@@ -23,11 +23,11 @@ const navbar_items: iNavbarItem[] = [
             },
             {
                 label: "Xuất kho",
-                to: "/",
+                to: "/list/export-receipts",
             },
             {
                 label: "Xử lý đơn hàng",
-                to: "/",
+                to: "/list/processor",
             },
             {
                 label: "Điều chuyển kho",
@@ -61,6 +61,14 @@ const navbar_items: iNavbarItem[] = [
                 label: "Biên bản hàng lỗi, hỏng",
                 to: "/list/defective-records",
             },
+            {
+                label: "Kiểm kê kho",
+                to: "/list/stock-taking",
+            },
+            // {
+            //     label: "Báo cáo nhập - xuất - tồn",
+            //     to: "/list/stock-taking",
+            // },
         ],
     },
     {

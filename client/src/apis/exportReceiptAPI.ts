@@ -1,8 +1,8 @@
 import { API_ROOT } from "~/constants";
 import { getCookie } from "~/utils/cookies";
-import { iGoodsItemProps, iGoodsProps } from "~/views/types";
+import { iExportReceiptItemProps, iExportReceiptProps } from "~/views/types";
 
-const getAllGoods = async () => {
+const getAllExportReceiptByStatus = async (status: number) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -16,8 +16,11 @@ const getAllGoods = async () => {
             },
         };
 
-        const res = await fetch(`${API_ROOT}/goods`, init);
-        const data: iGoodsItemProps[] = await res.json();
+        const res = await fetch(
+            `${API_ROOT}/export/receipts/status/${status}`,
+            init
+        );
+        const data: iExportReceiptItemProps[] = await res.json();
 
         return data;
     } catch (error) {
@@ -25,7 +28,7 @@ const getAllGoods = async () => {
     }
 };
 
-const getGoodsById = async (id: number) => {
+const getExportReceiptById = async (id: number) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -38,7 +41,7 @@ const getGoodsById = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/goods/${id}`, init);
+        const res = await fetch(`${API_ROOT}/export/receipts/id/${id}`, init);
         const data = await res.json();
         if (data.error) {
             throw new Error(data.error);
@@ -50,7 +53,7 @@ const getGoodsById = async (id: number) => {
     }
 };
 
-const createGoods = async (values: iGoodsProps) => {
+const createExportReceipt = async (values: iExportReceiptProps) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -65,7 +68,7 @@ const createGoods = async (values: iGoodsProps) => {
             },
             body: JSON.stringify(values),
         };
-        const res = await fetch(`${API_ROOT}/goods`, init);
+        const res = await fetch(`${API_ROOT}/export/receipts`, init);
 
         const data = await res.json();
         if (data.error) {
@@ -78,49 +81,7 @@ const createGoods = async (values: iGoodsProps) => {
     }
 };
 
-const modifyGoods = async (
-    goodsArray: {
-        id: number;
-        amount: number;
-        exp?: string;
-        importDate?: string;
-    }[]
-) => {
-    try {
-        const jwt = getCookie("jwt");
-        if (!jwt) {
-            throw new Error("Hết phiên đăng nhập");
-        }
-
-        const init: RequestInit = {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                authorization: jwt,
-            },
-            body: JSON.stringify({ goodsArray }),
-        };
-        const res = await fetch(`${API_ROOT}/goods/modify`, init);
-
-        const data = await res.json();
-        if (data.error) {
-            throw new Error(data.error);
-        }
-
-        return data;
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-const updateGoods = async (
-    values:
-        | iGoodsProps
-        | {
-              idGoods: number;
-              exp: string;
-          }
-) => {
+const updateExportReceipt = async (id: number, status: number) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -133,9 +94,9 @@ const updateGoods = async (
                 "Content-Type": "application/json",
                 authorization: jwt,
             },
-            body: JSON.stringify(values),
+            body: JSON.stringify({ status }),
         };
-        const res = await fetch(`${API_ROOT}/goods/${values.idGoods}`, init);
+        const res = await fetch(`${API_ROOT}/export/receipts/${id}`, init);
 
         const data = await res.json();
         if (data.error) {
@@ -148,7 +109,7 @@ const updateGoods = async (
     }
 };
 
-const softDeleteGoods = async (id: number) => {
+const softDeleteExportReceipt = async (id: number, reasonFailed: string) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -161,8 +122,11 @@ const softDeleteGoods = async (id: number) => {
                 "Content-Type": "application/json",
                 authorization: jwt,
             },
+            body: JSON.stringify({
+                reasonFailed,
+            }),
         };
-        const res = await fetch(`${API_ROOT}/goods/${id}`, init);
+        const res = await fetch(`${API_ROOT}/export/receipts/${id}`, init);
 
         const data = await res.json();
         if (data && data.error) {
@@ -176,10 +140,9 @@ const softDeleteGoods = async (id: number) => {
 };
 
 export {
-    createGoods,
-    modifyGoods,
-    getAllGoods,
-    getGoodsById,
-    softDeleteGoods,
-    updateGoods,
+    createExportReceipt,
+    getAllExportReceiptByStatus,
+    getExportReceiptById,
+    softDeleteExportReceipt,
+    updateExportReceipt,
 };

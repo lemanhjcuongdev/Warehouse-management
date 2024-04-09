@@ -30,6 +30,7 @@ goodsRouter.delete('/units/:id', [checkJwt], goodsUnitController.softDeleteGoods
 
 //goods
 goodsRouter.post('/', goodsController.createGoods)
+goodsRouter.post('/modify', goodsController.modifyGoods)
 goodsRouter.get('/', goodsController.getAllGoods)
 goodsRouter.get('/:id', goodsController.getGoodsById)
 goodsRouter.patch('/:id', goodsController.editGoodsById)

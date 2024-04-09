@@ -1,5 +1,6 @@
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { Button, Tab, Tabs } from "react-bootstrap";
+import { useParams } from "react-router-dom";
 import { getAllImportOrderByStatus } from "~/apis/importOrderAPI";
 import ImportOrderModal from "~/components/Layout/components/Modal/ImportOrderModal";
 import { iModalTypes } from "~/components/Layout/components/Modal/types";
@@ -25,8 +26,11 @@ interface iTabProps {
 
 function ImportOrderView() {
     //SHARED PROPS
+    const params = useParams();
+    const action = params.action;
+    const initShowModal = action ? true : false;
     const [key, setKey] = useState("in-process");
-    const [showModal, setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState(initShowModal);
     const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
     const [listData, setListData] = useState<iImportOrderProps[]>([
         initImportOrderData,
@@ -123,6 +127,7 @@ function ImportOrderView() {
                                 )}
 
                                 <ImportOrderModal
+                                    setKey={setKey}
                                     show={showModal}
                                     onHide={handleToggleShowModal}
                                     listData={listData}

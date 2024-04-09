@@ -16,7 +16,6 @@ import {
     Col,
     Form,
     FormLabel,
-    Image,
     Modal,
     Row,
 } from "react-bootstrap";
@@ -41,7 +40,6 @@ import {
 } from "~/views/types";
 import OrderDetailTable from "../Table/ImportOrderListTable/OrderDetailTable";
 import { iModalTypes } from "./types";
-import SPX_Express_Icon from "~/img/SPX_Express_Icon";
 
 function ImportOrderModal(props: {
     show: true | false;
@@ -51,6 +49,7 @@ function ImportOrderModal(props: {
     modalType: iModalTypes;
     formData: iImportOrderProps;
     setFormData: Dispatch<React.SetStateAction<iImportOrderProps>>;
+    setKey: React.Dispatch<React.SetStateAction<string>>;
 }) {
     const {
         show,
@@ -60,6 +59,7 @@ function ImportOrderModal(props: {
         modalType,
         formData,
         setFormData,
+        setKey,
     } = props;
     const [validated, setValidated] = useState(false);
     const importDateRef = useRef<HTMLInputElement>(null);
@@ -212,43 +212,6 @@ function ImportOrderModal(props: {
         }
     };
 
-    const customValidateDate = () => {
-        const importDate = importDateRef.current;
-        const exp = expRef.current;
-
-        //validate startDate <= now
-        if (importDate && importDate.value.length > 0) {
-            const date = new Date(importDate.value);
-            const now = new Date(Date.now());
-
-            if (date > now) {
-                importDate.setCustomValidity(
-                    "Ngày nhập kho không thể trong tương lai"
-                );
-                importDate.reportValidity();
-                return false;
-            } else {
-                importDate.setCustomValidity("");
-                importDate.reportValidity();
-            }
-        }
-
-        if (exp && exp.value.length > 0) {
-            const date = new Date(exp.value);
-            const now = new Date(Date.now());
-
-            if (date <= now) {
-                exp.setCustomValidity("Ngày hết hạn không thể trong quá khứ");
-                exp.reportValidity();
-                return false;
-            } else {
-                exp.setCustomValidity("");
-                exp.reportValidity();
-            }
-        }
-        return true;
-    };
-
     const validateForm = () => {
         const form = formRef.current;
         const idCreated = getCookie("id");
@@ -261,10 +224,7 @@ function ImportOrderModal(props: {
             alert("Vui lòng thêm chi tiết đơn nhập kho");
             return false;
         }
-        if (
-            (form && form.checkValidity() === false) ||
-            customValidateDate() === false
-        ) {
+        if (form && form.checkValidity() === false) {
             setValidated(true);
             return false;
         }
@@ -294,6 +254,26 @@ function ImportOrderModal(props: {
     );
 
     const handleUpdateStatus = (status: number) => {
+        const isValidated = validateForm();
+        //call API
+
+        if (status === 3) {
+            if (!isValidated) {
+                return;
+            }
+            //Call API Update Goods EXP
+            updateImportOrder(formData).catch(() => {
+                return;
+            });
+        }
+
+        if (status === 4) {
+            const windowObject = window;
+            const message = `Nhập lý do huỷ đơn nhập kho mã số "${formData.idImportOrders}":`;
+            const reasonFailed = windowObject.prompt(message)?.trim();
+            if (!reasonFailed) return;
+        }
+
         const idUpdated = +getCookie("id");
         setFormData((prev) => {
             return {
@@ -317,7 +297,10 @@ function ImportOrderModal(props: {
                             status,
                             idUpdated,
                         });
-                    else newData.splice(index, 1);
+                    else {
+                        newData.splice(index, 1);
+                        setKey("finished");
+                    }
                     setListData(newData);
                 }
             });
@@ -417,13 +400,13 @@ function ImportOrderModal(props: {
                                         <FormLabel>
                                             Nhà cung cấp &nbsp;
                                         </FormLabel>
-                                        <Link to={"/list/providers"}>
+                                        <Link to={"/list/providers/create"}>
                                             <Button
                                                 size="sm"
                                                 variant="outline-primary"
                                                 className="mb-2"
                                             >
-                                                Thêm nhà cung cấp mới
+                                                Thêm thông tin nhà cung cấp mới
                                             </Button>
                                         </Link>
                                         <Form.Select
@@ -469,6 +452,7 @@ function ImportOrderModal(props: {
                                     value={formData.palletCode}
                                     onChange={handleChangeOrderInput}
                                     min={1}
+                                    readOnly={!(formData.status === 0)}
                                 ></Form.Control>
                                 <Form.Control.Feedback type="invalid">
                                     Bắt buộc nhập
@@ -499,13 +483,19 @@ function ImportOrderModal(props: {
                                                     <FormLabel>
                                                         Tên mặt hàng &nbsp;{" "}
                                                     </FormLabel>
-                                                    <Link to={"/list/goods"}>
+                                                    <Link
+                                                        to={
+                                                            "/list/goods/create"
+                                                        }
+                                                    >
                                                         <Button
                                                             size="sm"
                                                             variant="outline-primary"
                                                             className="mb-2"
+                                                            title="Nếu chưa từng nhập kho mặt hàng này, vui lòng tạo mới mặt hàng"
                                                         >
-                                                            Thêm mặt hàng mới
+                                                            Thêm thông tin mặt
+                                                            hàng mới
                                                         </Button>
                                                     </Link>
                                                     <Form.Select
@@ -601,15 +591,16 @@ function ImportOrderModal(props: {
                                         onClick={handlePrintORCode}
                                         className="mb-3"
                                     >
-                                        <i className="fa-solid fa-print"></i>
+                                        <i className="fa-solid fa-qrcode"></i>
                                         &nbsp; In mã QR
-                                    </Button>
-                                    <Link to={"/list/import-receipts"}>
+                                    </Button>{" "}
+                                    &nbsp;{" "}
+                                    <Link to={"/list/import-receipts/create"}>
                                         <Button
                                             className="mb-3"
                                             variant="success"
                                         >
-                                            <i className="fa-solid fa-print"></i>
+                                            <i className="fa-solid fa-arrow-right-to-bracket"></i>
                                             &nbsp; Nhập kho
                                         </Button>
                                     </Link>
@@ -621,6 +612,7 @@ function ImportOrderModal(props: {
                                 setListData={handleAddOrderDetail}
                                 setFormData={setFormData}
                                 formData={formData}
+                                modalType={modalType}
                             />
                         </Col>
                     </Row>
@@ -636,6 +628,8 @@ function ImportOrderModal(props: {
                             </Form.Group>
                             <Alert variant="info">
                                 Vui lòng kiểm tra kỹ thông tin!
+                                <br />
+                                Đơn đã hoàn thành sẽ không thể huỷ bỏ!
                             </Alert>
                         </>
                     )}

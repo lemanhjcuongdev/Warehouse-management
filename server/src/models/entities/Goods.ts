@@ -1,4 +1,15 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Check,
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn
+} from 'typeorm'
 import { DefectiveRecords } from './DefectiveRecords'
 import { ExportOrderDetails } from './ExportOrderDetails'
 import { ExportReceipts } from './ExportReceipts'
@@ -7,7 +18,6 @@ import { GoodsUnits } from './GoodsUnits'
 import { Warehouses } from './Warehouses'
 import { ImportOrderDetails } from './ImportOrderDetails'
 import { StocktakingDetails } from './StocktakingDetails'
-
 @Index('FK_goods_type_idx', ['idType'], {})
 @Index('FK_goods_unit_idx', ['idUnit'], {})
 @Index('FK_goods_warehouse_idx', ['idWarehouse'], {})
@@ -34,10 +44,10 @@ export class Goods {
   @Column('int', { name: 'slot' })
   slot: number
 
-  @Column('datetime', { name: 'import_date' })
+  @Column('datetime', { name: 'import_date', nullable: true })
   importDate: Date
 
-  @Column('date', { name: 'exp' })
+  @Column('date', { name: 'exp', nullable: true })
   exp: string
 
   @Column('int', { name: 'amount' })
@@ -67,9 +77,6 @@ export class Goods {
 
   @OneToMany(() => ExportOrderDetails, (exportOrderDetails) => exportOrderDetails.idGoods2)
   exportOrderDetails: ExportOrderDetails[]
-
-  @OneToMany(() => ExportReceipts, (exportReceipts) => exportReceipts.idGoods2)
-  exportReceipts: ExportReceipts[]
 
   @ManyToOne(() => GoodsTypes, (goodsTypes) => goodsTypes.goods, {
     onDelete: 'NO ACTION',

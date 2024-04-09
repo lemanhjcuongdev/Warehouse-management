@@ -183,5 +183,5 @@ export {
     getImportOrderById,
     softDeleteImportOrder,
     updateImportOrder,
-    updateOrderStatus
+    updateOrderStatus,
 };

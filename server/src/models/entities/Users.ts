@@ -12,7 +12,8 @@ import { TransportReceipts } from './TransportReceipts'
 dotenv.config()
 
 const saltRounds: number = process.env.SALT_ROUNDS !== undefined ? +process.env.SALT_ROUNDS : 10
-
+@Index('phone_UNIQUE', ['phone'], { unique: true })
+@Index('email_UNIQUE', ['email'], { unique: true })
 @Index('username_UNIQUE', ['username'], { unique: true })
 @Entity('users', { schema: 'quanlykho' })
 export class Users {

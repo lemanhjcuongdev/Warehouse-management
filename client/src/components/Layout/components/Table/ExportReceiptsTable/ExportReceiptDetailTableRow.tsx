@@ -1,17 +1,17 @@
 import { Dispatch, SetStateAction, memo } from "react";
 import { Form } from "react-bootstrap";
 import {
+    iExportDetailProps,
+    iExportReceiptProps,
     iGoodsItemProps,
-    iImportOrderDetailProps,
-    iImportReceiptProps,
 } from "~/views/types";
 import { iModalTypes } from "../../Modal/types";
 
-function ReceiptDetailTableRow(props: {
+function ExportReceiptDetailTableRow(props: {
     goods: iGoodsItemProps[];
-    item: iImportOrderDetailProps;
+    item: iExportDetailProps;
     index: number;
-    setFormData: Dispatch<SetStateAction<iImportReceiptProps>>;
+    setFormData: Dispatch<SetStateAction<iExportReceiptProps>>;
     modalType: iModalTypes;
 }) {
     const { item, goods, setFormData, index, modalType } = props;
@@ -21,16 +21,16 @@ function ReceiptDetailTableRow(props: {
     const handleConfirm = () => {
         //toggle confirm receipt detail
         setFormData((prev) => {
-            const currentList = [...prev.idImportOrder2.importOrderDetails];
+            const currentList = [...prev.idExportOrder2.exportOrderDetails];
             currentList.splice(index, 1, {
                 ...item,
                 checked: !item.checked,
             });
             return {
                 ...prev,
-                idImportOrder2: {
-                    ...prev.idImportOrder2,
-                    importOrderDetails: currentList,
+                idExportOrder2: {
+                    ...prev.idExportOrder2,
+                    exportOrderDetails: currentList,
                 },
             };
         });
@@ -69,4 +69,4 @@ function ReceiptDetailTableRow(props: {
     );
 }
 
-export default memo(ReceiptDetailTableRow);
+export default memo(ExportReceiptDetailTableRow);

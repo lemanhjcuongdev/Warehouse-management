@@ -5,15 +5,13 @@ import {
     memo,
     useCallback,
 } from "react";
-import { Badge, Button, ButtonGroup, Dropdown } from "react-bootstrap";
-import { getGoodsGroupById, softDeleteGoodsGroup } from "~/apis/goodsGroupAPI";
-import { iModalTypes } from "../../Modal/types";
+import { Button, Form } from "react-bootstrap";
+import { QR_API_ROOT } from "~/constants";
 import {
     iGoodsItemProps,
     iImportOrderDetailProps,
     iImportOrderProps,
 } from "~/views/types";
-import { QR_API_ROOT } from "~/constants";
 
 function OrderDetailTableRow(props: {
     formData: iImportOrderProps;
@@ -72,7 +70,6 @@ function OrderDetailTableRow(props: {
 
     return (
         <tr
-            title="Click để xem thông tin"
             style={{
                 cursor: "pointer",
             }}
@@ -98,6 +95,36 @@ function OrderDetailTableRow(props: {
                     </>
                 )}
             </td>
+            {(formData.status === 2 || formData.status === 3) && (
+                <td
+                    onClick={(e) => {
+                        e.stopPropagation();
+                    }}
+                >
+                    <Form.Group>
+                        <Form.Control
+                            type="date"
+                            readOnly={formData.status === 3}
+                            value={item.exp}
+                            onChange={(e) => {
+                                setFormData((prev) => {
+                                    const importDetails = [
+                                        ...prev.importOrderDetails,
+                                    ];
+                                    importDetails.splice(index, 1, {
+                                        ...prev.importOrderDetails[index],
+                                        exp: e.target.value,
+                                    });
+                                    return {
+                                        ...prev,
+                                        importOrderDetails: importDetails,
+                                    };
+                                });
+                            }}
+                        />
+                    </Form.Group>
+                </td>
+            )}
         </tr>
     );
 }

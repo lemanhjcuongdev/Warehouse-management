@@ -10,11 +10,11 @@ export class ExportOrders {
   @Column('datetime', { name: 'order_date' })
   orderDate: Date
 
-  @Column('varchar', { name: 'customer_name', length: 100 })
-  customerName: string
+  // @Column('varchar', { name: 'customer_name', length: 100 })
+  // customerName: string
 
-  @Column('varchar', { name: 'phone', length: 12 })
-  phone: string
+  // @Column('varchar', { name: 'phone', length: 12 })
+  // phone: string
 
   @Column('varchar', { name: 'province_code', length: 2 })
   provinceCode: string

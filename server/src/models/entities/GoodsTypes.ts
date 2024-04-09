@@ -10,7 +10,7 @@ import {
 } from 'typeorm'
 import { Goods } from './Goods'
 import { GoodsGroups } from './GoodsGroups'
-
+@Index('name_UNIQUE', ['name'], { unique: true })
 @Index('FK_goods_type_group_idx', ['idGoodsGroup'], {})
 @Entity('goods_types', { schema: 'quanlykho' })
 export class GoodsTypes {
