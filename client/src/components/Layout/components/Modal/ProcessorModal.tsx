@@ -10,20 +10,20 @@ import {
     useState,
 } from "react";
 import { Button, Form, FormLabel, Modal, Row } from "react-bootstrap";
-import { updateExportReceipt } from "~/apis/exportReceiptAPI";
-import { getCookie } from "~/utils/cookies";
 import {
-    initExportOrder,
-    initExportReceipt,
-} from "~/views/ExportReceiptView/ExportReceiptView";
-import { iExportOrderProps, iExportReceiptItemProps } from "~/views/types";
+    getAllExportReceiptByStatus,
+    updateExportReceipt,
+} from "~/apis/exportReceiptAPI";
+import { getCookie } from "~/utils/cookies";
+import { initProcessingData } from "~/views/ProcessorView/ProcessorView";
+import { iExportReceiptItemProps } from "~/views/types";
 import QRCodeScanner from "../QRCodeScanner/QRCodeScanner";
 import { iModalTypes, iPrintExportReceipt } from "./types";
-import { initProcessingData } from "~/views/ProcessorView/ProcessorView";
 
 function ProcessorModal(props: {
     show: true | false;
     onHide: () => void;
+    tabKey: "packed" | "classified" | string;
     listData: iExportReceiptItemProps[];
     setListData: Dispatch<SetStateAction<iExportReceiptItemProps[]>>;
     modalType: iModalTypes;
@@ -38,11 +38,23 @@ function ProcessorModal(props: {
         modalType,
         formData,
         setFormData,
+        tabKey,
     } = props;
     const [validated, setValidated] = useState(false);
     const formRef = useRef<HTMLFormElement>(null);
-    let title: string;
+    const [unprocessedOrders, setUnprocessedOrders] = useState<
+        iExportReceiptItemProps[]
+    >([]);
 
+    useEffect(() => {
+        const statusCode = tabKey === "packed" ? 0 : 1;
+        getAllExportReceiptByStatus(statusCode).then((data) =>
+            setUnprocessedOrders(data)
+        );
+    }, [tabKey, listData]);
+
+    let title: string;
+    const process = tabKey === "packed" ? " đóng gói " : " phân loại ";
     switch (modalType.type) {
         case "create":
             title = "Xác nhận";
@@ -56,7 +68,7 @@ function ProcessorModal(props: {
         HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     > = (e) => {
         const { value } = e.target;
-        const idExportOrder = listData.find(
+        const idExportOrder = unprocessedOrders.find(
             (receipt) => receipt.idExportReceipts === +value
         )?.idExportOrder2.idExportOrders;
 
@@ -70,7 +82,6 @@ function ProcessorModal(props: {
 
     const validateForm = () => {
         const form = formRef.current;
-        const idUpdated = getCookie("id");
         formData.idExportOrder = +formData.idExportOrder;
         formData.idExportReceipts = +formData.idExportReceipts;
 
@@ -86,15 +97,22 @@ function ProcessorModal(props: {
         setFormData(data);
     };
 
-    const handleSubmitCreate: FormEventHandler<HTMLButtonElement> = useCallback(
+    const handleSubmit: FormEventHandler<HTMLButtonElement> = useCallback(
         (e) => {
             const isValidated = validateForm();
+            const idUpdated = +getCookie("id");
             e.preventDefault();
             e.stopPropagation();
 
+            const submitType = tabKey === "packed" ? 1 : 2;
+
             //call API
             if (isValidated) {
-                updateExportReceipt(formData.idExportReceipts, 1)
+                updateExportReceipt(
+                    formData.idExportReceipts,
+                    submitType,
+                    idUpdated
+                )
                     .then((data) => {
                         data && setListData((prev) => [data, ...prev]);
                         if (!data.error) {
@@ -110,21 +128,20 @@ function ProcessorModal(props: {
     const handleCancel = () => {
         setFormData(initProcessingData);
         setValidated(false);
-        onHide();
     };
-
-    console.log("LIST DATA: ", listData);
 
     return (
         <Modal
-            backdrop={modalType.type === "create" ? "static" : undefined}
             show={show}
-            onHide={handleCancel}
-            keyboard={false}
-            size="sm"
+            onHide={() => {
+                handleCancel();
+                onHide();
+            }}
+            fullscreen={"sm-down"}
+            size="lg"
         >
             <Modal.Header closeButton>
-                <Modal.Title>{`${title} đóng gói`}</Modal.Title>
+                <Modal.Title>{`${title} ${process}`}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form
@@ -143,7 +160,8 @@ function ProcessorModal(props: {
                             {modalType.type === "create" ? (
                                 <>
                                     <FormLabel>
-                                        Mã phiếu xuất chọn thủ công &nbsp;
+                                        Mã phiếu xuất kho (chọn thủ công nếu
+                                        không quét được mã QR) &nbsp;
                                     </FormLabel>
                                     <Form.Select
                                         required
@@ -154,17 +172,17 @@ function ProcessorModal(props: {
                                         <option value={0}>
                                             ----Chọn phiếu xuất kho----
                                         </option>
-                                        {listData.length > 0 &&
-                                            listData.map((order) => (
+                                        {unprocessedOrders.length > 0 &&
+                                            unprocessedOrders.map((order) => (
                                                 <option
                                                     key={order.idExportReceipts}
                                                     value={
-                                                        formData.idExportReceipts
+                                                        order.idExportReceipts
                                                     }
                                                 >
-                                                    ID phiếu:{" "}
+                                                    ID phiếu xuất:{" "}
                                                     {order?.idExportReceipts} -
-                                                    ID đơn:{" "}
+                                                    ID đơn xuất:{" "}
                                                     {
                                                         order?.idExportOrder2
                                                             .idExportOrders
@@ -181,7 +199,7 @@ function ProcessorModal(props: {
                                 <>
                                     <FormLabel>Mã phiếu xuất</FormLabel>
                                     <Form.Control
-                                        value={`ID: ${formData.idExportOrder}`}
+                                        value={`ID phiếu xuất: ${formData.idExportReceipts} - ID đơn xuất: ${formData.idExportOrder}`}
                                         readOnly
                                     ></Form.Control>
                                 </>
@@ -194,16 +212,23 @@ function ProcessorModal(props: {
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" type="reset" onClick={handleCancel}>
-                    {modalType.type === "update" ? "Đóng" : "Huỷ"}
+                <Button
+                    variant="secondary"
+                    type="reset"
+                    onClick={() => {
+                        handleCancel();
+                        onHide();
+                    }}
+                >
+                    Đóng
                 </Button>
                 {modalType.type === "create" ? (
                     <Button
                         variant="primary"
                         type="submit"
-                        onClick={handleSubmitCreate}
+                        onClick={handleSubmit}
                     >
-                        Xác nhận đóng gói
+                        Xác nhận {process}
                     </Button>
                 ) : (
                     <></>

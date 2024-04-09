@@ -161,7 +161,8 @@ class ExportReceiptController {
       exportReceipt = await exportReceiptRepo.findOneOrFail({
         where: {
           idExportReceipts: id
-        }
+        },
+        relations: ['idWarehouse2', 'idExportOrder2']
       })
     } catch (error) {
       console.log(error)
@@ -214,6 +215,10 @@ class ExportReceiptController {
               })
               return
             }
+            exportReceipt = {
+              ...exportReceipt,
+              status: EXPORT_STATUS.IN_PROCESS_PACKED
+            }
           }
           break
         case EXPORT_STATUS.IN_PROCESS_CLASSIFIED:
@@ -232,6 +237,10 @@ class ExportReceiptController {
                 error: 'Không thể cập nhật phiếu xuất kho đang vận chuyển'
               })
               return
+            }
+            exportReceipt = {
+              ...exportReceipt,
+              status: EXPORT_STATUS.IN_PROCESS_CLASSIFIED
             }
           }
           break
@@ -252,6 +261,10 @@ class ExportReceiptController {
               })
               return
             }
+            exportReceipt = {
+              ...exportReceipt,
+              status: EXPORT_STATUS.IN_PROCESS_ON_THE_WAY
+            }
           }
           break
         case EXPORT_STATUS.FINISHED:
@@ -270,6 +283,10 @@ class ExportReceiptController {
                 error: 'Không thể cập nhật phiếu xuất kho đang vận chuyển'
               })
               return
+            }
+            exportReceipt = {
+              ...exportReceipt,
+              status: EXPORT_STATUS.FINISHED
             }
           }
           break
@@ -305,7 +322,7 @@ class ExportReceiptController {
       return
     }
     //if ok
-    res.status(STATUS.NO_CONTENT).send()
+    res.status(STATUS.SUCCESS).send(exportReceipt)
   }
 
   //[DELETE /:id]

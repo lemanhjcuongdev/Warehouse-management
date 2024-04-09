@@ -3,7 +3,7 @@ import { ButtonGroup, Dropdown } from "react-bootstrap";
 import convertUTCToVNTime from "~/utils/convertUTCToVNTime";
 import stringToDate from "~/utils/stringToDate";
 import { iExportReceiptItemProps, iExportReceiptProps } from "~/views/types";
-import { iModalTypes } from "../../Modal/types";
+import { iModalTypes, iPrintExportReceipt } from "../../Modal/types";
 import {
     getExportReceiptById,
     softDeleteExportReceipt,
@@ -16,7 +16,7 @@ function ProcessorTable(props: {
     index: number;
     toggleShowModal: () => void;
     setModalType: Dispatch<SetStateAction<iModalTypes>>;
-    setFormData: Dispatch<React.SetStateAction<iExportReceiptProps>>;
+    setFormData: Dispatch<React.SetStateAction<iPrintExportReceipt>>;
 }) {
     const {
         tabKey,

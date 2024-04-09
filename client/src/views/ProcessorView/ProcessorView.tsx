@@ -30,7 +30,7 @@ function ProcessorView() {
     const [listData, setListData] = useState<iExportReceiptItemProps[]>([]);
     const [formData, setFormData] =
         useState<iPrintExportReceipt>(initProcessingData);
-
+    const process = key === "packed" ? " đóng gói " : " phân loại ";
     const tabs: iTabProps[] = [
         {
             eventKey: "packed",
@@ -47,10 +47,10 @@ function ProcessorView() {
         let statusCode: number = 0;
         switch (key) {
             case "packed":
-                statusCode = 0;
+                statusCode = 1; //STATUS.PACKED
                 break;
             case "classified":
-                statusCode = 1;
+                statusCode = 2; //STATUS.CLASSIFIED
                 break;
         }
         getAllExportReceiptByStatus(statusCode).then((data) =>
@@ -67,7 +67,7 @@ function ProcessorView() {
         setModalType({ type: "create" });
     };
 
-    console.log("SCAN DATA: ", formData);
+    console.log("LIST DATA: ", listData);
 
     return (
         <>
@@ -105,7 +105,7 @@ function ProcessorView() {
                                     }}
                                 >
                                     <i className="fa-solid fa-expand"></i>
-                                    &nbsp; Xác nhận đóng gói
+                                    &nbsp; Xác nhận {process}
                                 </Button>
 
                                 <ProcessorModal
@@ -116,6 +116,7 @@ function ProcessorView() {
                                     modalType={modalType}
                                     formData={formData}
                                     setFormData={setFormData}
+                                    tabKey={key}
                                 />
 
                                 <ProcessorTable

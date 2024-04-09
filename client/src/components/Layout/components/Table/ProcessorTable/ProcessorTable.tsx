@@ -24,14 +24,14 @@ function ProcessorTable(props: {
                 </tr>
             </thead>
             <tbody>
-                {/* {listData.map((item, index) => (
+                {listData.map((item, index) => (
                     <ProcessorTableRow
                         key={item.idExportReceipts}
                         item={item}
                         index={index}
                         {...props}
                     />
-                ))} */}
+                ))}
             </tbody>
         </Table>
     );

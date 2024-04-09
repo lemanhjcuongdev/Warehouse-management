@@ -81,7 +81,11 @@ const createExportReceipt = async (values: iExportReceiptProps) => {
     }
 };
 
-const updateExportReceipt = async (id: number, status: number) => {
+const updateExportReceipt = async (
+    id: number,
+    status: number,
+    idUpdated: number
+) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -94,7 +98,7 @@ const updateExportReceipt = async (id: number, status: number) => {
                 "Content-Type": "application/json",
                 authorization: jwt,
             },
-            body: JSON.stringify({ status }),
+            body: JSON.stringify({ status, idUpdated }),
         };
         const res = await fetch(`${API_ROOT}/export/receipts/${id}`, init);
 
