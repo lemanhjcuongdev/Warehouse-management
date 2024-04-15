@@ -29,6 +29,7 @@ interface iWarehouseDataProps {
     idWarehouse?: number;
     name: string;
     address: string;
+    provinceCode: string;
     totalFloors: number;
     totalSlots: number;
     idCreated?: number;
@@ -43,6 +44,7 @@ interface iWarehouseItemProps {
     idWarehouse: number;
     name: string;
     address: string;
+    provinceCode: string;
     totalFloors?: number;
     totalSlots?: number;
     disabled: 0 | 1;
@@ -94,16 +96,18 @@ interface iGoodsProps {
     usernameUpdated?: string;
     updatedAt?: Date | null;
     disabled: 0 | 1;
+    isHeavy: boolean;
 }
 interface iGoodsItemProps {
     idGoods: number;
     name: string;
-    exp: string;
+    exp?: string;
     amount: number;
     disabled: 0 | 1;
     idUnit2?: iGoodsUnitProps;
     floor?: number;
     slot?: number;
+    isHeavy: boolean;
 }
 
 // IMPORT ORDERS
@@ -188,6 +192,7 @@ interface iExportDetailProps {
     idExportOrderDetails?: number;
     idExportOrder?: number;
     idGoods: number;
+    idGoods2?: iGoodsProps;
     amount: number;
     checked?: boolean;
 }
@@ -201,6 +206,7 @@ interface iExportReceiptItemProps {
     status: number;
     reasonFailed?: string;
 }
+//PROCESSOR PROPS
 interface iExportReceiptProps {
     idExportReceipts: number;
     idWarehouse: number;
@@ -215,6 +221,67 @@ interface iExportReceiptProps {
     idWarehouse2?: iWarehouseDataProps;
     usernameCreated: string;
     usernameUpdated?: string;
+}
+
+//TRANSPORT RECEIPT PROPS
+interface iTransportReceiptProps {
+    idTransportReceipts?: number;
+    idUserSend: number;
+    idUserReceive?: number;
+    transportFromDate: string;
+    transportToDate?: string;
+    idWarehouseFrom: number;
+    idWarehouseTo?: number;
+    plateNumber: string;
+    transportDetails: iTransportDetailProps[];
+    status: number;
+    idUserSend2?: {
+        idUsers: number;
+        username: string;
+    };
+    idUserReceive2?: {
+        idUsers: number;
+        username: string;
+    };
+    idWarehouseFrom2?: {
+        idWarehouse: number;
+        name: string;
+        address: string;
+        provinceCode: string;
+    };
+    idWarehouseTo2?: {
+        idWarehouse: number;
+        name: string;
+        address: string;
+        provinceCode: string;
+    };
+    idUpdated?: number;
+    updatedAt?: string;
+}
+interface iTransportReceiptItemProps {
+    idTransportReceipts: number;
+    transportFromDate: string;
+    transportToDate: string;
+    idWarehouseFrom: number;
+    idWarehouseTo?: number;
+    status: number;
+    idWarehouseFrom2?: {
+        idWarehouse: number;
+        name: string;
+        address: string;
+    };
+    idWarehouseTo2?: {
+        idWarehouse: number;
+        name: string;
+        address: string;
+    };
+}
+interface iTransportDetailProps {
+    idTransportDetails?: number;
+    idTransportReceipt?: number;
+    idExportReceipt: number;
+    idExportOrder?: number;
+    idExportReceipt2?: iExportReceiptProps;
 }
 
 export type {
@@ -237,4 +304,7 @@ export type {
     iExportDetailProps,
     iExportReceiptItemProps,
     iExportReceiptProps,
+    iTransportReceiptProps,
+    iTransportReceiptItemProps,
+    iTransportDetailProps,
 };

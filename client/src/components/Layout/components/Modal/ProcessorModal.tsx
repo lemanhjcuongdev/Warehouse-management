@@ -9,16 +9,27 @@ import {
     useRef,
     useState,
 } from "react";
-import { Button, Form, FormLabel, Modal, Row } from "react-bootstrap";
+import {
+    Badge,
+    Button,
+    Col,
+    Form,
+    FormLabel,
+    Image,
+    Modal,
+    Row,
+} from "react-bootstrap";
 import {
     getAllExportReceiptByStatus,
     updateExportReceipt,
 } from "~/apis/exportReceiptAPI";
 import { getCookie } from "~/utils/cookies";
-import { initProcessingData } from "~/views/ProcessorView/ProcessorView";
-import { iExportReceiptItemProps } from "~/views/types";
+import stringToDate from "~/utils/stringToDate";
+import { initExportReceipt } from "~/views/ExportReceiptView/ExportReceiptView";
+import { iExportReceiptItemProps, iExportReceiptProps } from "~/views/types";
 import QRCodeScanner from "../QRCodeScanner/QRCodeScanner";
 import { iModalTypes, iPrintExportReceipt } from "./types";
+import { QR_API_ROOT } from "~/constants";
 
 function ProcessorModal(props: {
     show: true | false;
@@ -27,8 +38,8 @@ function ProcessorModal(props: {
     listData: iExportReceiptItemProps[];
     setListData: Dispatch<SetStateAction<iExportReceiptItemProps[]>>;
     modalType: iModalTypes;
-    formData: iPrintExportReceipt;
-    setFormData: Dispatch<React.SetStateAction<iPrintExportReceipt>>;
+    formData: iExportReceiptProps;
+    setFormData: Dispatch<React.SetStateAction<iExportReceiptProps>>;
 }) {
     const {
         show,
@@ -42,14 +53,20 @@ function ProcessorModal(props: {
     } = props;
     const [validated, setValidated] = useState(false);
     const formRef = useRef<HTMLFormElement>(null);
-    const [unprocessedOrders, setUnprocessedOrders] = useState<
+    const [processingOrders, setProcessingOrders] = useState<
         iExportReceiptItemProps[]
     >([]);
+
+    const qrObject: iPrintExportReceipt = {
+        idExportReceipts: formData.idExportReceipts,
+        idExportOrder: formData.idExportOrder,
+    };
+    const qrData = encodeURIComponent(JSON.stringify(qrObject));
 
     useEffect(() => {
         const statusCode = tabKey === "packed" ? 0 : 1;
         getAllExportReceiptByStatus(statusCode).then((data) =>
-            setUnprocessedOrders(data)
+            setProcessingOrders(data)
         );
     }, [tabKey, listData]);
 
@@ -68,16 +85,19 @@ function ProcessorModal(props: {
         HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     > = (e) => {
         const { value } = e.target;
-        const idExportOrder = unprocessedOrders.find(
+        const idExportOrder = processingOrders.find(
             (receipt) => receipt.idExportReceipts === +value
         )?.idExportOrder2.idExportOrders;
 
         if (idExportOrder) {
-            setFormData({
-                idExportReceipts: +value,
-                idExportOrder: idExportOrder,
+            setFormData((prev) => {
+                return {
+                    ...prev,
+                    idExportReceipts: +value,
+                    idExportOrder: idExportOrder,
+                };
             });
-        } else setFormData(initProcessingData);
+        } else setFormData(initExportReceipt);
     };
 
     const validateForm = () => {
@@ -93,7 +113,7 @@ function ProcessorModal(props: {
         return true;
     };
 
-    const handleUpdateListData = (data: iPrintExportReceipt) => {
+    const handleUpdateListData = (data: iExportReceiptProps) => {
         setFormData(data);
     };
 
@@ -126,7 +146,7 @@ function ProcessorModal(props: {
     );
 
     const handleCancel = () => {
-        setFormData(initProcessingData);
+        setFormData(initExportReceipt);
         setValidated(false);
     };
 
@@ -151,11 +171,13 @@ function ProcessorModal(props: {
                     onSubmit={(e) => e.preventDefault()}
                 >
                     <Row className="mb-3">
-                        <Form.Group>
-                            <QRCodeScanner
-                                handleUpdateListData={handleUpdateListData}
-                            />
-                        </Form.Group>
+                        {modalType.type === "create" && (
+                            <Form.Group>
+                                <QRCodeScanner
+                                    handleUpdateListData={handleUpdateListData}
+                                />
+                            </Form.Group>
+                        )}
                         <Form.Group className="mt-3">
                             {modalType.type === "create" ? (
                                 <>
@@ -172,8 +194,8 @@ function ProcessorModal(props: {
                                         <option value={0}>
                                             ----Chọn phiếu xuất kho----
                                         </option>
-                                        {unprocessedOrders.length > 0 &&
-                                            unprocessedOrders.map((order) => (
+                                        {processingOrders.length > 0 &&
+                                            processingOrders.map((order) => (
                                                 <option
                                                     key={order.idExportReceipts}
                                                     value={
@@ -197,11 +219,117 @@ function ProcessorModal(props: {
                                 </>
                             ) : (
                                 <>
-                                    <FormLabel>Mã phiếu xuất</FormLabel>
-                                    <Form.Control
-                                        value={`ID phiếu xuất: ${formData.idExportReceipts} - ID đơn xuất: ${formData.idExportOrder}`}
-                                        readOnly
-                                    ></Form.Control>
+                                    <Row>
+                                        <Form.Group as={Col}>
+                                            <FormLabel>
+                                                Mã phiếu xuất - Mã đơn xuất
+                                            </FormLabel>
+                                            <Form.Control
+                                                value={`ID phiếu xuất: ${formData.idExportReceipts} - ID đơn xuất: ${formData.idExportOrder}`}
+                                                readOnly
+                                            ></Form.Control>
+                                        </Form.Group>
+                                        <Form.Group as={Col}>
+                                            <FormLabel>Ngày xuất</FormLabel>
+                                            <Form.Control
+                                                value={stringToDate(
+                                                    formData.exportDate
+                                                )}
+                                                readOnly
+                                            ></Form.Control>
+                                        </Form.Group>
+                                    </Row>
+                                    <Row>
+                                        <Form.Group as={Col}>
+                                            <FormLabel>
+                                                Mã tỉnh / thành phố
+                                            </FormLabel>
+                                            <Form.Control
+                                                value={
+                                                    formData.idExportOrder2
+                                                        .provinceCode
+                                                }
+                                                readOnly
+                                            ></Form.Control>
+                                        </Form.Group>
+                                        <Form.Group as={Col}>
+                                            <FormLabel>
+                                                Mã quận / huyện
+                                            </FormLabel>
+                                            <Form.Control
+                                                value={
+                                                    formData.idExportOrder2
+                                                        .districtCode
+                                                }
+                                                readOnly
+                                            ></Form.Control>
+                                        </Form.Group>
+                                        <Form.Group as={Col}>
+                                            <FormLabel>
+                                                Mã xã / phường / thị trấn
+                                            </FormLabel>
+                                            <Form.Control
+                                                value={
+                                                    formData.idExportOrder2
+                                                        .wardCode
+                                                }
+                                                readOnly
+                                            ></Form.Control>
+                                        </Form.Group>
+                                    </Row>
+                                    <Row>
+                                        <Form.Group as={Col}>
+                                            <FormLabel>Kho xuất</FormLabel>
+                                            <Form.Control
+                                                value={`${formData.idWarehouse2?.name} - Đ/c: ${formData.idWarehouse2?.address}`}
+                                                readOnly
+                                            ></Form.Control>
+                                        </Form.Group>
+                                    </Row>
+                                    <Row>
+                                        {formData.usernameUpdated && (
+                                            <Form.Text>
+                                                {`Sửa đổi lần cuối lúc ${
+                                                    formData.updatedAt &&
+                                                    stringToDate(
+                                                        formData.updatedAt?.toString()
+                                                    )
+                                                } bởi ${
+                                                    formData.usernameUpdated
+                                                }`}
+                                            </Form.Text>
+                                        )}
+                                        <br />
+                                        <Form.Text>
+                                            Trạng thái:{" "}
+                                            <Badge
+                                                bg={
+                                                    formData.status === 1
+                                                        ? "primary"
+                                                        : "info"
+                                                }
+                                            >
+                                                {formData.status === 1
+                                                    ? "Đã đóng gói"
+                                                    : "Đã phân loại"}
+                                            </Badge>
+                                        </Form.Text>
+                                    </Row>
+                                    <Row>
+                                        <Form.Group as={Col}>
+                                            <FormLabel>
+                                                Mã QR gói hàng
+                                            </FormLabel>
+                                            <br />
+                                            <Form.Text muted>
+                                                Mã QR được dán trên gói hàng
+                                            </Form.Text>
+                                            <br />
+                                            <Image
+                                                src={`${QR_API_ROOT}&data=${qrData}`}
+                                            />
+                                        </Form.Group>
+                                    </Row>
                                 </>
                             )}
                             <Form.Control.Feedback type="invalid">

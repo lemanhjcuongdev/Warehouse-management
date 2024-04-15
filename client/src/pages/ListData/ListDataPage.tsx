@@ -10,6 +10,7 @@ import WarehouseView from "~/views/WarehouseView/WarehouseView";
 import Empty from "../Empty/Empty";
 import ExportReceiptView from "~/views/ExportReceiptView/ExportReceiptView";
 import ProcessorView from "~/views/ProcessorView/ProcessorView";
+import TransportReceiptView from "~/views/TransportReceiptView/TransportReceiptView";
 
 function ListData() {
     const params = useParams();
@@ -35,6 +36,8 @@ function ListData() {
             return <ExportReceiptView />;
         case "processor":
             return <ProcessorView />;
+        case "transport":
+            return <TransportReceiptView />;
         default:
             return <Empty />;
     }

@@ -53,6 +53,7 @@ function ExportReceiptModal(props: {
     modalType: iModalTypes;
     formData: iExportReceiptProps;
     setFormData: Dispatch<React.SetStateAction<iExportReceiptProps>>;
+    toggleCreateOrder: boolean;
 }) {
     const {
         show,
@@ -62,6 +63,7 @@ function ExportReceiptModal(props: {
         modalType,
         formData,
         setFormData,
+        toggleCreateOrder,
     } = props;
     const [validated, setValidated] = useState(false);
     const importDateRef = useRef<HTMLInputElement>(null);
@@ -86,6 +88,11 @@ function ExportReceiptModal(props: {
     }
 
     useEffect(() => {
+        getAllGoods().then((data) => setGoods(data));
+        getAllWarehouses().then((data) => setWarehouses(data));
+    }, [listData]);
+
+    useEffect(() => {
         getAllExportOrders().then((data) => {
             const ordersWithoutReceipt = [];
             //filter orders have been imported
@@ -108,9 +115,7 @@ function ExportReceiptModal(props: {
             }
             setExportOrders(ordersWithoutReceipt);
         });
-        getAllGoods().then((data) => setGoods(data));
-        getAllWarehouses().then((data) => setWarehouses(data));
-    }, [listData]);
+    }, [listData, toggleCreateOrder]);
 
     const handleChangeReceiptInput: ChangeEventHandler<
         HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -220,7 +225,7 @@ function ExportReceiptModal(props: {
     };
 
     const handleSubmitCreate: FormEventHandler<HTMLButtonElement> = useCallback(
-        (e) => {
+        async (e) => {
             const isValidated = validateForm();
             e.preventDefault();
             e.stopPropagation();
@@ -236,16 +241,19 @@ function ExportReceiptModal(props: {
                             };
                         }
                     );
-                modifyGoods(goodsArray).then(() =>
-                    createExportReceipt(formData)
-                        .then((data) => {
-                            data && setListData((prev) => [data, ...prev]);
-                            if (!data.error) {
-                                handleCancel();
-                            }
-                        })
-                        .catch((error) => console.log(error))
-                );
+
+                try {
+                    const res = await modifyGoods(goodsArray);
+                    if (res?.ok) {
+                        const data = await createExportReceipt(formData);
+                        data && setListData((prev) => [data, ...prev]);
+                        if (!data.error) {
+                            handleCancel();
+                        }
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
             }
         },
         [formData, setListData]
@@ -269,25 +277,6 @@ function ExportReceiptModal(props: {
             });
             handleCancel();
         }
-    };
-
-    const handleSubmitUpdate: FormEventHandler<HTMLButtonElement> = (e) => {
-        const isValidated = validateForm();
-        e.preventDefault();
-        e.stopPropagation();
-        if (!isValidated) return;
-
-        // updateExportOrder(formData).then(() => {
-        //     listData.forEach((data, index) => {
-        //         if (data.idExportOrders === formData.idExportOrders) {
-        //             //deep clone
-        //             const newData = [...listData];
-        //             newData.splice(index, 1, formData);
-        //             setListData(newData);
-        //         }
-        //     });
-        // });
-        handleCancel();
     };
 
     const handleCancel = () => {
@@ -345,14 +334,11 @@ function ExportReceiptModal(props: {
         >
             <Modal.Header closeButton>
                 <Modal.Title>
-                    {`${title} phiếu xuất kho `}
+                    <span className="mb-2">{`${title} phiếu xuất kho `}</span>
                     {modalType.type === "update" && formData.status === 0 && (
                         <>
                             &nbsp;
-                            <Button
-                                onClick={handlePrintORCode}
-                                className="mt-2"
-                            >
+                            <Button onClick={handlePrintORCode}>
                                 <i className="fa-solid fa-qrcode"></i> &nbsp; In
                                 mã QR phiếu
                             </Button>

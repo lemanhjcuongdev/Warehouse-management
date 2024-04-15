@@ -53,6 +53,9 @@ export class Goods {
   @Column('int', { name: 'amount' })
   amount: number
 
+  @Column('boolean', { name: 'is_heavy', nullable: true })
+  isHeavy: boolean
+
   @Column('datetime', {
     name: 'created_at',
     default: () => 'CURRENT_TIMESTAMP'

@@ -72,7 +72,8 @@ function GoodsTableRow(props: {
         >
             <td>{item.idGoods}</td>
             <td>{item.name}</td>
-            <td>{stringToDate(item.exp.toString())}</td>
+            <td>{item.amount}</td>
+            <td>{item.exp && stringToDate(item.exp.toString())}</td>
             <td className="d-flex justify-content-between align-items-center">
                 <div>
                     <Badge

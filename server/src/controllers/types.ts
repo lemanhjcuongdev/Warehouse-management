@@ -77,6 +77,25 @@ interface iExportReceiptReqBody {
   idUpdated: number
   reasonFailed: string
 }
+//TRANSPORT RECEIPT
+interface iTransportReceipt {
+  transportFromDate: string
+  transportToDate: string
+  idWarehouseFrom: number
+  idWarehouseTo: number
+  idUserSend: number
+  idUserReceive: number
+  plateNumber: string
+  transportDetails: iTransportDetail[]
+  status: number
+  idUpdated?: number
+  updatedAt?: string
+}
+interface iTransportDetail {
+  idTransportDetails?: number
+  idTransportReceipt?: number
+  idExportReceipt: number
+}
 
 export type {
   iCreateOrderRequestBody,
@@ -84,5 +103,6 @@ export type {
   iImportReceiptRequestBody,
   iDefectiveRecordRequestBody,
   iExportOrderReqBody,
-  iExportReceiptReqBody
+  iExportReceiptReqBody,
+  iTransportReceipt
 }

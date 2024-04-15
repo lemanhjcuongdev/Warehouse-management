@@ -4,7 +4,6 @@ import { ExportReceipts } from './ExportReceipts'
 import { Users } from './Users'
 import { Warehouses } from './Warehouses'
 
-@Index('FK_transport_export_order_idx', ['idExportReceipt'], {})
 @Index('FK_transport_from_user_idx', ['idUserSend'], {})
 @Index('FK_transport_from_warehouse_idx', ['idWarehouseFrom'], {})
 @Index('FK_transport_to_user_idx', ['idUserReceive'], {})
@@ -14,10 +13,10 @@ export class TransportReceipts {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id_transport_receipts' })
   idTransportReceipts: number
 
-  @Column('datetime', { name: 'transport_from_date' })
+  @Column('datetime', { name: 'transport_from_date', nullable: true })
   transportFromDate: Date
 
-  @Column('datetime', { name: 'transport_to_date' })
+  @Column('datetime', { name: 'transport_to_date', nullable: true })
   transportToDate: Date
 
   @Column('int', { name: 'id_warehouse_from' })
@@ -26,39 +25,30 @@ export class TransportReceipts {
   @Column('int', { name: 'id_warehouse_to' })
   idWarehouseTo: number
 
-  @Column('int', { name: 'id_user_send' })
+  @Column('int', { name: 'id_user_send', nullable: true })
   idUserSend: number
 
-  @Column('int', { name: 'id_user_receive' })
+  @Column('int', { name: 'id_user_receive', nullable: true })
   idUserReceive: number
 
-  @Column('varchar', { name: 'plate_number', length: 7 })
+  @Column('varchar', { name: 'plate_number', length: 10, nullable: true })
   plateNumber: string
-
-  @Column('int', { name: 'id_export_receipt' })
-  idExportReceipt: number
 
   @Column('int', { name: 'status' })
   status: number
 
   @Column('datetime', {
     name: 'updated_at',
+    nullable: true,
     default: () => 'CURRENT_TIMESTAMP'
   })
   updatedAt: Date
 
-  @Column('int', { name: 'id_updated' })
+  @Column('int', { name: 'id_updated', nullable: true })
   idUpdated: number
 
   @OneToMany(() => TransportDetails, (transportDetails) => transportDetails.idTransportReceipt2)
   transportDetails: TransportDetails[]
-
-  @ManyToOne(() => ExportReceipts, (exportReceipts) => exportReceipts.transportReceipts, {
-    onDelete: 'NO ACTION',
-    onUpdate: 'NO ACTION'
-  })
-  @JoinColumn([{ name: 'id_export_receipt', referencedColumnName: 'idExportReceipts' }])
-  idExportReceipt2: ExportReceipts
 
   @ManyToOne(() => Users, (users) => users.transportReceipts, {
     onDelete: 'NO ACTION',

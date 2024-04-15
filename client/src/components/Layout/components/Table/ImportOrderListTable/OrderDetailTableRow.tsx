@@ -103,6 +103,7 @@ function OrderDetailTableRow(props: {
                 >
                     <Form.Group>
                         <Form.Control
+                            required
                             type="date"
                             readOnly={formData.status === 3}
                             value={item.exp}

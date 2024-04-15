@@ -12,7 +12,7 @@ const userRepository = appDataSource.getRepository(Users)
 class WarehouseController {
   //[POST /warehouses]
   async createWarehouse(req: Request, res: Response, next: NextFunction) {
-    const { name, address, totalFloors, totalSlots, idCreated } = req.body
+    const { name, address, totalFloors, totalSlots, idCreated, provinceCode } = req.body
 
     let warehouse = new Warehouses()
     warehouse.name = name
@@ -20,6 +20,7 @@ class WarehouseController {
     warehouse.totalFloors = totalFloors
     warehouse.totalSlots = totalSlots
     warehouse.idCreated = idCreated
+    warehouse.provinceCode = provinceCode
     warehouse.disabled = 0
 
     //validate type of params
@@ -70,6 +71,7 @@ class WarehouseController {
       })
     }
   }
+
   //[GET /warehouses/:id]
   async getWarehouseById(req: Request, res: Response, next: NextFunction) {
     //get id from query string
@@ -110,11 +112,32 @@ class WarehouseController {
   }
 
   //[GET /warehouses/:id]
+  async getWarehouseByProvinceCode(req: Request, res: Response, next: NextFunction) {
+    //get provinceCode from query string
+    const provinceCode = req.params.provinceCode
+
+    //get warehouse by id from DB
+    try {
+      const warehouses = await whRepo.find({
+        where: {
+          provinceCode
+        }
+      })
+      //if ok
+      res.status(STATUS.SUCCESS).send(warehouses)
+    } catch (error) {
+      res.status(STATUS.NOT_FOUND).send({
+        error: 'Không tìm thấy kho'
+      })
+    }
+  }
+
+  //[GET /warehouses/:id]
   async editWarehouseById(req: Request, res: Response, next: NextFunction) {
     //get id from query string
     const id = +req.params.id
     //get params from body request
-    const { name, address, totalFloors, totalSlots, idUpdated } = req.body
+    const { name, address, totalFloors, totalSlots, idUpdated, provinceCode } = req.body
 
     //validate type
     const warehouse = new Warehouses()
@@ -122,6 +145,7 @@ class WarehouseController {
     warehouse.address = address
     warehouse.totalFloors = totalFloors
     warehouse.totalSlots = totalSlots
+    warehouse.provinceCode = provinceCode
     warehouse.idUpdated = idUpdated
     const errors = await validate(warehouse)
     if (errors.length > 0) {

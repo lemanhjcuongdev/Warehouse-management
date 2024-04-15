@@ -4,6 +4,7 @@ import { ExportOrders } from './ExportOrders'
 import { Users } from './Users'
 import { Warehouses } from './Warehouses'
 import { TransportReceipts } from './TransportReceipts'
+import { TransportDetails } from './TransportDetails'
 
 @Index('FK_out_receipt_order_idx', ['idExportOrder'], {})
 @Index('FK_out_receipt_user_idx', ['idUserExport'], {})
@@ -68,6 +69,6 @@ export class ExportReceipts {
   @JoinColumn([{ name: 'id_warehouse', referencedColumnName: 'idWarehouse' }])
   idWarehouse2: Warehouses
 
-  @OneToMany(() => TransportReceipts, (transportReceipts) => transportReceipts.idExportReceipt2)
-  transportReceipts: TransportReceipts[]
+  @OneToMany(() => TransportDetails, (transportDetails) => transportDetails.idExportReceipt2)
+  transportDetails: TransportDetails[]
 }

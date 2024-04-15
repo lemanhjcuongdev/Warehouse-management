@@ -18,6 +18,9 @@ export class Warehouses {
   @Column('varchar', { name: 'address', length: 200 })
   address: string
 
+  @Column('varchar', { name: 'province_code', length: 3 })
+  provinceCode: string
+
   @Column('int', { name: 'total_floors' })
   totalFloors: number
 

@@ -1,18 +1,10 @@
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { Button, Tab, Tabs } from "react-bootstrap";
 import { getAllExportReceiptByStatus } from "~/apis/exportReceiptAPI";
-// import ExportReceiptModal from "~/components/Layout/components/Modal/ExportReceiptModal";
 import { iModalTypes } from "~/components/Layout/components/Modal/types";
-// import ReceiptTable from "~/components/Layout/components/Table/ExportReceiptsTable/ReceiptTable";
 
-import {
-    iExportDetailProps,
-    iExportOrderProps,
-    iExportReceiptItemProps,
-    iExportReceiptProps,
-    iGoodsItemProps,
-} from "~/views/types";
-import { initialWarehouseDataState } from "../WarehouseView/WarehouseView";
+import { createExportOrder } from "~/apis/exportOrderAPI";
+import { getAllGoods } from "~/apis/goodsAPI";
 import {
     getDistricts,
     getProvinces,
@@ -21,10 +13,16 @@ import {
     iProvinceProps,
     iWardProps,
 } from "~/apis/provinceAPI";
-import { getAllGoods } from "~/apis/goodsAPI";
-import { createExportOrder } from "~/apis/exportOrderAPI";
 import ExportReceiptModal from "~/components/Layout/components/Modal/ExportReceiptModal";
 import ExportReceiptTable from "~/components/Layout/components/Table/ExportReceiptsTable/ExportReceiptTable";
+import {
+    iExportDetailProps,
+    iExportOrderProps,
+    iExportReceiptItemProps,
+    iExportReceiptProps,
+    iGoodsItemProps,
+} from "~/views/types";
+import { initialWarehouseDataState } from "../WarehouseView/WarehouseView";
 
 const initExportOrder: iExportOrderProps = {
     idExportOrders: 0,
@@ -52,6 +50,7 @@ const initExportReceiptItem: iExportReceiptItemProps = {
     idExportReceipts: 0,
     idWarehouse: 0,
     idWarehouse2: {
+        provinceCode: "",
         address: "",
         idWarehouse: 0,
         name: "",
@@ -79,11 +78,11 @@ function ExportReceiptView() {
     ]);
     const [formData, setFormData] =
         useState<iExportReceiptProps>(initExportReceipt);
-    //get continuousData from session storage
     const [provinces, setProvinces] = useState<iProvinceProps[]>([]);
     const [districts, setDistricts] = useState<iDistrictProps[]>([]);
     const [wards, setWards] = useState<iWardProps[]>([]);
     const [goods, setGoods] = useState<iGoodsItemProps[]>([]);
+    const [toggleCreateOrder, setToggleCreateOrder] = useState(false);
 
     useEffect(() => {
         getAllGoods().then((data) => {
@@ -92,13 +91,17 @@ function ExportReceiptView() {
     }, []);
 
     //TOGGLE AUTO GENERATE EXPORT ORDERS
-    // useEffect(() => {
-    //     const orderInterval = setInterval(() => {
-    //         generateRandomOrder();
-    //     }, 10000);
+    useEffect(() => {
+        let orderInterval: any;
 
-    //     return () => clearInterval(orderInterval);
-    // }, []);
+        if (toggleCreateOrder) {
+            orderInterval = setInterval(() => {
+                generateRandomOrder();
+            }, 1000);
+        }
+
+        return () => clearInterval(orderInterval);
+    }, [toggleCreateOrder]);
 
     const tabs: iTabProps[] = [
         {
@@ -165,29 +168,62 @@ function ExportReceiptView() {
         );
         const wardCode = wardData[randomWardIndex].ward_id;
         const address = `Số 3 ngách 121/33 tổ 3`;
+
+        //EXPORT ORDER DETAILS
         const exportOrderDetails: iExportDetailProps[] = [];
-        const detailCount = Math.floor(Math.random() * (goods?.length - 1));
-        for (let i = 0; i < detailCount; i++) {
-            const randomGoodsIndex = Math.floor(
-                Math.random() * (goods?.length - 1)
+        const lightGoods = goods.filter(
+            (goodsItem) => goodsItem.isHeavy === false
+        );
+        const detailCount = Math.floor(
+            Math.random() * (lightGoods?.length - 1)
+        );
+
+        if (detailCount === 1) {
+            const heavyGoods = goods.filter(
+                (goodsItem) => goodsItem.isHeavy === true
             );
-            const randomGoodsId = goods[randomGoodsIndex].idGoods;
-            const isExisted = exportOrderDetails.find(
-                (detail) => detail.idGoods === randomGoodsId
+            const randomGoodsIndex = Math.round(
+                Math.random() * (heavyGoods?.length - 1)
             );
-            if (isExisted) break;
+            console.log("INDEX: ", randomGoodsIndex);
+
+            const randomGoodsId = heavyGoods[randomGoodsIndex].idGoods;
+            console.log("RANDOM GOODS: ", heavyGoods[randomGoodsIndex]);
+
             const randomAmount = Math.floor(Math.random() * 10);
             if (
-                randomAmount > goods[randomGoodsIndex].amount ||
+                randomAmount > heavyGoods[randomGoodsIndex].amount ||
                 randomAmount === 0
             )
-                break;
+                return;
+            console.log("RANDOM AMOUNT: ", randomAmount);
 
             exportOrderDetails.push({
                 idGoods: randomGoodsId,
                 amount: randomAmount,
             });
-        }
+        } else
+            for (let i = 0; i < detailCount; i++) {
+                const randomGoodsIndex = Math.floor(
+                    Math.random() * (lightGoods?.length - 1)
+                );
+                const randomGoodsId = lightGoods[randomGoodsIndex].idGoods;
+                const isExisted = exportOrderDetails.find(
+                    (detail) => detail.idGoods === randomGoodsId
+                );
+                if (isExisted) break;
+                const randomAmount = Math.floor(Math.random() * 10);
+                if (
+                    randomAmount > lightGoods[randomGoodsIndex].amount ||
+                    randomAmount === 0
+                )
+                    break;
+
+                exportOrderDetails.push({
+                    idGoods: randomGoodsId,
+                    amount: randomAmount,
+                });
+            }
         const orderDate = new Date().toISOString();
         const exportOrder: iExportOrderProps = {
             orderDate,
@@ -242,10 +278,26 @@ function ExportReceiptView() {
                                         }}
                                     >
                                         <i className="fa-solid fa-plus"></i>
-                                        &nbsp; Thêm mới
+                                        &nbsp; Thêm mới phiếu xuất kho
                                     </Button>
                                 )}
-
+                                &nbsp;&nbsp;&nbsp;
+                                <Button
+                                    onClick={() =>
+                                        setToggleCreateOrder(!toggleCreateOrder)
+                                    }
+                                    className="mb-3"
+                                    variant="outline-primary"
+                                    style={{
+                                        fontWeight: "bold",
+                                    }}
+                                >
+                                    <i className="fa-solid fa-right-from-bracket"></i>
+                                    &nbsp;{" "}
+                                    {toggleCreateOrder
+                                        ? "Dừng lấy thêm đơn hàng"
+                                        : "Lấy thêm đơn hàng"}
+                                </Button>
                                 <ExportReceiptModal
                                     show={showModal}
                                     onHide={handleToggleShowModal}
@@ -254,8 +306,8 @@ function ExportReceiptView() {
                                     modalType={modalType}
                                     formData={formData}
                                     setFormData={setFormData}
+                                    toggleCreateOrder={toggleCreateOrder}
                                 />
-
                                 <ExportReceiptTable
                                     tabKey={key}
                                     listData={listData}
@@ -273,5 +325,5 @@ function ExportReceiptView() {
     );
 }
 
-export { initExportReceipt, initExportReceiptItem, initExportOrder };
+export { initExportOrder, initExportReceipt, initExportReceiptItem };
 export default ExportReceiptView;

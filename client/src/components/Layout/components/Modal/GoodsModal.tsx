@@ -177,6 +177,15 @@ function GoodsModal(props: {
         HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     > = (e) => {
         const { value, name } = e.target;
+
+        if (name === "isHeavy") {
+            setFormData((prev) => ({
+                ...prev,
+                [name]: !prev.isHeavy,
+            }));
+            return;
+        }
+
         setFormData((prev) => ({
             ...prev,
             [name]: value,
@@ -349,7 +358,7 @@ function GoodsModal(props: {
                                 <Form.Group as={Col} sm={4}>
                                     <FormLabel>Số lượng</FormLabel>
                                     <Form.Control
-                                        required
+                                        readOnly
                                         name="amount"
                                         value={formData.amount}
                                         onChange={handleChange}
@@ -451,6 +460,21 @@ function GoodsModal(props: {
                                             </option>
                                         ))}
                                     </Form.Select>
+                                    <Form.Control.Feedback type="invalid">
+                                        Bắt buộc chọn
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                                <Form.Group as={Col} sm>
+                                    <Form.Label>
+                                        Có phải hàng cồng kềnh không?
+                                    </Form.Label>
+                                    <Form.Check
+                                        required
+                                        type="switch"
+                                        name="isHeavy"
+                                        checked={formData.isHeavy}
+                                        onChange={handleChange}
+                                    ></Form.Check>
                                     <Form.Control.Feedback type="invalid">
                                         Bắt buộc chọn
                                     </Form.Control.Feedback>

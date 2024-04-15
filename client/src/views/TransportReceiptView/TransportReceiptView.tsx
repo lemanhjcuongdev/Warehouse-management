@@ -1,43 +1,32 @@
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { Button, Tab, Tabs } from "react-bootstrap";
-import { getAllImportReceiptByStatus } from "~/apis/importReceiptAPI";
-import ImportReceiptModal from "~/components/Layout/components/Modal/ImportReceiptModal";
+import { getAllTransportReceiptByStatus } from "~/apis/transportReceiptAPI";
 import { iModalTypes } from "~/components/Layout/components/Modal/types";
-import ReceiptTable from "~/components/Layout/components/Table/ImportReceiptsTable/ReceiptTable";
 
-import { iImportReceiptItemProps, iImportReceiptProps } from "~/views/types";
-import { initImportOrderData } from "../ImportOrderView/ImportOrderView";
-import { initProviderData } from "../ProviderView/ProviderView";
-import { initialWarehouseDataState } from "../WarehouseView/WarehouseView";
-import { useParams } from "react-router-dom";
+import TransportReceiptModal from "~/components/Layout/components/Modal/TransportReceiptModal";
+import TransportReceiptTable from "~/components/Layout/components/Table/TransportReceiptsTable/TransportReceiptTable";
+import {
+    iTransportReceiptItemProps,
+    iTransportReceiptProps,
+} from "~/views/types";
 
-let initImportReceipt: iImportReceiptProps = {
-    idImportReceipts: 0,
-    idWarehouse: 0,
-    idImportOrder: 0,
-    idProvider: 0,
-    idUserImport: 0,
-    importDate: "",
+const initTransportReceipt: iTransportReceiptProps = {
+    idUserSend: 0,
+    idUserReceive: 0,
+    transportFromDate: "",
+    transportToDate: "",
+    idWarehouseFrom: 0,
+    idWarehouseTo: 0,
+    plateNumber: "",
+    transportDetails: [],
     status: 0,
-    idImportOrder2: initImportOrderData,
-    idProvider2: initProviderData,
-    idWarehouse2: initialWarehouseDataState,
-    usernameCreated: "",
 };
-let initImportReceiptItem: iImportReceiptItemProps = {
-    idImportReceipts: 0,
-    idWarehouse: 0,
-    idWarehouse2: {
-        address: "",
-        provinceCode: "",
-        idWarehouse: 0,
-        name: "",
-        totalFloors: 0,
-        totalSlots: 0,
-        disabled: 0,
-    },
-    idImportOrder: 0,
-    importDate: "",
+const initTransportReceiptItem: iTransportReceiptItemProps = {
+    idTransportReceipts: 0,
+    transportFromDate: "",
+    transportToDate: "",
+    idWarehouseTo: 0,
+    idWarehouseFrom: 0,
     status: 0,
 };
 
@@ -46,26 +35,25 @@ interface iTabProps {
     title: ReactNode;
 }
 
-function ImportReceiptView() {
-    const params = useParams();
-    const action = params.action;
-    const initShowModal = action ? true : false;
-    const [key, setKey] = useState("finished");
-    const [showModal, setShowModal] = useState(initShowModal);
+function TransportReceiptView() {
+    //SHARED PROPS
+    const [key, setKey] = useState("on_the_way");
+    const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
-    const [listData, setListData] = useState<iImportReceiptItemProps[]>([
-        initImportReceiptItem,
+    const [listData, setListData] = useState<iTransportReceiptItemProps[]>([
+        initTransportReceiptItem,
     ]);
     const [formData, setFormData] =
-        useState<iImportReceiptProps>(initImportReceipt);
+        useState<iTransportReceiptProps>(initTransportReceipt);
+
     const tabs: iTabProps[] = [
         {
-            eventKey: "finished",
-            title: "Đã nhập kho",
+            eventKey: "on_the_way",
+            title: "Đang điều chuyển",
         },
         {
-            eventKey: "failed",
-            title: "Đã huỷ bỏ",
+            eventKey: "finished",
+            title: "Đã điều chuyển",
         },
     ];
 
@@ -73,14 +61,14 @@ function ImportReceiptView() {
     const handleSelected = useCallback(() => {
         let statusCode: number = 0;
         switch (key) {
-            case "finished":
-                statusCode = 0;
+            case "on_the_way":
+                statusCode = 3;
                 break;
-            case "failed":
-                statusCode = 1;
+            case "finished":
+                statusCode = 4;
                 break;
         }
-        getAllImportReceiptByStatus(statusCode).then((data) =>
+        getAllTransportReceiptByStatus(statusCode).then((data) =>
             setListData(data)
         );
     }, [key]);
@@ -94,13 +82,12 @@ function ImportReceiptView() {
         setModalType({ type: "create" });
     };
 
-    console.log("FORM DATA: ", formData);
-
+    console.log("RECEIPT DATA: ", formData);
     return (
         <>
-            <h2>Danh sách phiếu nhập kho</h2>
+            <h2>Danh sách phiếu điều chuyển kho</h2>
             <Tabs
-                defaultActiveKey="finished"
+                defaultActiveKey="on_the_way"
                 activeKey={key}
                 id="fill-tabs"
                 className="my-3"
@@ -123,7 +110,7 @@ function ImportReceiptView() {
                         {key === tab.eventKey && (
                             <>
                                 <hr />
-                                {key === "finished" && (
+                                {key === "on_the_way" && (
                                     <Button
                                         onClick={handleToggleShowModal}
                                         className="mb-3"
@@ -137,7 +124,7 @@ function ImportReceiptView() {
                                     </Button>
                                 )}
 
-                                <ImportReceiptModal
+                                <TransportReceiptModal
                                     show={showModal}
                                     onHide={handleToggleShowModal}
                                     listData={listData}
@@ -147,7 +134,7 @@ function ImportReceiptView() {
                                     setFormData={setFormData}
                                 />
 
-                                <ReceiptTable
+                                <TransportReceiptTable
                                     tabKey={key}
                                     listData={listData}
                                     setListData={setListData}
@@ -164,5 +151,5 @@ function ImportReceiptView() {
     );
 }
 
-export { initImportReceipt, initImportReceiptItem };
-export default ImportReceiptView;
+export { initTransportReceipt, initTransportReceiptItem };
+export default TransportReceiptView;

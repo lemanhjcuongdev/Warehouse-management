@@ -7,6 +7,7 @@ import providerRouter from './provider.route'
 import importingRouter from './importing.route'
 import defectiveRecordRouter from './defectiveRecord.route'
 import exportingRouter from './exporting.route'
+import transportingRouter from './transporting.route'
 
 function route(app: Express) {
   app.use('/users', userRouter)
@@ -17,6 +18,7 @@ function route(app: Express) {
   app.use('/import', importingRouter)
   app.use('/export', exportingRouter)
   app.use('/defective-records', defectiveRecordRouter)
+  app.use('/transport', transportingRouter)
 }
 
 export default route

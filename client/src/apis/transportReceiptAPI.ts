@@ -1,12 +1,11 @@
 import { API_ROOT } from "~/constants";
 import { getCookie } from "~/utils/cookies";
 import {
-    iGoodsProps,
-    iWarehouseDataProps,
-    iWarehouseItemProps,
+    iTransportReceiptItemProps,
+    iTransportReceiptProps,
 } from "~/views/types";
 
-const getAllWarehouses = async () => {
+const getAllTransportReceiptByStatus = async (status: number) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -20,8 +19,8 @@ const getAllWarehouses = async () => {
             },
         };
 
-        const res = await fetch(`${API_ROOT}/warehouses`, init);
-        const data: iWarehouseItemProps[] = await res.json();
+        const res = await fetch(`${API_ROOT}/transport/status/${status}`, init);
+        const data: iTransportReceiptItemProps[] = await res.json();
 
         return data;
     } catch (error) {
@@ -29,7 +28,7 @@ const getAllWarehouses = async () => {
     }
 };
 
-const getWarehouseById = async (id: number) => {
+const getTransportReceiptById = async (id: number) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -42,7 +41,7 @@ const getWarehouseById = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/warehouses/id/${id}`, init);
+        const res = await fetch(`${API_ROOT}/transport/id/${id}`, init);
         const data = await res.json();
         if (data.error) {
             throw new Error(data.error);
@@ -54,67 +53,7 @@ const getWarehouseById = async (id: number) => {
     }
 };
 
-const getWarehousesByProvince = async (provinceCode: string) => {
-    try {
-        const jwt = getCookie("jwt");
-        if (!jwt) {
-            throw new Error("Hết phiên đăng nhập");
-        }
-        const init: RequestInit = {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                authorization: jwt,
-            },
-        };
-        const res = await fetch(
-            `${API_ROOT}/warehouses/province/${provinceCode}`,
-            init
-        );
-
-        if (res.status === 404) {
-            throw new Error();
-        } else {
-            const data = await res.json();
-            return data;
-        }
-    } catch (error) {
-        return [];
-    }
-};
-
-const getWarehouseSlotsById = async (id: number) => {
-    try {
-        const jwt = getCookie("jwt");
-        if (!jwt) {
-            throw new Error("Hết phiên đăng nhập");
-        }
-        const init: RequestInit = {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                authorization: jwt,
-            },
-        };
-        const res = await fetch(`${API_ROOT}/warehouses/slots/${id}`, init);
-        const data: {
-            idWarehouse: number;
-            totalFloors: number;
-            totalSlots: number;
-            goods: iGoodsProps[];
-            error?: string;
-        } = await res.json();
-        if (data.error) {
-            throw new Error(data.error);
-        }
-
-        return data;
-    } catch (error) {
-        return error;
-    }
-};
-
-const createWarehouse = async (values: iWarehouseDataProps) => {
+const createTransportReceipt = async (values: iTransportReceiptProps) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -129,7 +68,7 @@ const createWarehouse = async (values: iWarehouseDataProps) => {
             },
             body: JSON.stringify(values),
         };
-        const res = await fetch(`${API_ROOT}/warehouses`, init);
+        const res = await fetch(`${API_ROOT}/transport`, init);
 
         const data = await res.json();
         if (data.error) {
@@ -142,7 +81,7 @@ const createWarehouse = async (values: iWarehouseDataProps) => {
     }
 };
 
-const updateWarehouse = async (values: iWarehouseDataProps) => {
+const updateTransportReceipt = async (value: iTransportReceiptProps) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -155,10 +94,10 @@ const updateWarehouse = async (values: iWarehouseDataProps) => {
                 "Content-Type": "application/json",
                 authorization: jwt,
             },
-            body: JSON.stringify(values),
+            body: JSON.stringify(value),
         };
         const res = await fetch(
-            `${API_ROOT}/warehouses/${values.idWarehouse}`,
+            `${API_ROOT}/transport/${value.idTransportReceipts}`,
             init
         );
 
@@ -173,7 +112,7 @@ const updateWarehouse = async (values: iWarehouseDataProps) => {
     }
 };
 
-const softDeleteWarehouse = async (id: number) => {
+const softDeleteTransportReceipt = async (id: number, idUpdated: number) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
@@ -186,8 +125,11 @@ const softDeleteWarehouse = async (id: number) => {
                 "Content-Type": "application/json",
                 authorization: jwt,
             },
+            body: JSON.stringify({
+                idUpdated,
+            }),
         };
-        const res = await fetch(`${API_ROOT}/warehouses/${id}`, init);
+        const res = await fetch(`${API_ROOT}/transport/${id}`, init);
 
         const data = await res.json();
         if (data && data.error) {
@@ -201,11 +143,9 @@ const softDeleteWarehouse = async (id: number) => {
 };
 
 export {
-    createWarehouse,
-    getAllWarehouses,
-    getWarehouseById,
-    getWarehousesByProvince,
-    getWarehouseSlotsById,
-    softDeleteWarehouse,
-    updateWarehouse,
+    createTransportReceipt,
+    getAllTransportReceiptByStatus,
+    getTransportReceiptById,
+    softDeleteTransportReceipt,
+    updateTransportReceipt,
 };

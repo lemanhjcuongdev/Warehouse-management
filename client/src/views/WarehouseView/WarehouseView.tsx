@@ -11,6 +11,7 @@ const managerId = getCookie("id");
 const initialWarehouseDataState: iWarehouseDataProps = {
     name: "",
     address: "",
+    provinceCode: "",
     totalFloors: 0,
     totalSlots: 0,
     idCreated: +managerId,
@@ -25,6 +26,7 @@ function WarehouseView() {
             idWarehouse: -1,
             name: "",
             address: "",
+            provinceCode: "",
             disabled: 0,
         },
     ]);
@@ -44,6 +46,8 @@ function WarehouseView() {
         setShowModal(!showModal);
         setModalType({ type: "create" });
     }, [showModal]);
+
+    console.log("WAREHOUSE FORM: ", formData);
 
     return (
         <>

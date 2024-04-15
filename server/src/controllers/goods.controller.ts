@@ -1,7 +1,7 @@
 import { validate } from 'class-validator'
 import dotenv from 'dotenv'
 import { NextFunction, Request, Response } from 'express'
-import { And, MoreThan, MoreThanOrEqual } from 'typeorm'
+import { MoreThanOrEqual } from 'typeorm'
 import { appDataSource } from '~/constants/appDataSource'
 import STATUS from '~/constants/statusCode'
 import { Goods } from '~/models/entities/Goods'
@@ -18,7 +18,7 @@ class GoodsController {
   async getAllGoods(req: Request, res: Response, next: NextFunction) {
     //get all Goods from DB
     const goods = await goodsRepository.find({
-      select: ['idGoods', 'name', 'exp', 'amount', 'disabled', 'idUnit2', 'floor', 'slot'],
+      select: ['idGoods', 'name', 'exp', 'amount', 'disabled', 'idUnit2', 'floor', 'slot', 'isHeavy'],
       relations: ['idUnit2']
     })
 
@@ -48,7 +48,8 @@ class GoodsController {
           'idCreated',
           'idUpdated',
           'createdAt',
-          'updatedAt'
+          'updatedAt',
+          'isHeavy'
         ],
         where: {
           idGoods: id
@@ -84,7 +85,7 @@ class GoodsController {
   //[POST /Goods/create-Goods]
   async createGoods(req: Request, res: Response, next: NextFunction) {
     //get params from request body
-    const { name, idType, idUnit, idWarehouse, floor, slot, importDate, exp, amount, idCreated } = req.body
+    const { name, idType, idUnit, idWarehouse, floor, slot, amount, idCreated, isHeavy } = req.body
 
     let goods = new Goods()
     goods.idType = idType
@@ -93,11 +94,10 @@ class GoodsController {
     goods.name = name
     goods.floor = floor
     goods.slot = slot
-    goods.importDate = importDate
-    goods.exp = exp
     goods.amount = amount
     goods.idCreated = idCreated
     goods.disabled = 0
+    goods.isHeavy = isHeavy
 
     //validate type of params
     const errors = await validate(Goods)
@@ -140,61 +140,55 @@ class GoodsController {
       }[]
     } = req.body
 
-    if (goodsArray.length > 0) {
-      goodsArray.map(async (good) => {
-        const id = good.id
-        const amount = good.amount
-        const exp = good.exp
-        const importDate = good.importDate
+    if (goodsArray.length === 0) {
+      return res.status(STATUS.BAD_REQUEST).send({
+        error: 'Không có hàng cần cập nhật số lượng'
+      })
+    }
 
-        if (amount === 0) {
-          res.status(STATUS.BAD_REQUEST).send({
-            error: 'Không thể cập nhật số lượng = 0'
-          })
-          return
-        }
+    for (const goods of goodsArray) {
+      const { id, amount, exp, importDate } = goods
 
-        //try to save, if fails, the Goodsname is already in use
-        try {
-          const currentGoods = await goodsRepository.findOneOrFail({
-            where: {
-              idGoods: id,
-              disabled: 0,
-              amount: MoreThanOrEqual(0)
-            }
-          })
-          if (amount + currentGoods.amount < 0) {
-            res.status(STATUS.BAD_REQUEST).send({
-              error: 'Số lượng xuất nhỏ hơn tồn trong kho'
-            })
-            return
-          }
-          const updateResult = await goodsRepository.update(
-            {
-              idGoods: id
-            },
-            {
-              amount: currentGoods.amount + +amount,
-              exp,
-              importDate
-            }
-          )
+      // Kiểm tra giá trị cập nhật
+      const errors = await validate(goods)
+      if (errors.length > 0) {
+        return res.status(STATUS.BAD_REQUEST).send({
+          errors: errors.map((error) => error.toString())
+        })
+      }
 
-          if (updateResult.affected === 0) {
-            throw new Error()
-          }
-        } catch (error) {
-          res.status(STATUS.BAD_REQUEST).send({
-            error: 'Không thể cập nhật số lượng'
-          })
-          return
+      if (amount === 0) {
+        return res.status(STATUS.BAD_REQUEST).send({
+          error: 'Không có số lượng cần cập nhật'
+        })
+      }
+      const currentGoods = await goodsRepository.findOneOrFail({
+        where: {
+          idGoods: id,
+          disabled: 0,
+          amount: MoreThanOrEqual(0)
         }
       })
-    } else {
-      res.status(STATUS.BAD_REQUEST).send({
-        error: 'Không có hàng hoá cần cập nhật số lượng'
-      })
-      return
+      if (amount + currentGoods.amount < 0) {
+        return res.status(STATUS.BAD_REQUEST).send({
+          error: 'Số lượng hàng tồn không đủ'
+        })
+      }
+      const response = await goodsRepository.update(
+        {
+          idGoods: id
+        },
+        {
+          amount: currentGoods.amount + +amount,
+          exp,
+          importDate
+        }
+      )
+      if (response.affected === 0) {
+        return res.status(STATUS.BAD_REQUEST).send({
+          error: 'Không cập nhật được số lượng'
+        })
+      }
     }
 
     //if ok, return
@@ -206,7 +200,7 @@ class GoodsController {
     //get id from query string
     const id: number = +req.params.id
     //get params from body request
-    const { name, idType, idUnit, idWarehouse, floor, slot, importDate, exp, amount, idUpdated } = req.body
+    const { name, idType, idUnit, idWarehouse, floor, slot, importDate, exp, amount, idUpdated, isHeavy } = req.body
 
     let goods: Goods
     //get Goods by id from DB
@@ -234,6 +228,7 @@ class GoodsController {
     goods.exp = exp
     goods.amount = amount
     goods.idUpdated = idUpdated
+    goods.isHeavy = isHeavy
     const errors = await validate(goods)
     if (errors.length > 0) {
       res.status(STATUS.BAD_REQUEST).send({
@@ -257,7 +252,8 @@ class GoodsController {
         exp,
         amount,
         idUpdated,
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        isHeavy
       }
     )
     //if ok

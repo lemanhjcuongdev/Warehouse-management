@@ -31,7 +31,7 @@ const navbar_items: iNavbarItem[] = [
             },
             {
                 label: "Điều chuyển kho",
-                to: "/",
+                to: "/list/transport",
             },
         ],
     },

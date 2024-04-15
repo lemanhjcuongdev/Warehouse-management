@@ -7,11 +7,13 @@ import { ExportReceipts } from '~/models/entities/ExportReceipts'
 import { Users } from '~/models/entities/Users'
 import { iExportReceiptReqBody } from './types'
 import EXPORT_STATUS from '~/constants/ExportOrderStatusCode'
+import { ExportOrders } from '~/models/entities/ExportOrders'
 
 dotenv.config()
 
 //use datasource
 const exportReceiptRepo = appDataSource.getRepository(ExportReceipts)
+const exportOrderRepo = appDataSource.getRepository(ExportOrders)
 const userRepository = appDataSource.getRepository(Users)
 
 class ExportReceiptController {
@@ -27,7 +29,7 @@ class ExportReceiptController {
         order: {
           exportDate: 'DESC'
         },
-        relations: ['idWarehouse2', 'idExportOrder2']
+        relations: ['idWarehouse2', 'idExportOrder2', 'idExportOrder2.exportOrderDetails.idGoods2']
       })
       res.status(STATUS.SUCCESS).send(exportReceipt)
     } catch (error) {
@@ -59,7 +61,7 @@ class ExportReceiptController {
         where: {
           idExportReceipts: id
         },
-        relations: ['idWarehouse2', 'idExportOrder2.exportOrderDetails']
+        relations: ['idWarehouse2', 'idExportOrder2.exportOrderDetails.idGoods2']
       })
 
       const createdManager = await userRepository.findOneOrFail({
@@ -129,6 +131,14 @@ class ExportReceiptController {
         },
         relations: ['idExportOrder2']
       })
+      exportOrderRepo.update(
+        {
+          idExportOrders: receiptOrder.idExportOrder2.idExportOrders
+        },
+        {
+          status: 1
+        }
+      )
       exportReceipt = {
         ...exportReceipt,
         idWarehouse2: {

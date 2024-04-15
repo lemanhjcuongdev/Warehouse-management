@@ -23,6 +23,9 @@ class ExportOrderController {
       //get all ExportOrder from DB
       const exportOrder = await exportOrderRepo.find({
         select: ['idExportOrders', 'orderDate', 'status', 'exportOrderDetails'],
+        where: {
+          status: 0
+        },
         order: {
           orderDate: 'ASC'
         },

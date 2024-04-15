@@ -18,6 +18,7 @@ function GoodsTable(props: {
                 <tr>
                     <th>ID</th>
                     <th>Tên hàng</th>
+                    <th>SL tồn</th>
                     <th>Hạn sử dụng</th>
                     <th>Trạng thái</th>
                 </tr>

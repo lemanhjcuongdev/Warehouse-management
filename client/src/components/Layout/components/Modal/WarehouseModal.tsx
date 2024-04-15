@@ -5,6 +5,7 @@ import {
     SetStateAction,
     memo,
     useCallback,
+    useEffect,
     useRef,
     useState,
 } from "react";
@@ -24,6 +25,7 @@ import stringToDate from "~/utils/stringToDate";
 import { initialWarehouseDataState } from "~/views/WarehouseView/WarehouseView";
 import { iWarehouseItemProps, iWarehouseDataProps } from "~/views/types";
 import { iModalTypes } from "./types";
+import { getProvinces, iProvinceProps } from "~/apis/provinceAPI";
 
 function WarehouseModal(props: {
     show: true | false;
@@ -45,6 +47,7 @@ function WarehouseModal(props: {
     } = props;
     const [validated, setValidated] = useState(false);
     const formRef = useRef<HTMLFormElement>(null);
+    const [provinces, setProvinces] = useState<iProvinceProps[]>([]);
     let title: string;
 
     switch (modalType.type) {
@@ -56,7 +59,15 @@ function WarehouseModal(props: {
             break;
     }
 
-    const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    useEffect(() => {
+        getProvinces().then((data) => {
+            data && setProvinces(data);
+        });
+    }, []);
+
+    const handleChange: ChangeEventHandler<
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    > = (e) => {
         const { value, name } = e.target;
         setFormData(
             (prev) =>
@@ -182,7 +193,7 @@ function WarehouseModal(props: {
                         </Form.Group>
                     </Row>
                     <Row className="mb-3">
-                        <Form.Group controlId="formGridAddress">
+                        <Form.Group controlId="formGridAddress" as={Col}>
                             <Form.Label>Địa chỉ kho hàng</Form.Label>
                             <Form.Control
                                 required
@@ -190,6 +201,31 @@ function WarehouseModal(props: {
                                 value={formData.address}
                                 onChange={handleChange}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Bắt buộc nhập
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                        <Form.Group controlId="formGridProvinceCode" as={Col}>
+                            <Form.Label>Tỉnh / Thành phố</Form.Label>
+                            <Form.Select
+                                required
+                                name="provinceCode"
+                                value={formData.provinceCode}
+                                onChange={handleChange}
+                            >
+                                <option value="">
+                                    ----Chọn Tỉnh / Thành phố----
+                                </option>
+                                {provinces.map((province) => (
+                                    <option
+                                        key={province.province_id}
+                                        value={province.province_id}
+                                    >
+                                        ID: {province.province_id} -{" "}
+                                        {province.province_name}
+                                    </option>
+                                ))}
+                            </Form.Select>
                             <Form.Control.Feedback type="invalid">
                                 Bắt buộc nhập
                             </Form.Control.Feedback>

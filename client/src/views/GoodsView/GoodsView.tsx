@@ -14,6 +14,7 @@ const initGoodsItem: iGoodsItemProps = {
     exp: "",
     amount: 0,
     disabled: 0,
+    isHeavy: false,
 };
 const initGoodsInfo: iGoodsProps = {
     idGoods: 0,
@@ -30,6 +31,7 @@ const initGoodsInfo: iGoodsProps = {
     usernameCreated: "",
     createdAt: new Date(),
     disabled: 0,
+    isHeavy: false,
 };
 
 function GoodsView() {

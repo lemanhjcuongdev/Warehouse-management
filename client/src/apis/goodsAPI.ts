@@ -102,12 +102,7 @@ const modifyGoods = async (
         };
         const res = await fetch(`${API_ROOT}/goods/modify`, init);
 
-        const data = await res.json();
-        if (data.error) {
-            throw new Error(data.error);
-        }
-
-        return data;
+        return res;
     } catch (error) {
         console.log(error);
     }

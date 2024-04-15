@@ -1,26 +1,25 @@
 import { Dispatch, SetStateAction, memo } from "react";
 import { Table } from "react-bootstrap";
-import { iExportReceiptItemProps } from "~/views/types";
-import { iModalTypes, iPrintExportReceipt } from "../../Modal/types";
+import { iExportReceiptItemProps, iExportReceiptProps } from "~/views/types";
+import { iModalTypes } from "../../Modal/types";
 import ProcessorTableRow from "./ProcessorTableRow";
 
 function ProcessorTable(props: {
     tabKey: "packed" | "classified" | string;
     listData: iExportReceiptItemProps[];
-    setListData: Dispatch<SetStateAction<iExportReceiptItemProps[]>>;
     toggleShowModal: () => void;
     setModalType: Dispatch<SetStateAction<iModalTypes>>;
-    setFormData: Dispatch<React.SetStateAction<iPrintExportReceipt>>;
+    setFormData: Dispatch<React.SetStateAction<iExportReceiptProps>>;
 }) {
-    const { listData, tabKey } = props;
+    const { listData } = props;
     return (
         <Table striped bordered hover responsive>
             <thead>
                 <tr>
                     <th>ID phiếu xuất</th>
                     <th>ID đơn xuất</th>
-                    <th>Nhà cung cấp</th>
                     <th>Ngày xuất</th>
+                    <th colSpan={3}>Mã Tỉnh thành - Quận huyện - Xã phường</th>
                 </tr>
             </thead>
             <tbody>
