@@ -1,17 +1,16 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import useGlobalState from "~/hooks/useGlobalState";
+import { getCookie } from "~/utils/cookies";
 
 function Empty() {
     const navigate = useNavigate();
-    const { state } = useGlobalState();
-    const { isAuthentication } = state;
+    const id = getCookie("id");
 
     useEffect(() => {
-        if (!isAuthentication) {
+        if (!id) {
             navigate("/login");
         } else navigate("/");
-    }, [isAuthentication, navigate]);
+    }, [id, navigate]);
     return <h1>Trang không tồn tại</h1>;
 }
 

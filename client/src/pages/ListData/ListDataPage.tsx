@@ -11,6 +11,7 @@ import Empty from "../Empty/Empty";
 import ExportReceiptView from "~/views/ExportReceiptView/ExportReceiptView";
 import ProcessorView from "~/views/ProcessorView/ProcessorView";
 import TransportReceiptView from "~/views/TransportReceiptView/TransportReceiptView";
+import StocktakingReceiptView from "~/views/StocktakingReceiptView/StocktakingReceiptView";
 
 function ListData() {
     const params = useParams();
@@ -38,8 +39,12 @@ function ListData() {
             return <ProcessorView />;
         case "transport":
             return <TransportReceiptView />;
+        case "stocktaking":
+            return <StocktakingReceiptView />;
+        case "":
+            return <ExportReceiptView />;
         default:
-            return <Empty />;
+            return <ExportReceiptView />;
     }
 }
 

@@ -1,12 +1,10 @@
 import { validate } from 'class-validator'
 import dotenv from 'dotenv'
 import { NextFunction, Request, Response } from 'express'
-import EXPORT_STATUS from '~/constants/ExportOrderStatusCode'
 import { appDataSource } from '~/constants/appDataSource'
 import STATUS from '~/constants/statusCode'
 import { ExportOrderDetails } from '~/models/entities/ExportOrderDetails'
 import { ExportOrders } from '~/models/entities/ExportOrders'
-import { Users } from '~/models/entities/Users'
 import { iExportOrderReqBody } from './types'
 
 dotenv.config()
@@ -14,7 +12,6 @@ dotenv.config()
 //use datasource
 const exportOrderRepo = appDataSource.getRepository(ExportOrders)
 const exportOrderDetailRepo = appDataSource.getRepository(ExportOrderDetails)
-const userRepository = appDataSource.getRepository(Users)
 
 class ExportOrderController {
   //[GET /ExportOrder/:status]

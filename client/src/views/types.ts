@@ -101,6 +101,7 @@ interface iGoodsProps {
 interface iGoodsItemProps {
     idGoods: number;
     name: string;
+    importDate?: string;
     exp?: string;
     amount: number;
     disabled: 0 | 1;
@@ -284,6 +285,36 @@ interface iTransportDetailProps {
     idExportReceipt2?: iExportReceiptProps;
 }
 
+//STOCKTAKING RECEIPT
+interface iStocktakingReceiptProps {
+    idStocktakingReceipts: number;
+    idWarehouse: number;
+    idWarehouse2?: iWarehouseDataProps;
+    date: string;
+    idUser: number;
+    idUser2?: iUserDataProps;
+    idUpdated?: number;
+    updatedAt?: string;
+    stocktakingDetails: iStocktakingDetail[];
+}
+
+interface iStocktakingReceiptItemProps {
+    idStocktakingReceipts: number;
+    idWarehouse2: iWarehouseDataProps;
+    date: string;
+}
+
+interface iStocktakingDetail {
+    idStocktakingDetails?: number;
+    idReceipt?: number;
+    idGoods: number;
+    amount: number;
+    storedAmount?: number;
+    quality: string;
+    solution?: string;
+    idGoods2?: iGoodsProps;
+}
+
 export type {
     iUserDataProps,
     iUserItemProps,
@@ -307,4 +338,7 @@ export type {
     iTransportReceiptProps,
     iTransportReceiptItemProps,
     iTransportDetailProps,
+    iStocktakingReceiptProps,
+    iStocktakingReceiptItemProps,
+    iStocktakingDetail,
 };

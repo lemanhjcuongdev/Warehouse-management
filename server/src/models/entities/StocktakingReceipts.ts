@@ -21,11 +21,12 @@ export class StocktakingReceipts {
 
   @Column('datetime', {
     name: 'updated_at',
+    nullable: true,
     default: () => 'CURRENT_TIMESTAMP'
   })
   updatedAt: Date
 
-  @Column('int', { name: 'id_updated' })
+  @Column('int', { name: 'id_updated', nullable: true })
   idUpdated: number
 
   @OneToMany(() => StocktakingDetails, (stocktakingDetails) => stocktakingDetails.idReceipt2)

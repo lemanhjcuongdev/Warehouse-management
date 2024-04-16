@@ -8,6 +8,7 @@ import importingRouter from './importing.route'
 import defectiveRecordRouter from './defectiveRecord.route'
 import exportingRouter from './exporting.route'
 import transportingRouter from './transporting.route'
+import stocktakingRouter from './stockTaking.route'
 
 function route(app: Express) {
   app.use('/users', userRouter)
@@ -19,6 +20,7 @@ function route(app: Express) {
   app.use('/export', exportingRouter)
   app.use('/defective-records', defectiveRecordRouter)
   app.use('/transport', transportingRouter)
+  app.use('/stocktaking', stocktakingRouter)
 }
 
 export default route

@@ -58,17 +58,17 @@ const navbar_items: iNavbarItem[] = [
         to: "/",
         children: [
             {
-                label: "Biên bản hàng lỗi, hỏng",
-                to: "/list/defective-records",
-            },
-            {
                 label: "Kiểm kê kho",
-                to: "/list/stock-taking",
+                to: "/list/stocktaking",
             },
             // {
             //     label: "Báo cáo nhập - xuất - tồn",
             //     to: "/list/stock-taking",
             // },
+            {
+                label: "Biên bản hàng lỗi, hỏng",
+                to: "/list/defective-records",
+            },
         ],
     },
     {

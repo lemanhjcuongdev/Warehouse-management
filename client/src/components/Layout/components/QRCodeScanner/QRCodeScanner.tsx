@@ -4,7 +4,8 @@ import { OnResultFunction, QrReader } from "react-qr-reader";
 
 function QRCodeScanner(props: { handleUpdateListData: (data: any) => void }) {
     const { handleUpdateListData } = props;
-    const [component, setComponent] = useState<any>(true);
+    const [hide, setHide] = useState("block");
+
     const handleResult: OnResultFunction = (result) => {
         if (result?.getText()) {
             const currentDetail = JSON.parse(result?.getText());
@@ -16,26 +17,46 @@ function QRCodeScanner(props: { handleUpdateListData: (data: any) => void }) {
             <Button
                 className="mb-3"
                 onClick={() => {
-                    if (component) {
-                        setComponent(undefined);
-                    } else setComponent(true);
+                    const QRCamera = document.getElementById(
+                        "qr_camera"
+                    ) as HTMLVideoElement;
+                    if (hide === "block") {
+                        QRCamera.pause();
+                        setHide("none");
+                    } else {
+                        QRCamera.load();
+                        QRCamera.play();
+                        setHide("block");
+                    }
                 }}
             >
-                {component ? "Tắt" : "Bật"} Camera
+                {hide === "block" ? (
+                    <>
+                        <i className="fa-solid fa-video-slash"></i>
+                        &nbsp; Tắt
+                    </>
+                ) : (
+                    <>
+                        <i className="fa-solid fa-video"></i>
+                        &nbsp; Bật
+                    </>
+                )}{" "}
+                Camera
             </Button>
-            {component && (
-                <QrReader
-                    constraints={{ facingMode: "user" }}
-                    scanDelay={300}
-                    onResult={handleResult}
-                    videoStyle={{
-                        height: "auto",
-                    }}
-                    videoContainerStyle={{
-                        paddingTop: "70%",
-                    }}
-                />
-            )}
+
+            <QrReader
+                constraints={{ facingMode: "user" }}
+                scanDelay={300}
+                videoId="qr_camera"
+                onResult={handleResult}
+                videoStyle={{
+                    height: "auto",
+                }}
+                videoContainerStyle={{
+                    display: hide,
+                    paddingTop: "70%",
+                }}
+            />
         </>
     );
 }

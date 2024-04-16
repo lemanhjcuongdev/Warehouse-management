@@ -18,10 +18,13 @@ export class StocktakingDetails {
   @Column('int', { name: 'amount' })
   amount: number
 
+  @Column('int', { name: 'stored_amount' })
+  storedAmount: number
+
   @Column('varchar', { name: 'quality', length: 45 })
   quality: string
 
-  @Column('varchar', { name: 'solution', length: 100 })
+  @Column('varchar', { name: 'solution', length: 100, nullable: true })
   solution: string
 
   @ManyToOne(() => Goods, (goods) => goods.stocktakingDetails, {

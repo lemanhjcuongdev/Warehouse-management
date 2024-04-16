@@ -18,7 +18,7 @@ class GoodsController {
   async getAllGoods(req: Request, res: Response, next: NextFunction) {
     //get all Goods from DB
     const goods = await goodsRepository.find({
-      select: ['idGoods', 'name', 'exp', 'amount', 'disabled', 'idUnit2', 'floor', 'slot', 'isHeavy'],
+      select: ['idGoods', 'name', 'exp', 'importDate', 'amount', 'disabled', 'idUnit2', 'floor', 'slot', 'isHeavy'],
       relations: ['idUnit2']
     })
 

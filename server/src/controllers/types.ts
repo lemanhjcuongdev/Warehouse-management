@@ -97,6 +97,25 @@ interface iTransportDetail {
   idExportReceipt: number
 }
 
+//STOCK TAKING
+interface iStocktakingReceiptReqBody {
+  date: string
+  idWarehouse: number
+  idUser: number
+  idUpdated?: number
+  updatedAt?: string
+  stocktakingDetails: iStocktakingDetail[]
+}
+interface iStocktakingDetail {
+  idStocktakingDetails?: number
+  idReceipt?: number
+  idGoods: number
+  amount: number
+  storedAmount: number
+  quality: string
+  solution: string
+}
+
 export type {
   iCreateOrderRequestBody,
   iUpdateOrderRequestBody,
@@ -104,5 +123,6 @@ export type {
   iDefectiveRecordRequestBody,
   iExportOrderReqBody,
   iExportReceiptReqBody,
-  iTransportReceipt
+  iTransportReceipt,
+  iStocktakingReceiptReqBody
 }

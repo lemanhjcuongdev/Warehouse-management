@@ -6,12 +6,16 @@ import DropdownMenu from "../../components/Dropdown/NavDropdownMenu";
 import HeaderProfile from "../../components/HeaderProfile/HeaderProfile";
 import SearchBar from "../../components/Searchbar/Searchbar";
 import navbar_items from "../../../../constants/navbar-items";
+import { useState } from "react";
 
 function Header() {
     const navbarItems = navbar_items;
+    const [expanded, setExpanded] = useState(true);
 
     return (
         <Navbar
+            collapseOnSelect
+            expanded={expanded}
             expand="xl"
             sticky="top"
             className="mb-3"
@@ -31,7 +35,10 @@ function Header() {
                     />
                     {/* Hệ thống quản lý kho hàng */}
                 </NavLink>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                <Navbar.Toggle
+                    aria-controls="basic-navbar-nav"
+                    onClick={() => setExpanded(!expanded)}
+                />
                 <Navbar.Collapse
                     id="basic-navbar-nav"
                     className="justify-content-between"
@@ -40,9 +47,16 @@ function Header() {
                         {navbarItems.map((item, index) => (
                             <Fragment key={index}>
                                 {item.children ? (
-                                    <DropdownMenu items={item} />
+                                    <DropdownMenu
+                                        items={item}
+                                        setExpanded={setExpanded}
+                                    />
                                 ) : (
-                                    <Nav.Link as={Link} to={item.to}>
+                                    <Nav.Link
+                                        as={Link}
+                                        to={item.to}
+                                        onClick={() => setExpanded(false)}
+                                    >
                                         {item.label}
                                     </Nav.Link>
                                 )}

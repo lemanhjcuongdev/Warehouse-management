@@ -13,10 +13,10 @@ exportingRouter.get('/orders/', [checkJwt], exportOrderController.getAllExportOr
 exportingRouter.delete('/orders/:id', [checkJwt], exportOrderController.softDeleteExportOrderById)
 
 //EXPORT RECEIPT
-exportingRouter.post('/receipts/', exportReceiptController.createExportReceipt)
-exportingRouter.get('/receipts/id/:id', exportReceiptController.getExportReceiptById)
-exportingRouter.get('/receipts/status/:status', exportReceiptController.getAllExportReceiptsByStatus)
-exportingRouter.patch('/receipts/:id', exportReceiptController.editExportReceiptById)
-exportingRouter.delete('/receipts/:id', exportReceiptController.softDeleteExportReceiptById)
+exportingRouter.post('/receipts/', [checkJwt], exportReceiptController.createExportReceipt)
+exportingRouter.get('/receipts/id/:id', [checkJwt], exportReceiptController.getExportReceiptById)
+exportingRouter.get('/receipts/status/:status', [checkJwt], exportReceiptController.getAllExportReceiptsByStatus)
+exportingRouter.patch('/receipts/:id', [checkJwt], exportReceiptController.editExportReceiptById)
+exportingRouter.delete('/receipts/:id', [checkJwt], exportReceiptController.softDeleteExportReceiptById)
 
 export default exportingRouter
