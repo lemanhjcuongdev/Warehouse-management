@@ -4,9 +4,8 @@ import { getAllUser } from "~/apis/userAPI";
 import UserModal from "~/components/Layout/components/Modal/UserModal";
 import { iModalTypes } from "~/components/Layout/components/Modal/types";
 import UserTable from "~/components/Layout/components/Table/ListUserTable/UserTable";
-import ROLES from "~/constants/roles";
-import { iUserDataProps, iUserItemProps } from "~/views/types";
 import { getCookie } from "~/utils/cookies";
+import { iUserDataProps, iUserItemProps } from "~/views/types";
 
 const managerId = getCookie("id") || 1;
 const initialUserDataState: iUserDataProps = {
@@ -49,6 +48,8 @@ function UserView() {
         setShowModal(!showModal);
         setModalType({ type: "create" });
     }, [showModal]);
+
+    console.log("USER DATA: ", formData);
 
     return (
         <>

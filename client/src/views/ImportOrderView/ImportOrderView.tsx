@@ -6,6 +6,8 @@ import ImportOrderModal from "~/components/Layout/components/Modal/ImportOrderMo
 import { iModalTypes } from "~/components/Layout/components/Modal/types";
 import OrderTable from "~/components/Layout/components/Table/ImportOrderListTable/OrderTable";
 import { IMPORT_ORDER_DETAIL_KEY } from "~/constants/localStorage";
+import { ROLE_ID } from "~/constants/roles";
+import useRole from "~/hooks/useRole";
 
 import { iImportOrderProps } from "~/views/types";
 
@@ -37,6 +39,8 @@ function ImportOrderView() {
     ]);
     const [formData, setFormData] =
         useState<iImportOrderProps>(initImportOrderData);
+    const role = useRole();
+
     //get continousData from session storage
     useEffect(() => {
         const continousOrder = sessionStorage.getItem(IMPORT_ORDER_DETAIL_KEY);
@@ -112,19 +116,20 @@ function ImportOrderView() {
                         {key === tab.eventKey && (
                             <>
                                 <hr />
-                                {key === "in-process" && (
-                                    <Button
-                                        onClick={handleToggleShowModal}
-                                        className="mb-3"
-                                        variant="outline-primary"
-                                        style={{
-                                            fontWeight: "bold",
-                                        }}
-                                    >
-                                        <i className="fa-solid fa-plus"></i>
-                                        &nbsp; Thêm mới
-                                    </Button>
-                                )}
+                                {key === "in-process" &&
+                                    role === ROLE_ID.ASSURANCE_3 && (
+                                        <Button
+                                            onClick={handleToggleShowModal}
+                                            className="mb-3"
+                                            variant="outline-primary"
+                                            style={{
+                                                fontWeight: "bold",
+                                            }}
+                                        >
+                                            <i className="fa-solid fa-plus"></i>
+                                            &nbsp; Thêm mới
+                                        </Button>
+                                    )}
 
                                 <ImportOrderModal
                                     setKey={setKey}

@@ -23,6 +23,8 @@ import {
     iGoodsItemProps,
 } from "~/views/types";
 import { initialWarehouseDataState } from "../WarehouseView/WarehouseView";
+import useRole from "~/hooks/useRole";
+import { ROLE_ID } from "~/constants/roles";
 
 const initExportOrder: iExportOrderProps = {
     idExportOrders: 0,
@@ -83,6 +85,7 @@ function ExportReceiptView() {
     const [wards, setWards] = useState<iWardProps[]>([]);
     const [goods, setGoods] = useState<iGoodsItemProps[]>([]);
     const [toggleCreateOrder, setToggleCreateOrder] = useState(false);
+    const role = useRole();
 
     useEffect(() => {
         getAllGoods().then((data) => {
@@ -268,36 +271,42 @@ function ExportReceiptView() {
                         {key === tab.eventKey && (
                             <>
                                 <hr />
-                                {key === "finished" && (
-                                    <Button
-                                        onClick={handleToggleShowModal}
-                                        className="mb-3"
-                                        variant="outline-primary"
-                                        style={{
-                                            fontWeight: "bold",
-                                        }}
-                                    >
-                                        <i className="fa-solid fa-plus"></i>
-                                        &nbsp; Thêm mới phiếu xuất kho
-                                    </Button>
+                                {role === ROLE_ID.OPERATION_1 && (
+                                    <>
+                                        {key === "finished" && (
+                                            <Button
+                                                onClick={handleToggleShowModal}
+                                                className="mb-3"
+                                                variant="outline-primary"
+                                                style={{
+                                                    fontWeight: "bold",
+                                                }}
+                                            >
+                                                <i className="fa-solid fa-plus"></i>
+                                                &nbsp; Thêm mới phiếu xuất kho
+                                            </Button>
+                                        )}
+                                        &nbsp;&nbsp;&nbsp;
+                                        <Button
+                                            onClick={() =>
+                                                setToggleCreateOrder(
+                                                    !toggleCreateOrder
+                                                )
+                                            }
+                                            className="mb-3"
+                                            variant="outline-primary"
+                                            style={{
+                                                fontWeight: "bold",
+                                            }}
+                                        >
+                                            <i className="fa-solid fa-right-from-bracket"></i>
+                                            &nbsp;{" "}
+                                            {toggleCreateOrder
+                                                ? "Dừng lấy thêm đơn hàng"
+                                                : "Lấy thêm đơn hàng"}
+                                        </Button>
+                                    </>
                                 )}
-                                &nbsp;&nbsp;&nbsp;
-                                <Button
-                                    onClick={() =>
-                                        setToggleCreateOrder(!toggleCreateOrder)
-                                    }
-                                    className="mb-3"
-                                    variant="outline-primary"
-                                    style={{
-                                        fontWeight: "bold",
-                                    }}
-                                >
-                                    <i className="fa-solid fa-right-from-bracket"></i>
-                                    &nbsp;{" "}
-                                    {toggleCreateOrder
-                                        ? "Dừng lấy thêm đơn hàng"
-                                        : "Lấy thêm đơn hàng"}
-                                </Button>
                                 <ExportReceiptModal
                                     show={showModal}
                                     onHide={handleToggleShowModal}

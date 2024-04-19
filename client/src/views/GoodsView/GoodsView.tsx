@@ -9,6 +9,8 @@ import SearchBar from "~/components/Layout/components/Searchbar/Searchbar";
 import GoodsTable from "~/components/Layout/components/Table/GoodsListTable/GoodsTable";
 import { iGoodsItemProps, iGoodsProps, iGoodsTypeProps } from "../types";
 import { getAllGoodsTypes } from "~/apis/goodsTypeAPI";
+import useRole from "~/hooks/useRole";
+import { ROLE_ID } from "~/constants/roles";
 
 const initGoodsItem: iGoodsItemProps = {
     idGoods: 0,
@@ -49,6 +51,7 @@ function GoodsView() {
     const [goodsTypes, setGoodsTypes] = useState<iGoodsTypeProps[]>([]);
     const [query, setQuery] = useState("");
     const [type, setType] = useState("");
+    const role = useRole();
 
     const handleSetListData = useCallback(() => {
         getAllGoods().then((data) => setListData(data));
@@ -96,16 +99,23 @@ function GoodsView() {
     return (
         <>
             <h2>Danh sách hàng hoá</h2>
-            <Button onClick={handleToggleShowModal} className="my-sm-3 me-3">
-                <i className="fa-solid fa-plus"></i>
-                &nbsp; Thêm mặt hàng mới
-            </Button>
-            <Link to={"/list/import-orders"}>
-                <Button className="my-3">
-                    <i className="fa-solid fa-arrow-right-to-bracket"></i>&nbsp;
-                    Đặt đơn nhập kho mới
-                </Button>
-            </Link>
+            {role === ROLE_ID.ASSURANCE_3 && (
+                <>
+                    <Button
+                        onClick={handleToggleShowModal}
+                        className="mt-1 mb-3 me-3"
+                    >
+                        <i className="fa-solid fa-plus"></i>
+                        &nbsp; Thêm mặt hàng mới
+                    </Button>
+                    <Link to={"/list/import-orders"}>
+                        <Button className="my-3">
+                            <i className="fa-solid fa-arrow-right-to-bracket"></i>
+                            &nbsp; Đặt đơn nhập kho mới
+                        </Button>
+                    </Link>
+                </>
+            )}
             <SearchBar
                 onChange={handleChangeInputSearch}
                 filterList={[

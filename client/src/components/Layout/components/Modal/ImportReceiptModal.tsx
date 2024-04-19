@@ -39,6 +39,8 @@ import {
 } from "~/views/types";
 import ReceiptDetailTable from "../Table/ImportReceiptsTable/ReceiptDetailTable";
 import { iModalTypes } from "./types";
+import useRole from "~/hooks/useRole";
+import { ROLE_ID } from "~/constants/roles";
 
 function ImportReceiptModal(props: {
     show: true | false;
@@ -70,6 +72,7 @@ function ImportReceiptModal(props: {
     ]);
     const [currentOrder, setCurrentOrder] =
         useState<iImportOrderProps>(initImportOrderData);
+    const role = useRole();
 
     switch (modalType.type) {
         case "create":
@@ -569,7 +572,8 @@ function ImportReceiptModal(props: {
                         Nhập kho
                     </Button>
                 ) : (
-                    formData.status === 0 && (
+                    formData.status === 0 &&
+                    role === ROLE_ID.DIRECTOR_2 && (
                         <Button variant="dark" onClick={handleSoftDelete}>
                             Huỷ phiếu
                         </Button>

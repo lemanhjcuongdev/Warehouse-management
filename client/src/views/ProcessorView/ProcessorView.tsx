@@ -1,12 +1,10 @@
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { Button, Col, Form, Row, Tab, Tabs } from "react-bootstrap";
 import { getAllExportReceiptByStatus } from "~/apis/exportReceiptAPI";
-// import ExportReceiptModal from "~/components/Layout/components/Modal/ExportReceiptModal";
 import {
     iModalTypes,
     iPrintExportReceipt,
 } from "~/components/Layout/components/Modal/types";
-// import ReceiptTable from "~/components/Layout/components/Table/ExportReceiptsTable/ReceiptTable";
 
 import {
     getDistricts,
@@ -20,6 +18,8 @@ import ProcessorModal from "~/components/Layout/components/Modal/ProcessorModal"
 import ProcessorTable from "~/components/Layout/components/Table/ProcessorTable/ProcessorTable";
 import { iExportReceiptItemProps, iExportReceiptProps } from "~/views/types";
 import { initExportReceipt } from "../ExportReceiptView/ExportReceiptView";
+import useRole from "~/hooks/useRole";
+import { ROLE_ID } from "~/constants/roles";
 
 const initProcessingData: iPrintExportReceipt = {
     idExportReceipts: 0,
@@ -47,6 +47,7 @@ function ProcessorView() {
     const [selectedDistrict, setSelectedDistrict] = useState<string>("");
     const [selectedWard, setSelectedWard] = useState<string>("");
     const [isHeavy, setIsHeavy] = useState<boolean>(false);
+    const role = useRole();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -181,17 +182,19 @@ function ProcessorView() {
                         {key === tab.eventKey && (
                             <>
                                 <hr />
-                                <Button
-                                    onClick={handleToggleShowModal}
-                                    className="mb-3"
-                                    variant="outline-primary"
-                                    style={{
-                                        fontWeight: "bold",
-                                    }}
-                                >
-                                    <i className="fa-solid fa-expand"></i>
-                                    &nbsp; Xác nhận {process}
-                                </Button>
+                                {role === ROLE_ID.OPERATION_1 && (
+                                    <Button
+                                        onClick={handleToggleShowModal}
+                                        className="mb-3"
+                                        variant="outline-primary"
+                                        style={{
+                                            fontWeight: "bold",
+                                        }}
+                                    >
+                                        <i className="fa-solid fa-expand"></i>
+                                        &nbsp; Xác nhận {process}
+                                    </Button>
+                                )}
 
                                 <ProcessorModal
                                     show={showModal}

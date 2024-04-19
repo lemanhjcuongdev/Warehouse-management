@@ -19,7 +19,7 @@ import {
 } from "react-bootstrap";
 
 import { createUser, updateUser } from "~/apis/userAPI";
-import ROLES from "~/constants/roles";
+import ROLES, { iRole } from "~/constants/roles";
 import { iUserDataProps, iUserItemProps } from "~/views/types";
 import { getCookie } from "~/utils/cookies";
 import stringToDate from "~/utils/stringToDate";
@@ -87,7 +87,10 @@ function UserModal(props: {
                 }
                 break;
             case "id_permissions": {
-                const currentRole = ROLES.filter(
+                const originalRoles: iRole[] = JSON.parse(
+                    JSON.stringify(ROLES)
+                );
+                const currentRole = originalRoles.filter(
                     (role) => role.id === +value
                 )[0];
                 const idPermissions = currentRole?.idPermissions || [];
@@ -209,6 +212,7 @@ function UserModal(props: {
     const handleCancel = () => {
         setFormData(initialUserDataState);
         setValidated(false);
+        setRole(0);
         onHide();
     };
 
@@ -366,7 +370,9 @@ function UserModal(props: {
                             name="id_permissions"
                             value={role}
                         >
-                            <option value="">------Chọn phòng ban------</option>
+                            <option value={0}>
+                                ------Chọn phòng ban------
+                            </option>
                             {ROLES.map((role) => (
                                 <option key={role.id} value={role.id}>
                                     {role.roleName}

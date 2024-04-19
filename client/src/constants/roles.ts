@@ -4,12 +4,22 @@ interface iRole {
     idPermissions: number[];
 }
 
+const ROLE_ID = {
+    OPERATION_1: 1,
+    DIRECTOR_2: 2,
+    ASSURANCE_3: 3,
+    ACCOUNTANT_4: 4,
+    HR_5: 5,
+    CEO_6: 6,
+};
+
 const ROLES: iRole[] = [
     {
         id: 1,
         roleName: "Phòng vận hành kho",
         idPermissions: [
-            5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 20, 21, 22, 24, 28, 32, 40,
+            5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 20, 21, 22, 24, 28, 32, 36,
+            40,
         ],
     },
     {
@@ -31,7 +41,7 @@ const ROLES: iRole[] = [
     {
         id: 4,
         roleName: "Phòng kế toán",
-        idPermissions: [8, 12, 16, 20, 24, 28, 32, 44, 45, 46, 48],
+        idPermissions: [8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 45, 46, 48],
     },
     {
         id: 5,
@@ -49,4 +59,6 @@ const ROLES: iRole[] = [
     },
 ];
 
+export { ROLE_ID };
+export type { iRole };
 export default ROLES;

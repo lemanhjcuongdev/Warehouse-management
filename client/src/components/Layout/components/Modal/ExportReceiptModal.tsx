@@ -44,6 +44,8 @@ import QRCodeScanner from "../QRCodeScanner/QRCodeScanner";
 import ExportReceiptDetailTable from "../Table/ExportReceiptsTable/ExportReceiptDetailTable";
 import { iModalTypes, iPrintExportReceipt } from "./types";
 import { QR_API_ROOT } from "~/constants";
+import useRole from "~/hooks/useRole";
+import { ROLE_ID } from "~/constants/roles";
 
 function ExportReceiptModal(props: {
     show: true | false;
@@ -77,6 +79,7 @@ function ExportReceiptModal(props: {
     ]);
     const [currentOrder, setCurrentOrder] =
         useState<iExportOrderProps>(initExportOrder);
+    const role = useRole();
 
     switch (modalType.type) {
         case "create":
@@ -605,7 +608,8 @@ function ExportReceiptModal(props: {
                         Xuất kho
                     </Button>
                 ) : (
-                    formData.status === 0 && (
+                    formData.status === 0 &&
+                    role === ROLE_ID.DIRECTOR_2 && (
                         <Button variant="dark" onClick={handleSoftDelete}>
                             Huỷ phiếu
                         </Button>

@@ -3,7 +3,9 @@ import ROLES from "~/constants/roles";
 function roleIdGenerator(idPermissions: number[]) {
     let roleId: number = 0;
     ROLES.forEach((role) => {
-        if (role.idPermissions.length === idPermissions.length) {
+        if (
+            JSON.stringify(role.idPermissions) === JSON.stringify(idPermissions)
+        ) {
             roleId = role.id;
         }
     });

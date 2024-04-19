@@ -9,6 +9,8 @@ import {
     iTransportReceiptItemProps,
     iTransportReceiptProps,
 } from "~/views/types";
+import useRole from "~/hooks/useRole";
+import { ROLE_ID } from "~/constants/roles";
 
 const initTransportReceipt: iTransportReceiptProps = {
     idUserSend: 0,
@@ -45,6 +47,7 @@ function TransportReceiptView() {
     ]);
     const [formData, setFormData] =
         useState<iTransportReceiptProps>(initTransportReceipt);
+    const role = useRole();
 
     const tabs: iTabProps[] = [
         {
@@ -110,19 +113,20 @@ function TransportReceiptView() {
                         {key === tab.eventKey && (
                             <>
                                 <hr />
-                                {key === "on_the_way" && (
-                                    <Button
-                                        onClick={handleToggleShowModal}
-                                        className="mb-3"
-                                        variant="outline-primary"
-                                        style={{
-                                            fontWeight: "bold",
-                                        }}
-                                    >
-                                        <i className="fa-solid fa-plus"></i>
-                                        &nbsp; Thêm mới
-                                    </Button>
-                                )}
+                                {key === "on_the_way" &&
+                                    role === ROLE_ID.OPERATION_1 && (
+                                        <Button
+                                            onClick={handleToggleShowModal}
+                                            className="mb-3"
+                                            variant="outline-primary"
+                                            style={{
+                                                fontWeight: "bold",
+                                            }}
+                                        >
+                                            <i className="fa-solid fa-plus"></i>
+                                            &nbsp; Thêm mới
+                                        </Button>
+                                    )}
 
                                 <TransportReceiptModal
                                     show={showModal}

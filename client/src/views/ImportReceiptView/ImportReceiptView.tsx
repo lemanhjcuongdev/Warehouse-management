@@ -10,6 +10,8 @@ import { initImportOrderData } from "../ImportOrderView/ImportOrderView";
 import { initProviderData } from "../ProviderView/ProviderView";
 import { initialWarehouseDataState } from "../WarehouseView/WarehouseView";
 import { useParams } from "react-router-dom";
+import useRole from "~/hooks/useRole";
+import { ROLE_ID } from "~/constants/roles";
 
 let initImportReceipt: iImportReceiptProps = {
     idImportReceipts: 0,
@@ -58,6 +60,8 @@ function ImportReceiptView() {
     ]);
     const [formData, setFormData] =
         useState<iImportReceiptProps>(initImportReceipt);
+    const role = useRole();
+
     const tabs: iTabProps[] = [
         {
             eventKey: "finished",
@@ -123,19 +127,20 @@ function ImportReceiptView() {
                         {key === tab.eventKey && (
                             <>
                                 <hr />
-                                {key === "finished" && (
-                                    <Button
-                                        onClick={handleToggleShowModal}
-                                        className="mb-3"
-                                        variant="outline-primary"
-                                        style={{
-                                            fontWeight: "bold",
-                                        }}
-                                    >
-                                        <i className="fa-solid fa-plus"></i>
-                                        &nbsp; Thêm mới
-                                    </Button>
-                                )}
+                                {key === "finished" &&
+                                    role === ROLE_ID.OPERATION_1 && (
+                                        <Button
+                                            onClick={handleToggleShowModal}
+                                            className="mb-3"
+                                            variant="outline-primary"
+                                            style={{
+                                                fontWeight: "bold",
+                                            }}
+                                        >
+                                            <i className="fa-solid fa-plus"></i>
+                                            &nbsp; Thêm mới
+                                        </Button>
+                                    )}
 
                                 <ImportReceiptModal
                                     show={showModal}

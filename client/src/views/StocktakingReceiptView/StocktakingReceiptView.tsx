@@ -1,14 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { getAllGoods } from "~/apis/goodsAPI";
-import {
-    getDistricts,
-    getProvinces,
-    getWards,
-    iDistrictProps,
-    iProvinceProps,
-    iWardProps,
-} from "~/apis/provinceAPI";
 import { getAllStocktakingReceipts } from "~/apis/stocktakingReceiptAPI";
 import StocktakingReceiptModal from "~/components/Layout/components/Modal/StocktakingReceiptModal";
 import { iModalTypes } from "~/components/Layout/components/Modal/types";
@@ -20,6 +12,8 @@ import {
 } from "~/views/types";
 import { initialUserDataState } from "../UserView/UserView";
 import { initialWarehouseDataState } from "../WarehouseView/WarehouseView";
+import useRole from "~/hooks/useRole";
+import { ROLE_ID } from "~/constants/roles";
 
 const stocktakingInit: iStocktakingReceiptProps = {
     idStocktakingReceipts: 0,
@@ -48,6 +42,7 @@ function StocktakingReceiptView() {
     const [formData, setFormData] =
         useState<iStocktakingReceiptProps>(stocktakingInit);
     const [goods, setGoods] = useState<iGoodsItemProps[]>([]);
+    const role = useRole();
 
     useEffect(() => {
         getAllGoods().then((data) => {
@@ -66,17 +61,19 @@ function StocktakingReceiptView() {
     return (
         <>
             <h2 className="mb-3">Danh sách phiếu kiểm kê</h2>
-            <Button
-                onClick={handleToggleShowModal}
-                className="mb-3"
-                variant="outline-primary"
-                style={{
-                    fontWeight: "bold",
-                }}
-            >
-                <i className="fa-solid fa-plus"></i>
-                &nbsp; Thêm mới
-            </Button>
+            {role === ROLE_ID.ASSURANCE_3 && (
+                <Button
+                    onClick={handleToggleShowModal}
+                    className="mb-3"
+                    variant="outline-primary"
+                    style={{
+                        fontWeight: "bold",
+                    }}
+                >
+                    <i className="fa-solid fa-plus"></i>
+                    &nbsp; Thêm mới
+                </Button>
+            )}
             <StocktakingReceiptModal
                 show={showModal}
                 onHide={handleToggleShowModal}

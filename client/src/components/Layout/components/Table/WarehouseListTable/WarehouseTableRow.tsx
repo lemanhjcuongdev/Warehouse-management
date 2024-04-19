@@ -3,6 +3,8 @@ import { Badge, ButtonGroup, Dropdown } from "react-bootstrap";
 import { getWarehouseById, softDeleteWarehouse } from "~/apis/warehouseAPI";
 import { iWarehouseDataProps, iWarehouseItemProps } from "~/views/types";
 import { iModalTypes } from "../../Modal/types";
+import useGlobalState from "~/hooks/useGlobalState";
+import useRole from "~/hooks/useRole";
 
 function WarehouseTableRow(props: {
     item: iWarehouseItemProps;
@@ -20,6 +22,8 @@ function WarehouseTableRow(props: {
         setModalType,
         setFormData,
     } = props;
+
+    const role = useRole();
 
     const handleReadOrUpdate = async () => {
         const warehouseInfo: iWarehouseDataProps = await getWarehouseById(
@@ -96,19 +100,23 @@ function WarehouseTableRow(props: {
                             <i className="fa-solid fa-pen-to-square"></i>
                             &nbsp; Cập nhật thông tin
                         </Dropdown.Item>
-                        <Dropdown.Item
-                            onClick={() => handleDelete(item.idWarehouse)}
-                        >
-                            <i
-                                className={
-                                    item.disabled
-                                        ? "fa-solid fa-check"
-                                        : "fa-solid fa-ban"
-                                }
-                            ></i>
-                            &nbsp;
-                            {item.disabled ? "Kích hoạt lại" : "Vô hiệu hoá"}
-                        </Dropdown.Item>
+                        {role === 3 && (
+                            <Dropdown.Item
+                                onClick={() => handleDelete(item.idWarehouse)}
+                            >
+                                <i
+                                    className={
+                                        item.disabled
+                                            ? "fa-solid fa-check"
+                                            : "fa-solid fa-ban"
+                                    }
+                                ></i>
+                                &nbsp;
+                                {item.disabled
+                                    ? "Kích hoạt lại"
+                                    : "Vô hiệu hoá"}
+                            </Dropdown.Item>
+                        )}
                     </Dropdown.Menu>
                 </Dropdown>
             </td>

@@ -1,17 +1,16 @@
 import { useParams } from "react-router-dom";
 import DefectiveRecordView from "~/views/DefectiveRecordView/DefectiveRecordView";
+import ExportReceiptView from "~/views/ExportReceiptView/ExportReceiptView";
 import GoodsPropsView from "~/views/GoodsPropsView/GoodsPropsView";
 import GoodsView from "~/views/GoodsView/GoodsView";
 import ImportOrderView from "~/views/ImportOrderView/ImportOrderView";
 import ImportReceiptView from "~/views/ImportReceiptView/ImportReceiptView";
+import ProcessorView from "~/views/ProcessorView/ProcessorView";
 import ProviderView from "~/views/ProviderView/ProviderView";
+import StocktakingReceiptView from "~/views/StocktakingReceiptView/StocktakingReceiptView";
+import TransportReceiptView from "~/views/TransportReceiptView/TransportReceiptView";
 import UserView from "~/views/UserView/UserView";
 import WarehouseView from "~/views/WarehouseView/WarehouseView";
-import Empty from "../Empty/Empty";
-import ExportReceiptView from "~/views/ExportReceiptView/ExportReceiptView";
-import ProcessorView from "~/views/ProcessorView/ProcessorView";
-import TransportReceiptView from "~/views/TransportReceiptView/TransportReceiptView";
-import StocktakingReceiptView from "~/views/StocktakingReceiptView/StocktakingReceiptView";
 
 function ListData() {
     const params = useParams();

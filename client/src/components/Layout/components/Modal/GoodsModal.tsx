@@ -35,6 +35,8 @@ import {
 import WarehouseDiagram from "../WarehouseDiagram/WarehouseDiagram";
 import { iModalTypes } from "./types";
 import { createGoods, updateGoods } from "~/apis/goodsAPI";
+import useRole from "~/hooks/useRole";
+import { ROLE_ID } from "~/constants/roles";
 
 interface iWarehouseSlots {
     warehouse: {
@@ -112,6 +114,7 @@ function GoodsModal(props: {
         },
     ]);
     const [radioValue, setRadioValue] = useState("0-0");
+    const role = useRole();
 
     switch (modalType.type) {
         case "create":
@@ -621,13 +624,16 @@ function GoodsModal(props: {
                         Thêm mới
                     </Button>
                 ) : (
-                    <Button
-                        variant="warning"
-                        type="submit"
-                        onClick={handleSubmitUpdate}
-                    >
-                        Cập nhật chỉnh sửa
-                    </Button>
+                    (role === ROLE_ID.ASSURANCE_3 ||
+                        role === ROLE_ID.OPERATION_1) && (
+                        <Button
+                            variant="warning"
+                            type="submit"
+                            onClick={handleSubmitUpdate}
+                        >
+                            Cập nhật chỉnh sửa
+                        </Button>
+                    )
                 )}
             </Modal.Footer>
         </Modal>

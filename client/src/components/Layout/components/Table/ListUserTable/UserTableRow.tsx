@@ -29,7 +29,10 @@ function UserTableRow(props: {
         setFormData(userInfo);
         //get role
         ROLES.forEach((role) => {
-            if (role.idPermissions.length === userInfo.idPermissions.length) {
+            if (
+                JSON.stringify(role.idPermissions) ===
+                JSON.stringify(userInfo.idPermissions)
+            ) {
                 setRole(role.id);
             }
         });

@@ -8,6 +8,8 @@ import convertUTCToVNTime from "~/utils/convertUTCToVNTime";
 import stringToDate from "~/utils/stringToDate";
 import { iImportReceiptItemProps, iImportReceiptProps } from "~/views/types";
 import { iModalTypes } from "../../Modal/types";
+import useRole from "~/hooks/useRole";
+import { ROLE_ID } from "~/constants/roles";
 
 function ReceiptTableRow(props: {
     tabKey: "finished" | "failed" | string;
@@ -27,6 +29,7 @@ function ReceiptTableRow(props: {
         setModalType,
         setFormData,
     } = props;
+    const role = useRole();
 
     const handleReadOrUpdate = async () => {
         const receiptInfo: iImportReceiptProps = await getImportReceiptById(
@@ -88,22 +91,16 @@ function ReceiptTableRow(props: {
                                 <i className="fa-solid fa-receipt"></i>
                                 &nbsp; Xem thông tin chi tiết
                             </Dropdown.Item>
-                            {/* {item.status === 0 && (
+                            {role === ROLE_ID.DIRECTOR_2 && (
                                 <Dropdown.Item
-                                    onClick={() => handleReadOrUpdate()}
+                                    onClick={() =>
+                                        handleDelete(item.idImportReceipts)
+                                    }
                                 >
-                                    <i className="fa-solid fa-pen-to-square"></i>
-                                    &nbsp; Cập nhật thông tin
+                                    <i className={"fa-solid fa-ban"}></i>
+                                    &nbsp; Huỷ phiếu nhập
                                 </Dropdown.Item>
-                            )} */}
-                            <Dropdown.Item
-                                onClick={() =>
-                                    handleDelete(item.idImportReceipts)
-                                }
-                            >
-                                <i className={"fa-solid fa-ban"}></i>
-                                &nbsp; Huỷ phiếu nhập
-                            </Dropdown.Item>
+                            )}
                         </Dropdown.Menu>
                     </Dropdown>
                 )}

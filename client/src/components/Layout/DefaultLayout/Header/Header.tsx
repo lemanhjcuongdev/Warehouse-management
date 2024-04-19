@@ -2,13 +2,37 @@ import { Container, Nav, Navbar } from "react-bootstrap";
 import { Link, NavLink } from "react-router-dom";
 import { Fragment } from "react/jsx-runtime";
 
-import { useState } from "react";
-import navbar_items from "../../../../constants/navbar-items";
+import { useEffect, useState } from "react";
+import useRole from "~/hooks/useRole";
+import navbar_items, { iNavbarItem } from "../../../../constants/navbar-items";
 import DropdownMenu from "../../components/Dropdown/NavDropdownMenu";
 import HeaderProfile from "../../components/HeaderProfile/HeaderProfile";
 
 function Header() {
-    const navbarItems = navbar_items;
+    const role = useRole();
+    const [navbarItems, setNavbarItems] = useState<iNavbarItem[]>([]);
+
+    useEffect(() => {
+        //FILTER HEADER BY ROLE
+        let filteredNavbarItems: iNavbarItem[] = [];
+        const handleFilterNavbarItems = (navbarItems?: iNavbarItem[]) => {
+            return (
+                navbarItems &&
+                navbarItems.filter((item) => item.roleIds.indexOf(role) >= 0)
+            );
+        };
+        //ORIGINAL NAVBAR ITEMS MUST BE CLONE DEEPLY
+        filteredNavbarItems =
+            handleFilterNavbarItems(JSON.parse(JSON.stringify(navbar_items))) ||
+            [];
+        filteredNavbarItems.forEach((item) => {
+            item.children = handleFilterNavbarItems(item.children);
+        });
+
+        setNavbarItems(filteredNavbarItems);
+        //
+    }, [role]);
+
     const [expanded, setExpanded] = useState(true);
 
     return (
@@ -43,24 +67,25 @@ function Header() {
                     className="justify-content-between"
                 >
                     <Nav navbarScroll>
-                        {navbarItems.map((item, index) => (
-                            <Fragment key={index}>
-                                {item.children ? (
-                                    <DropdownMenu
-                                        items={item}
-                                        setExpanded={setExpanded}
-                                    />
-                                ) : (
-                                    <Nav.Link
-                                        as={Link}
-                                        to={item.to}
-                                        onClick={() => setExpanded(false)}
-                                    >
-                                        {item.label}
-                                    </Nav.Link>
-                                )}
-                            </Fragment>
-                        ))}
+                        {navbarItems.length &&
+                            navbarItems.map((item, index) => (
+                                <Fragment key={index}>
+                                    {item.children ? (
+                                        <DropdownMenu
+                                            items={item}
+                                            setExpanded={setExpanded}
+                                        />
+                                    ) : (
+                                        <Nav.Link
+                                            as={Link}
+                                            to={item.to}
+                                            onClick={() => setExpanded(false)}
+                                        >
+                                            {item.label}
+                                        </Nav.Link>
+                                    )}
+                                </Fragment>
+                            ))}
                     </Nav>
                     <HeaderProfile />
                 </Navbar.Collapse>

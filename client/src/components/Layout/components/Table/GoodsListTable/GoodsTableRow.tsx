@@ -5,6 +5,8 @@ import { iGoodsItemProps, iGoodsProps } from "~/views/types";
 import { getGoodsById, softDeleteGoods } from "~/apis/goodsAPI";
 import stringToDate from "~/utils/stringToDate";
 import convertUTCToVNTime from "~/utils/convertUTCToVNTime";
+import useRole from "~/hooks/useRole";
+import { ROLE_ID } from "~/constants/roles";
 
 function GoodsTableRow(props: {
     item: iGoodsItemProps;
@@ -22,6 +24,7 @@ function GoodsTableRow(props: {
         setModalType,
         setFormData,
     } = props;
+    const role = useRole();
 
     const handleReadOrUpdate = async () => {
         const goodsInfo: iGoodsProps = await getGoodsById(item.idGoods);
@@ -98,23 +101,30 @@ function GoodsTableRow(props: {
                             <i className="fa-solid fa-box"></i>
                             &nbsp; Xem thông tin chi tiết
                         </Dropdown.Item>
-                        <Dropdown.Item onClick={() => handleReadOrUpdate()}>
-                            <i className="fa-solid fa-pen-to-square"></i>
-                            &nbsp; Cập nhật thông tin
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                            onClick={() => handleDelete(item.idGoods)}
-                        >
-                            <i
-                                className={
-                                    item.disabled
-                                        ? "fa-solid fa-check"
-                                        : "fa-solid fa-ban"
-                                }
-                            ></i>
-                            &nbsp;
-                            {item.disabled ? "Kích hoạt lại" : "Vô hiệu hoá"}
-                        </Dropdown.Item>
+                        {(role === ROLE_ID.ASSURANCE_3 ||
+                            role === ROLE_ID.OPERATION_1) && (
+                            <Dropdown.Item onClick={() => handleReadOrUpdate()}>
+                                <i className="fa-solid fa-pen-to-square"></i>
+                                &nbsp; Cập nhật thông tin
+                            </Dropdown.Item>
+                        )}
+                        {role === ROLE_ID.ASSURANCE_3 && (
+                            <Dropdown.Item
+                                onClick={() => handleDelete(item.idGoods)}
+                            >
+                                <i
+                                    className={
+                                        item.disabled
+                                            ? "fa-solid fa-check"
+                                            : "fa-solid fa-ban"
+                                    }
+                                ></i>
+                                &nbsp;
+                                {item.disabled
+                                    ? "Kích hoạt lại"
+                                    : "Vô hiệu hoá"}
+                            </Dropdown.Item>
+                        )}
                     </Dropdown.Menu>
                 </Dropdown>
             </td>

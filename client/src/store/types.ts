@@ -8,7 +8,7 @@ interface iStateProps {
     isAuthentication?: boolean;
     userId: number;
     username: string;
-    role?: number;
+    role: number;
 }
 
 interface iActionProps {

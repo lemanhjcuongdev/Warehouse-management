@@ -8,6 +8,8 @@ import {
     getExportReceiptById,
     softDeleteExportReceipt,
 } from "~/apis/exportReceiptAPI";
+import useRole from "~/hooks/useRole";
+import { ROLE_ID } from "~/constants/roles";
 
 function ExportReceiptTableRow(props: {
     tabKey: "finished" | "failed" | string;
@@ -27,6 +29,7 @@ function ExportReceiptTableRow(props: {
         setModalType,
         setFormData,
     } = props;
+    const role = useRole();
 
     const handleReadOrUpdate = async () => {
         const receiptInfo: iExportReceiptProps = await getExportReceiptById(
@@ -88,22 +91,16 @@ function ExportReceiptTableRow(props: {
                                 <i className="fa-solid fa-receipt"></i>
                                 &nbsp; Xem thông tin chi tiết
                             </Dropdown.Item>
-                            {/* {item.status === 0 && (
+                            {role === ROLE_ID.DIRECTOR_2 && (
                                 <Dropdown.Item
-                                    onClick={() => handleReadOrUpdate()}
+                                    onClick={() =>
+                                        handleDelete(item.idExportReceipts)
+                                    }
                                 >
-                                    <i className="fa-solid fa-pen-to-square"></i>
-                                    &nbsp; Cập nhật thông tin
+                                    <i className={"fa-solid fa-ban"}></i>
+                                    &nbsp; Huỷ phiếu xuất
                                 </Dropdown.Item>
-                            )} */}
-                            <Dropdown.Item
-                                onClick={() =>
-                                    handleDelete(item.idExportReceipts)
-                                }
-                            >
-                                <i className={"fa-solid fa-ban"}></i>
-                                &nbsp; Huỷ phiếu xuất
-                            </Dropdown.Item>
+                            )}
                         </Dropdown.Menu>
                     </Dropdown>
                 )}

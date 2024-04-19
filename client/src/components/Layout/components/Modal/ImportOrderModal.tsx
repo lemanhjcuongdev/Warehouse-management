@@ -40,6 +40,8 @@ import {
 } from "~/views/types";
 import OrderDetailTable from "../Table/ImportOrderListTable/OrderDetailTable";
 import { iModalTypes } from "./types";
+import useRole from "~/hooks/useRole";
+import { ROLE_ID } from "~/constants/roles";
 
 function ImportOrderModal(props: {
     show: true | false;
@@ -74,6 +76,7 @@ function ImportOrderModal(props: {
     };
     const [currentDetail, setCurrentDetail] =
         useState<iImportOrderDetailProps>(initDetail);
+    const role = useRole();
 
     switch (modalType.type) {
         case "create":
@@ -107,15 +110,19 @@ function ImportOrderModal(props: {
                         >
                             Huỷ đơn
                         </Button>
-                        <Button onClick={() => handleUpdateStatus(1)}>
-                            KT duyệt
-                        </Button>
-                        <Button
-                            variant="info"
-                            onClick={() => handleUpdateStatus(2)}
-                        >
-                            GĐ duyệt - Gửi đơn đặt hàng cho nhà cung cấp
-                        </Button>
+                        {role === ROLE_ID.ACCOUNTANT_4 && (
+                            <Button onClick={() => handleUpdateStatus(1)}>
+                                KT duyệt
+                            </Button>
+                        )}
+                        {role === ROLE_ID.DIRECTOR_2 && (
+                            <Button
+                                variant="info"
+                                onClick={() => handleUpdateStatus(2)}
+                            >
+                                GĐ duyệt - Gửi đơn đặt hàng cho nhà cung cấp
+                            </Button>
+                        )}
                     </>
                 );
             case 1:
@@ -127,12 +134,14 @@ function ImportOrderModal(props: {
                         >
                             Huỷ đơn
                         </Button>
-                        <Button
-                            variant="info"
-                            onClick={() => handleUpdateStatus(2)}
-                        >
-                            GĐ duyệt - Gửi đơn đặt hàng cho nhà cung cấp
-                        </Button>
+                        {role === ROLE_ID.DIRECTOR_2 && (
+                            <Button
+                                variant="info"
+                                onClick={() => handleUpdateStatus(2)}
+                            >
+                                GĐ duyệt - Gửi đơn đặt hàng cho nhà cung cấp
+                            </Button>
+                        )}
                     </>
                 );
             case 2:
@@ -400,15 +409,19 @@ function ImportOrderModal(props: {
                                         <FormLabel>
                                             Nhà cung cấp &nbsp;
                                         </FormLabel>
-                                        <Link to={"/list/providers/create"}>
-                                            <Button
-                                                size="sm"
-                                                variant="outline-primary"
-                                                className="mb-2"
-                                            >
-                                                Thêm thông tin nhà cung cấp mới
-                                            </Button>
-                                        </Link>
+                                        {(role === ROLE_ID.DIRECTOR_2 ||
+                                            role === ROLE_ID.ASSURANCE_3) && (
+                                            <Link to={"/list/providers/create"}>
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline-primary"
+                                                    className="mb-2"
+                                                >
+                                                    Thêm thông tin nhà cung cấp
+                                                    mới
+                                                </Button>
+                                            </Link>
+                                        )}
                                         <Form.Select
                                             required
                                             name="idProvider"
