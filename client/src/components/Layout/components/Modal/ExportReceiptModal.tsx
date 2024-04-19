@@ -95,6 +95,9 @@ function ExportReceiptModal(props: {
     useEffect(() => {
         getAllExportOrders().then((data) => {
             const ordersWithoutReceipt = [];
+            if (!data.length || !listData.length) {
+                return;
+            }
             //filter orders have been imported
             for (const order of data) {
                 let hasReceipt = false;
@@ -459,15 +462,16 @@ function ExportReceiptModal(props: {
                                             <option value="">
                                                 ------Chọn kho xuất------
                                             </option>
-                                            {warehouses.map((item) => (
-                                                <option
-                                                    key={item.idWarehouse}
-                                                    value={item.idWarehouse}
-                                                >
-                                                    {item.name} - Đ/c:{" "}
-                                                    {item.address}
-                                                </option>
-                                            ))}
+                                            {warehouses.length &&
+                                                warehouses.map((item) => (
+                                                    <option
+                                                        key={item.idWarehouse}
+                                                        value={item.idWarehouse}
+                                                    >
+                                                        {item.name} - Đ/c:{" "}
+                                                        {item.address}
+                                                    </option>
+                                                ))}
                                         </Form.Select>
                                         <Form.Control.Feedback type="invalid">
                                             Bắt buộc chọn

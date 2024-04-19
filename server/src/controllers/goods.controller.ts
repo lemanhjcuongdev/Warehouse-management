@@ -1,7 +1,7 @@
 import { validate } from 'class-validator'
 import dotenv from 'dotenv'
 import { NextFunction, Request, Response } from 'express'
-import { MoreThanOrEqual } from 'typeorm'
+import { Like, MoreThanOrEqual } from 'typeorm'
 import { appDataSource } from '~/constants/appDataSource'
 import STATUS from '~/constants/statusCode'
 import { Goods } from '~/models/entities/Goods'
@@ -80,6 +80,38 @@ class GoodsController {
         error: 'Không tìm thấy mặt hàng'
       })
     }
+  }
+
+  async findGoods(req: Request, res: Response, next: NextFunction) {
+    //get query string
+    const searchTerm = req.query.q as string
+    const searchType = req.query.type
+    //search
+    let goodsResults: Goods[] = []
+
+    if (searchTerm && !searchType) {
+      goodsResults = await goodsRepository.find({
+        where: {
+          name: Like(`%${searchTerm}%`)
+        }
+      })
+    }
+    if (searchType && searchType) {
+      goodsResults = await goodsRepository.find({
+        where: {
+          name: Like(`%${searchTerm}%`),
+          idType: +searchType
+        }
+      })
+    }
+    if (!searchTerm && searchType) {
+      goodsResults = await goodsRepository.find({
+        where: {
+          idType: +searchType
+        }
+      })
+    }
+    res.status(STATUS.SUCCESS).send(goodsResults)
   }
 
   //[POST /Goods/create-Goods]

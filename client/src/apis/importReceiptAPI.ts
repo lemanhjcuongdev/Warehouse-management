@@ -17,7 +17,7 @@ const getAllImportReceiptByStatus = async (status: number) => {
         };
 
         const res = await fetch(
-            `${API_ROOT}/import/receipts/status/${status}`,
+            `${API_ROOT}/import/receipts/status/${status}?permissionId=8`,
             init
         );
         const data: iImportReceiptItemProps[] = await res.json();
@@ -41,7 +41,10 @@ const getImportReceiptById = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/import/receipts/id/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/import/receipts/id/${id}?permissionId=8`,
+            init
+        );
         const data = await res.json();
         if (data.error) {
             throw new Error(data.error);
@@ -68,7 +71,10 @@ const createImportReceipt = async (values: iImportReceiptProps) => {
             },
             body: JSON.stringify(values),
         };
-        const res = await fetch(`${API_ROOT}/import/receipts`, init);
+        const res = await fetch(
+            `${API_ROOT}/import/receipts?permissionId=5`,
+            init
+        );
 
         const data = await res.json();
         if (data.error) {
@@ -97,7 +103,7 @@ const updateImportReceipt = async (values: iImportReceiptProps) => {
             body: JSON.stringify(values),
         };
         const res = await fetch(
-            `${API_ROOT}/import/receipts/${values.idImportReceipts}`,
+            `${API_ROOT}/import/receipts/${values.idImportReceipts}?permissionId=6`,
             init
         );
 
@@ -126,7 +132,10 @@ const softDeleteImportReceipt = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/import/receipts/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/import/receipts/${id}?permissionId=7`,
+            init
+        );
 
         const data = await res.json();
         if (data && data.error) {

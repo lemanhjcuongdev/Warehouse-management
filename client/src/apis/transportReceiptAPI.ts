@@ -19,7 +19,10 @@ const getAllTransportReceiptByStatus = async (status: number) => {
             },
         };
 
-        const res = await fetch(`${API_ROOT}/transport/status/${status}`, init);
+        const res = await fetch(
+            `${API_ROOT}/transport/status/${status}?permissionId=16`,
+            init
+        );
         const data: iTransportReceiptItemProps[] = await res.json();
 
         return data;
@@ -41,7 +44,10 @@ const getTransportReceiptById = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/transport/id/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/transport/id/${id}?permissionId=16`,
+            init
+        );
         const data = await res.json();
         if (data.error) {
             throw new Error(data.error);
@@ -68,7 +74,7 @@ const createTransportReceipt = async (values: iTransportReceiptProps) => {
             },
             body: JSON.stringify(values),
         };
-        const res = await fetch(`${API_ROOT}/transport`, init);
+        const res = await fetch(`${API_ROOT}/transport?permissionId=13`, init);
 
         const data = await res.json();
         if (data.error) {
@@ -97,7 +103,7 @@ const updateTransportReceipt = async (value: iTransportReceiptProps) => {
             body: JSON.stringify(value),
         };
         const res = await fetch(
-            `${API_ROOT}/transport/${value.idTransportReceipts}`,
+            `${API_ROOT}/transport/${value.idTransportReceipts}?permissionId=14`,
             init
         );
 
@@ -129,7 +135,10 @@ const softDeleteTransportReceipt = async (id: number, idUpdated: number) => {
                 idUpdated,
             }),
         };
-        const res = await fetch(`${API_ROOT}/transport/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/transport/${id}?permissionId=15`,
+            init
+        );
 
         const data = await res.json();
         if (data && data.error) {

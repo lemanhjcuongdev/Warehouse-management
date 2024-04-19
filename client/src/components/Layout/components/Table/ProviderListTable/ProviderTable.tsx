@@ -23,14 +23,15 @@ function GoodsGroupTable(props: {
                 </tr>
             </thead>
             <tbody>
-                {listData.map((item, index) => (
-                    <ProviderTableRow
-                        key={item.idProviders}
-                        item={item}
-                        index={index}
-                        {...props}
-                    />
-                ))}
+                {listData.length &&
+                    listData.map((item, index) => (
+                        <ProviderTableRow
+                            key={item.idProviders}
+                            item={item}
+                            index={index}
+                            {...props}
+                        />
+                    ))}
             </tbody>
         </Table>
     );

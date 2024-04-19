@@ -16,7 +16,10 @@ const getAllGoodsGroups = async () => {
             },
         };
 
-        const res = await fetch(`${API_ROOT}/goods/groups`, init);
+        const res = await fetch(
+            `${API_ROOT}/goods/groups?permissionId=32`,
+            init
+        );
         const data: iGoodsGroupProps[] = await res.json();
 
         return data;
@@ -38,7 +41,10 @@ const getGoodsGroupById = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/goods/groups/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/goods/groups/${id}?permissionId=32`,
+            init
+        );
         const data = await res.json();
         if (data.error) {
             throw new Error(data.error);
@@ -65,7 +71,10 @@ const createGoodsGroup = async (values: iGoodsGroupProps) => {
             },
             body: JSON.stringify(values),
         };
-        const res = await fetch(`${API_ROOT}/goods/groups`, init);
+        const res = await fetch(
+            `${API_ROOT}/goods/groups?permissionId=29`,
+            init
+        );
 
         const data = await res.json();
         if (data.error) {
@@ -94,7 +103,7 @@ const updateGoodsGroup = async (values: iGoodsGroupProps) => {
             body: JSON.stringify(values),
         };
         const res = await fetch(
-            `${API_ROOT}/goods/groups/${values.idGoodsGroups}`,
+            `${API_ROOT}/goods/groups/${values.idGoodsGroups}?permissionId=30`,
             init
         );
 
@@ -123,7 +132,10 @@ const softDeleteGoodsGroup = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/goods/groups/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/goods/groups/${id}?permissionId=31`,
+            init
+        );
 
         const data = await res.json();
         if (data && data.error) {

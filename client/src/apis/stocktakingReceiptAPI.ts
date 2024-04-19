@@ -19,7 +19,10 @@ const getAllStocktakingReceipts = async () => {
             },
         };
 
-        const res = await fetch(`${API_ROOT}/stocktaking`, init);
+        const res = await fetch(
+            `${API_ROOT}/stocktaking?permissionId=44`,
+            init
+        );
         const data: iStocktakingReceiptItemProps[] = await res.json();
 
         return data;
@@ -41,7 +44,10 @@ const getStocktakingReceiptById = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/stocktaking/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/stocktaking/${id}?permissionId=44`,
+            init
+        );
         const data = await res.json();
         if (data.error) {
             throw new Error(data.error);
@@ -68,7 +74,10 @@ const createStocktakingReceipt = async (values: iStocktakingReceiptProps) => {
             },
             body: JSON.stringify(values),
         };
-        const res = await fetch(`${API_ROOT}/stocktaking`, init);
+        const res = await fetch(
+            `${API_ROOT}/stocktaking?permissionId=41`,
+            init
+        );
 
         const data = await res.json();
         if (data.error) {
@@ -100,7 +109,10 @@ const updateStocktakingReceipt = async (
             },
             body: JSON.stringify({ status, idUpdated }),
         };
-        const res = await fetch(`${API_ROOT}/stocktaking/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/stocktaking/${id}?permissionId=42`,
+            init
+        );
 
         const data = await res.json();
         if (data.error) {
@@ -113,43 +125,9 @@ const updateStocktakingReceipt = async (
     }
 };
 
-// const softDeleteStocktakingReceipt = async (
-//     id: number,
-//     reasonFailed: string
-// ) => {
-//     try {
-//         const jwt = getCookie("jwt");
-//         if (!jwt) {
-//             throw new Error("Hết phiên đăng nhập");
-//         }
-
-//         const init: RequestInit = {
-//             method: "DELETE",
-//             headers: {
-//                 "Content-Type": "application/json",
-//                 authorization: jwt,
-//             },
-//             body: JSON.stringify({
-//                 reasonFailed,
-//             }),
-//         };
-//         const res = await fetch(`${API_ROOT}/stocktaking/${id}`, init);
-
-//         const data = await res.json();
-//         if (data && data.error) {
-//             throw new Error(data.error);
-//         }
-
-//         return data;
-//     } catch (error) {
-//         error && console.log(error);
-//     }
-// };
-
 export {
     createStocktakingReceipt,
     getAllStocktakingReceipts,
     getStocktakingReceiptById,
-    // softDeleteStocktakingReceipt,
     updateStocktakingReceipt,
 };

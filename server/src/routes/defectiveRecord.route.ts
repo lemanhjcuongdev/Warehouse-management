@@ -1,13 +1,13 @@
 import express from 'express'
 import defectiveRecordController from '~/controllers/defectiveRecord.controller'
 
-import { checkJwt } from '~/middleware/authentication'
+import { checkJwt, checkRole } from '~/middleware/authentication'
 
 const defectiveRecordRouter = express.Router()
 
-defectiveRecordRouter.post('/', [checkJwt], defectiveRecordController.createDefectiveRecord)
-defectiveRecordRouter.get('/', [checkJwt], defectiveRecordController.getAllDefectiveRecords)
-defectiveRecordRouter.get('/:id', [checkJwt], defectiveRecordController.getDefectiveRecordById)
-defectiveRecordRouter.patch('/:id', [checkJwt], defectiveRecordController.editDefectiveRecordById)
+defectiveRecordRouter.post('/', [checkJwt, checkRole], defectiveRecordController.createDefectiveRecord)
+defectiveRecordRouter.get('/', [checkJwt, checkRole], defectiveRecordController.getAllDefectiveRecords)
+defectiveRecordRouter.get('/:id', [checkJwt, checkRole], defectiveRecordController.getDefectiveRecordById)
+defectiveRecordRouter.patch('/:id', [checkJwt, checkRole], defectiveRecordController.editDefectiveRecordById)
 
 export default defectiveRecordRouter

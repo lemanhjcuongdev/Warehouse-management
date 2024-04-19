@@ -418,15 +418,20 @@ function ImportOrderModal(props: {
                                             <option value="">
                                                 ------Chọn nhà cung cấp------
                                             </option>
-                                            {providers.map((provider) => (
-                                                <option
-                                                    key={provider.idProviders}
-                                                    value={provider.idProviders}
-                                                >
-                                                    {provider.name} - Đ/c:{" "}
-                                                    {provider.address}
-                                                </option>
-                                            ))}
+                                            {providers.length &&
+                                                providers.map((provider) => (
+                                                    <option
+                                                        key={
+                                                            provider.idProviders
+                                                        }
+                                                        value={
+                                                            provider.idProviders
+                                                        }
+                                                    >
+                                                        {provider.name} - Đ/c:{" "}
+                                                        {provider.address}
+                                                    </option>
+                                                ))}
                                         </Form.Select>
                                     </>
                                 ) : (
@@ -511,23 +516,29 @@ function ImportOrderModal(props: {
                                                             ------Chọn mặt
                                                             hàng------
                                                         </option>
-                                                        {goods.map((good) => (
-                                                            <option
-                                                                key={
-                                                                    good.idGoods
-                                                                }
-                                                                value={
-                                                                    good.idGoods
-                                                                }
-                                                            >
-                                                                {good.name} -
-                                                                ĐVT:{" "}
-                                                                {
-                                                                    good.idUnit2
-                                                                        ?.name
-                                                                }
-                                                            </option>
-                                                        ))}
+                                                        {goods.length &&
+                                                            goods.map(
+                                                                (good) => (
+                                                                    <option
+                                                                        key={
+                                                                            good.idGoods
+                                                                        }
+                                                                        value={
+                                                                            good.idGoods
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            good.name
+                                                                        }{" "}
+                                                                        - ĐVT:{" "}
+                                                                        {
+                                                                            good
+                                                                                .idUnit2
+                                                                                ?.name
+                                                                        }
+                                                                    </option>
+                                                                )
+                                                            )}
                                                     </Form.Select>
                                                     <Form.Control.Feedback type="invalid">
                                                         Bắt buộc chọn

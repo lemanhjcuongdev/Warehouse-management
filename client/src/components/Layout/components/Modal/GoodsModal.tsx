@@ -125,6 +125,7 @@ function GoodsModal(props: {
     useEffect(() => {
         getAllGoodsTypes().then((data) => {
             setGoodsTypes(data);
+            if (!data.length) return;
             const currentGroup = data.find(
                 (type) => type.idGoodsTypes === formData.idType
             )?.idGoodsGroup2?.name;
@@ -383,14 +384,15 @@ function GoodsModal(props: {
                                         <option value="">
                                             ------Chọn loại hàng------
                                         </option>
-                                        {goodsTypes.map((type) => (
-                                            <option
-                                                key={type.idGoodsTypes}
-                                                value={type.idGoodsTypes}
-                                            >
-                                                {type.name}
-                                            </option>
-                                        ))}
+                                        {goodsTypes.length &&
+                                            goodsTypes.map((type) => (
+                                                <option
+                                                    key={type.idGoodsTypes}
+                                                    value={type.idGoodsTypes}
+                                                >
+                                                    {type.name}
+                                                </option>
+                                            ))}
                                     </Form.Select>
                                     <Form.Control.Feedback type="invalid">
                                         Bắt buộc nhập
@@ -425,14 +427,17 @@ function GoodsModal(props: {
                                         <option value="">
                                             ------Chọn kho------
                                         </option>
-                                        {warehouses.map((warehouse) => (
-                                            <option
-                                                key={warehouse.idWarehouse}
-                                                value={warehouse.idWarehouse}
-                                            >
-                                                {warehouse.name}
-                                            </option>
-                                        ))}
+                                        {warehouses.length &&
+                                            warehouses.map((warehouse) => (
+                                                <option
+                                                    key={warehouse.idWarehouse}
+                                                    value={
+                                                        warehouse.idWarehouse
+                                                    }
+                                                >
+                                                    {warehouse.name}
+                                                </option>
+                                            ))}
                                     </Form.Select>
 
                                     <Form.Control.Feedback type="invalid">
@@ -451,14 +456,15 @@ function GoodsModal(props: {
                                         <option value="">
                                             ------Chọn đơn vị tính------
                                         </option>
-                                        {goodsUnits.map((unit) => (
-                                            <option
-                                                key={unit.idGoodsUnits}
-                                                value={unit.idGoodsUnits}
-                                            >
-                                                {unit.name}
-                                            </option>
-                                        ))}
+                                        {goodsUnits.length &&
+                                            goodsUnits.map((unit) => (
+                                                <option
+                                                    key={unit.idGoodsUnits}
+                                                    value={unit.idGoodsUnits}
+                                                >
+                                                    {unit.name}
+                                                </option>
+                                            ))}
                                     </Form.Select>
                                     <Form.Control.Feedback type="invalid">
                                         Bắt buộc chọn

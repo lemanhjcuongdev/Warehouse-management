@@ -320,15 +320,16 @@ function StocktakingReceiptModal(props: {
                                             <option value="">
                                                 ------Chọn kho kiểm kê------
                                             </option>
-                                            {warehouses.map((item) => (
-                                                <option
-                                                    key={item.idWarehouse}
-                                                    value={item.idWarehouse}
-                                                >
-                                                    {item.name} - Đ/c:{" "}
-                                                    {item.address}
-                                                </option>
-                                            ))}
+                                            {warehouses.length &&
+                                                warehouses.map((item) => (
+                                                    <option
+                                                        key={item.idWarehouse}
+                                                        value={item.idWarehouse}
+                                                    >
+                                                        {item.name} - Đ/c:{" "}
+                                                        {item.address}
+                                                    </option>
+                                                ))}
                                         </Form.Select>
                                         <Form.Control.Feedback type="invalid">
                                             Bắt buộc chọn
@@ -375,15 +376,21 @@ function StocktakingReceiptModal(props: {
                                                         ----Chọn hàng hoá kiểm
                                                         kê----
                                                     </option>
-                                                    {goods.map((item) => (
-                                                        <option
-                                                            key={item.idGoods}
-                                                            value={item.idGoods}
-                                                        >
-                                                            ID: {item.idGoods} -{" "}
-                                                            {item.name}
-                                                        </option>
-                                                    ))}
+                                                    {goods.length &&
+                                                        goods.map((item) => (
+                                                            <option
+                                                                key={
+                                                                    item.idGoods
+                                                                }
+                                                                value={
+                                                                    item.idGoods
+                                                                }
+                                                            >
+                                                                ID:{" "}
+                                                                {item.idGoods} -{" "}
+                                                                {item.name}
+                                                            </option>
+                                                        ))}
                                                 </Form.Select>
                                                 <Form.Text muted>
                                                     Chọn thủ công nếu không thể

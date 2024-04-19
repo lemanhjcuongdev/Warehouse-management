@@ -25,14 +25,16 @@ function OrderTable(props: {
                 </tr>
             </thead>
             <tbody>
-                {listData.map((item, index) => (
-                    <OrderTableRow
-                        key={item.idImportOrders}
-                        item={item}
-                        index={index}
-                        {...props}
-                    />
-                ))}
+                {listData.length
+                    ? listData.map((item, index) => (
+                          <OrderTableRow
+                              key={item.idImportOrders}
+                              item={item}
+                              index={index}
+                              {...props}
+                          />
+                      ))
+                    : null}
             </tbody>
         </Table>
     );

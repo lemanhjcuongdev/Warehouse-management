@@ -2,11 +2,10 @@ import { Container, Nav, Navbar } from "react-bootstrap";
 import { Link, NavLink } from "react-router-dom";
 import { Fragment } from "react/jsx-runtime";
 
+import { useState } from "react";
+import navbar_items from "../../../../constants/navbar-items";
 import DropdownMenu from "../../components/Dropdown/NavDropdownMenu";
 import HeaderProfile from "../../components/HeaderProfile/HeaderProfile";
-import SearchBar from "../../components/Searchbar/Searchbar";
-import navbar_items from "../../../../constants/navbar-items";
-import { useState } from "react";
 
 function Header() {
     const navbarItems = navbar_items;
@@ -63,7 +62,6 @@ function Header() {
                             </Fragment>
                         ))}
                     </Nav>
-                    <SearchBar />
                     <HeaderProfile />
                 </Navbar.Collapse>
             </Container>

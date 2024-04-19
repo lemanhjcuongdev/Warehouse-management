@@ -19,7 +19,7 @@ function TransportReceiptDetailTable(props: {
                 </tr>
             </thead>
             <tbody>
-                {listData &&
+                {listData.length &&
                     listData.map((item, index) => (
                         <TransportReceiptDetailTableRow
                             key={item.idExportReceipt}

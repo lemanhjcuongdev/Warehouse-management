@@ -16,7 +16,7 @@ const getAllProviders = async () => {
             },
         };
 
-        const res = await fetch(`${API_ROOT}/providers`, init);
+        const res = await fetch(`${API_ROOT}/providers?permissionId=36`, init);
         const data: iProviderProps[] = await res.json();
 
         return data;
@@ -38,7 +38,10 @@ const getProviderById = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/providers/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/providers/${id}?permissionId=36`,
+            init
+        );
         const data = await res.json();
         if (data.error) {
             throw new Error(data.error);
@@ -65,7 +68,7 @@ const createProvider = async (values: iProviderProps) => {
             },
             body: JSON.stringify(values),
         };
-        const res = await fetch(`${API_ROOT}/providers`, init);
+        const res = await fetch(`${API_ROOT}/providers?permissionId=33`, init);
 
         const data = await res.json();
         if (data.error) {
@@ -94,7 +97,7 @@ const updateProvider = async (values: iProviderProps) => {
             body: JSON.stringify(values),
         };
         const res = await fetch(
-            `${API_ROOT}/providers/${values.idProviders}`,
+            `${API_ROOT}/providers/${values.idProviders}?permissionId=34`,
             init
         );
 
@@ -123,7 +126,10 @@ const softDeleteProvider = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/providers/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/providers/${id}?permissionId=35`,
+            init
+        );
 
         const data = await res.json();
         if (data && data.error) {

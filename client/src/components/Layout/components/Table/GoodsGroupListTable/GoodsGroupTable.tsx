@@ -28,17 +28,18 @@ function GoodsGroupTable(props: {
                 </tr>
             </thead>
             <tbody>
-                {listData.map((item, index) => (
-                    <GoodsGroupTableRow
-                        key={item.idGoodsGroups}
-                        item={item}
-                        index={index}
-                        setListData={setListData}
-                        toggleShowModal={toggleShowModal}
-                        setModalType={setModalType}
-                        setFormData={setFormData}
-                    />
-                ))}
+                {listData.length &&
+                    listData.map((item, index) => (
+                        <GoodsGroupTableRow
+                            key={item.idGoodsGroups}
+                            item={item}
+                            index={index}
+                            setListData={setListData}
+                            toggleShowModal={toggleShowModal}
+                            setModalType={setModalType}
+                            setFormData={setFormData}
+                        />
+                    ))}
             </tbody>
         </Table>
     );

@@ -16,7 +16,7 @@ const getAllUser = async () => {
             },
         };
 
-        const res = await fetch(`${API_ROOT}/users`, init);
+        const res = await fetch(`${API_ROOT}/users?permissionId=4`, init);
         const data: iUserItemProps[] = await res.json();
 
         return data;
@@ -38,7 +38,7 @@ const getUserById = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/users/${id}`, init);
+        const res = await fetch(`${API_ROOT}/users/${id}?permissionId=4`, init);
         const data = await res.json();
         if (data.error) {
             throw new Error(data.error);
@@ -65,7 +65,10 @@ const createUser = async (userInfo: iUserDataProps) => {
             },
             body: JSON.stringify(userInfo),
         };
-        const res = await fetch(`${API_ROOT}/users/create-user`, init);
+        const res = await fetch(
+            `${API_ROOT}/users/create-user?permissionId=1`,
+            init
+        );
 
         const data = await res.json();
         if (data.error) {
@@ -93,7 +96,10 @@ const updateUser = async (userInfo: iUserDataProps) => {
             },
             body: JSON.stringify(userInfo),
         };
-        const res = await fetch(`${API_ROOT}/users/${userInfo.idUsers}`, init);
+        const res = await fetch(
+            `${API_ROOT}/users/${userInfo.idUsers}?permissionId=2`,
+            init
+        );
 
         const data = await res.json();
         if (data.error) {
@@ -120,7 +126,7 @@ const softDeleteUser = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/users/${id}`, init);
+        const res = await fetch(`${API_ROOT}/users/${id}?permissionId=3`, init);
 
         const data = await res.json();
         if (data && data.error) {

@@ -16,7 +16,7 @@ const getAllGoods = async () => {
             },
         };
 
-        const res = await fetch(`${API_ROOT}/goods`, init);
+        const res = await fetch(`${API_ROOT}/goods?permissionId=24`, init);
         const data: iGoodsItemProps[] = await res.json();
 
         return data;
@@ -38,7 +38,38 @@ const getGoodsById = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/goods/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/goods/${id}?permissionId=24`,
+            init
+        );
+        const data = await res.json();
+        if (data.error) {
+            throw new Error(data.error);
+        }
+
+        return data;
+    } catch (error) {
+        return error;
+    }
+};
+
+const findGoods = async (queryString?: string, type?: string) => {
+    try {
+        const jwt = getCookie("jwt");
+        if (!jwt) {
+            throw new Error("Hết phiên đăng nhập");
+        }
+        const init: RequestInit = {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: jwt,
+            },
+        };
+        const res = await fetch(
+            `${API_ROOT}/goods/search?q=${queryString}&type=${type}&permissionId=24`,
+            init
+        );
         const data = await res.json();
         if (data.error) {
             throw new Error(data.error);
@@ -65,7 +96,7 @@ const createGoods = async (values: iGoodsProps) => {
             },
             body: JSON.stringify(values),
         };
-        const res = await fetch(`${API_ROOT}/goods`, init);
+        const res = await fetch(`${API_ROOT}/goods?permissionId=21`, init);
 
         const data = await res.json();
         if (data.error) {
@@ -100,7 +131,10 @@ const modifyGoods = async (
             },
             body: JSON.stringify({ goodsArray }),
         };
-        const res = await fetch(`${API_ROOT}/goods/modify`, init);
+        const res = await fetch(
+            `${API_ROOT}/goods/modify?permissionId=22`,
+            init
+        );
 
         return res;
     } catch (error) {
@@ -130,7 +164,10 @@ const updateGoods = async (
             },
             body: JSON.stringify(values),
         };
-        const res = await fetch(`${API_ROOT}/goods/${values.idGoods}`, init);
+        const res = await fetch(
+            `${API_ROOT}/goods/${values.idGoods}?permissionId=22`,
+            init
+        );
 
         const data = await res.json();
         if (data.error) {
@@ -157,7 +194,10 @@ const softDeleteGoods = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/goods/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/goods/${id}?permissionId=23`,
+            init
+        );
 
         const data = await res.json();
         if (data && data.error) {
@@ -173,6 +213,7 @@ const softDeleteGoods = async (id: number) => {
 export {
     createGoods,
     modifyGoods,
+    findGoods,
     getAllGoods,
     getGoodsById,
     softDeleteGoods,

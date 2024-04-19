@@ -36,9 +36,12 @@ function TransportReceiptTableRow(props: {
         const receiptInfo: iTransportReceiptProps =
             await getTransportReceiptById(item.idTransportReceipts);
 
-        const transportToDate = convertUTCToVNTime(
-            receiptInfo.transportToDate || ""
-        );
+        let transportToDate;
+
+        if (receiptInfo.transportToDate) {
+            transportToDate = convertUTCToVNTime(receiptInfo.transportToDate);
+        }
+
         setFormData({
             ...receiptInfo,
             transportToDate: transportToDate,

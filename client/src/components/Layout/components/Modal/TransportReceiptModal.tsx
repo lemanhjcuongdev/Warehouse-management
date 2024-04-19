@@ -128,6 +128,7 @@ function TransportReceiptModal(props: {
             return provinceReceipts;
         };
         getAllExportReceiptByStatus(2).then((data) => {
+            if (!data.length) return;
             const filteredList = filterReceiptByProvince(data);
             setReceipts(filteredList);
         });
@@ -151,8 +152,8 @@ function TransportReceiptModal(props: {
                     idWarehouseFrom:
                         receiptDetail?.provinceReceipts[0]?.idWarehouse2
                             ?.idWarehouse || 0,
+                    idWarehouseTo: 0,
                 }));
-
                 break;
             default:
                 setFormData((prev) => ({
@@ -230,27 +231,23 @@ function TransportReceiptModal(props: {
         e
     ) => {
         const isValidated = validateForm();
+        if (!isValidated) return;
         e.preventDefault();
         e.stopPropagation();
         formData.status = 4;
 
         //call API
-        if (isValidated) {
-            updateTransportReceipt(formData).then(() => {
-                listData.forEach((data, index) => {
-                    if (
-                        data.idTransportReceipts ===
-                        formData.idTransportReceipts
-                    ) {
-                        //deep clone
-                        const newList = [...listData];
-                        newList.splice(index, 1);
-                        setListData(newList);
-                    }
-                });
+        updateTransportReceipt(formData).then(() => {
+            listData.forEach((data, index) => {
+                if (data.idTransportReceipts === formData.idTransportReceipts) {
+                    //deep clone
+                    const newList = [...listData];
+                    newList.splice(index, 1);
+                    setListData(newList);
+                }
             });
-            handleCancel();
-        }
+        });
+        handleCancel();
     };
 
     const handleUpdateTransportDetail = (scanResult: {

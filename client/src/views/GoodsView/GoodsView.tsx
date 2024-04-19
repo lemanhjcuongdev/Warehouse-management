@@ -1,12 +1,14 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import _ from "lodash";
 import { Button } from "react-bootstrap";
-import { iModalTypes } from "~/components/Layout/components/Modal/types";
-import { getCookie } from "~/utils/cookies";
-import { iGoodsItemProps, iGoodsProps } from "../types";
-import { getAllGoods } from "~/apis/goodsAPI";
-import GoodsModal from "~/components/Layout/components/Modal/GoodsModal";
-import GoodsTable from "~/components/Layout/components/Table/GoodsListTable/GoodsTable";
 import { Link, useParams } from "react-router-dom";
+import { findGoods, getAllGoods } from "~/apis/goodsAPI";
+import GoodsModal from "~/components/Layout/components/Modal/GoodsModal";
+import { iModalTypes } from "~/components/Layout/components/Modal/types";
+import SearchBar from "~/components/Layout/components/Searchbar/Searchbar";
+import GoodsTable from "~/components/Layout/components/Table/GoodsListTable/GoodsTable";
+import { iGoodsItemProps, iGoodsProps, iGoodsTypeProps } from "../types";
+import { getAllGoodsTypes } from "~/apis/goodsTypeAPI";
 
 const initGoodsItem: iGoodsItemProps = {
     idGoods: 0,
@@ -44,6 +46,9 @@ function GoodsView() {
         initGoodsItem,
     ]);
     const [formData, setFormData] = useState<iGoodsProps>(initGoodsInfo);
+    const [goodsTypes, setGoodsTypes] = useState<iGoodsTypeProps[]>([]);
+    const [query, setQuery] = useState("");
+    const [type, setType] = useState("");
 
     const handleSetListData = useCallback(() => {
         getAllGoods().then((data) => setListData(data));
@@ -53,10 +58,40 @@ function GoodsView() {
         handleSetListData();
     }, [handleSetListData]);
 
+    useEffect(() => {
+        getAllGoodsTypes().then((data) => {
+            data.length && setGoodsTypes(data);
+        });
+    }, []);
+
     const handleToggleShowModal = useCallback(() => {
         setShowModal(!showModal);
         setModalType({ type: "create" });
     }, [showModal]);
+
+    const handleChangeInputSearch = _.debounce(
+        (
+            e: React.ChangeEvent<
+                HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+            >
+        ) => {
+            switch (e.target.name) {
+                case "q":
+                    setQuery(e.target.value);
+                    break;
+                case "Loại hàng":
+                    setType(e.target.value);
+                    break;
+            }
+        },
+        1000
+    );
+
+    useEffect(() => {
+        !query && !type
+            ? handleSetListData()
+            : findGoods(query, type).then((data) => setListData(data));
+    }, [query, type]);
 
     return (
         <>
@@ -71,6 +106,20 @@ function GoodsView() {
                     Đặt đơn nhập kho mới
                 </Button>
             </Link>
+            <SearchBar
+                onChange={handleChangeInputSearch}
+                filterList={[
+                    {
+                        title: "Loại hàng",
+                        list: goodsTypes.map((type) => {
+                            return {
+                                label: type.name,
+                                value: type.idGoodsTypes,
+                            };
+                        }),
+                    },
+                ]}
+            />
             <GoodsModal
                 show={showModal}
                 onHide={handleToggleShowModal}
@@ -91,5 +140,5 @@ function GoodsView() {
     );
 }
 
-export { initGoodsItem, initGoodsInfo };
+export { initGoodsInfo, initGoodsItem };
 export default GoodsView;

@@ -16,7 +16,10 @@ const getAllGoodsTypes = async () => {
             },
         };
 
-        const res = await fetch(`${API_ROOT}/goods/types`, init);
+        const res = await fetch(
+            `${API_ROOT}/goods/types?permissionId=28`,
+            init
+        );
         const data: iGoodsTypeProps[] = await res.json();
 
         return data;
@@ -38,7 +41,10 @@ const getGoodsTypeById = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/goods/types/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/goods/types/${id}?permissionId=28`,
+            init
+        );
         const data = await res.json();
         if (data.error) {
             throw new Error(data.error);
@@ -65,7 +71,10 @@ const createGoodsType = async (values: iGoodsTypeProps) => {
             },
             body: JSON.stringify(values),
         };
-        const res = await fetch(`${API_ROOT}/goods/types`, init);
+        const res = await fetch(
+            `${API_ROOT}/goods/types?permissionId=25`,
+            init
+        );
 
         const data = await res.json();
         if (data.error) {
@@ -94,7 +103,7 @@ const updateGoodsType = async (values: iGoodsTypeProps) => {
             body: JSON.stringify(values),
         };
         const res = await fetch(
-            `${API_ROOT}/goods/types/${values.idGoodsTypes}`,
+            `${API_ROOT}/goods/types/${values.idGoodsTypes}?permissionId=26`,
             init
         );
 
@@ -123,7 +132,10 @@ const softDeleteGoodsType = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/goods/types/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/goods/types/${id}?permissionId=27`,
+            init
+        );
 
         const data = await res.json();
         if (data && data.error) {

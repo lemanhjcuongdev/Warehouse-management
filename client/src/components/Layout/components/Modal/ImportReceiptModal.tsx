@@ -82,6 +82,7 @@ function ImportReceiptModal(props: {
 
     useEffect(() => {
         getAllImportOrderByStatus(1).then((data) => {
+            if (!data.length || !listData.length) return;
             const ordersWithoutReceipt = [];
             //filter orders have been imported
             for (const order of data) {
@@ -414,15 +415,16 @@ function ImportReceiptModal(props: {
                                             <option value="">
                                                 ------Chọn kho nhập------
                                             </option>
-                                            {warehouses.map((item) => (
-                                                <option
-                                                    key={item.idWarehouse}
-                                                    value={item.idWarehouse}
-                                                >
-                                                    {item.name} - Đ/c:{" "}
-                                                    {item.address}
-                                                </option>
-                                            ))}
+                                            {warehouses.length &&
+                                                warehouses.map((item) => (
+                                                    <option
+                                                        key={item.idWarehouse}
+                                                        value={item.idWarehouse}
+                                                    >
+                                                        {item.name} - Đ/c:{" "}
+                                                        {item.address}
+                                                    </option>
+                                                ))}
                                         </Form.Select>
                                         <Form.Control.Feedback type="invalid">
                                             Bắt buộc chọn

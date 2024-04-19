@@ -29,14 +29,15 @@ function StocktakingReceiptDetailTable(props: {
                 </tr>
             </thead>
             <tbody>
-                {listData.map((item, index) => (
-                    <StocktakingReceiptDetailTableRow
-                        key={item.idGoods}
-                        item={item}
-                        index={index}
-                        {...props}
-                    />
-                ))}
+                {listData.length &&
+                    listData.map((item, index) => (
+                        <StocktakingReceiptDetailTableRow
+                            key={item.idGoods}
+                            item={item}
+                            index={index}
+                            {...props}
+                        />
+                    ))}
             </tbody>
         </Table>
     );

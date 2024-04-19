@@ -80,7 +80,7 @@ function GoodsTableRow(props: {
                         pill
                         bg={item.disabled === 0 ? "success" : "secondary"}
                     >
-                        {item.disabled === 0 ? "Hoạt động" : "Vô hiệu hoá"}
+                        {item.disabled === 0 ? "Có sẵn" : "Không có sẵn"}
                     </Badge>
                 </div>
                 &nbsp;

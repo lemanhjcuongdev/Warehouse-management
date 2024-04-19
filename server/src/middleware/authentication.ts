@@ -2,8 +2,13 @@ import { Request, Response, NextFunction } from 'express'
 import * as jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import STATUS from '~/constants/statusCode'
+import { appDataSource } from '~/constants/appDataSource'
+import { Users } from '~/models/entities/Users'
+import { PermissionDetails } from '~/models/entities/PermissionDetails'
 
 dotenv.config()
+//use datasource
+const permissionDetailRepo = appDataSource.getRepository(PermissionDetails)
 
 function checkJwt(req: Request, res: Response, next: NextFunction) {
   //get the jwt token from request head
@@ -34,4 +39,41 @@ function checkJwt(req: Request, res: Response, next: NextFunction) {
   next()
 }
 
-export { checkJwt }
+async function checkRole(req: Request, res: Response, next: NextFunction) {
+  //get the userID from previous middleware
+  const id = +res.locals.JwtPayload.userId
+  const permissionId = req.query.permissionId
+
+  console.log('PERMISSION ID: ', permissionId)
+
+  //Get user role from the database
+  try {
+    //get permissions of user
+    const existingPermissions = await permissionDetailRepo.find({
+      where: {
+        idUsers: id
+      }
+    })
+    const idPermissions = existingPermissions.map((permission) => permission.idPermission)
+    if (permissionId) {
+      const hasAccept = idPermissions.find((permission) => permission === +permissionId)
+
+      if (!hasAccept) {
+        return res.status(STATUS.FORBIDDEN).send({
+          error: 'Không có quyền truy cập'
+        })
+      }
+    } else
+      return res.status(STATUS.FORBIDDEN).send({
+        error: 'Không có quyền truy cập'
+      })
+  } catch (id) {
+    res.status(STATUS.UNAUTHORIZED).send({
+      error: 'Chưa đăng nhập'
+    })
+  }
+
+  next()
+}
+
+export { checkJwt, checkRole }

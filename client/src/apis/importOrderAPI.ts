@@ -68,7 +68,10 @@ const createImportOrder = async (values: iImportOrderProps) => {
             },
             body: JSON.stringify(values),
         };
-        const res = await fetch(`${API_ROOT}/import/orders`, init);
+        const res = await fetch(
+            `${API_ROOT}/import/orders?permissionId=19`,
+            init
+        );
 
         const data = await res.json();
         if (data.error) {
@@ -97,7 +100,7 @@ const updateImportOrder = async (values: iImportOrderProps) => {
             body: JSON.stringify(values),
         };
         const res = await fetch(
-            `${API_ROOT}/import/orders/${values.idImportOrders}`,
+            `${API_ROOT}/import/orders/${values.idImportOrders}?permissionId=20`,
             init
         );
 
@@ -132,7 +135,7 @@ const updateOrderStatus = async (values: {
             body: JSON.stringify(values),
         };
         const res = await fetch(
-            `${API_ROOT}/import/orders/${values.idImportOrders}`,
+            `${API_ROOT}/import/orders/${values.idImportOrders}?permissionId=20`,
             init
         );
 

@@ -24,14 +24,15 @@ function ExportReceiptTable(props: {
                 </tr>
             </thead>
             <tbody>
-                {listData.map((item, index) => (
-                    <ExportReceiptTableRow
-                        key={item.idExportReceipts}
-                        item={item}
-                        index={index}
-                        {...props}
-                    />
-                ))}
+                {listData.length &&
+                    listData.map((item, index) => (
+                        <ExportReceiptTableRow
+                            key={item.idExportReceipts}
+                            item={item}
+                            index={index}
+                            {...props}
+                        />
+                    ))}
             </tbody>
         </Table>
     );

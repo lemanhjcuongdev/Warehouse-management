@@ -27,14 +27,15 @@ function OrderDetailTable(props: {
                 </tr>
             </thead>
             <tbody>
-                {listData.map((item, index) => (
-                    <DefectiveRecordTableRow
-                        key={item.idDefectiveRecords}
-                        item={item}
-                        index={index}
-                        {...props}
-                    />
-                ))}
+                {listData.length &&
+                    listData.map((item, index) => (
+                        <DefectiveRecordTableRow
+                            key={item.idDefectiveRecords}
+                            item={item}
+                            index={index}
+                            {...props}
+                        />
+                    ))}
             </tbody>
         </Table>
     );

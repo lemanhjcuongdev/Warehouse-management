@@ -163,7 +163,27 @@ class UserController {
     //get id from query string
     const id: number = +req.params.id
     //get params from body request
-    const { name, email, gender, phone, startDate, username, disabled, idUpdated, idPermissions } = req.body
+    const {
+      name,
+      email,
+      gender,
+      phone,
+      startDate,
+      username,
+      disabled,
+      idUpdated,
+      idPermissions
+    }: {
+      name: string
+      email: string
+      gender: 'M' | 'F' | 'O'
+      phone: string
+      startDate: string
+      username: string
+      disabled: number
+      idUpdated?: number
+      idPermissions: number[]
+    } = req.body
 
     //get fields need to be updated
     const updatedFields = ['name', 'email', 'gender', 'phone', 'startDate', 'username', 'disabled', 'idUpdated'].filter(
@@ -194,7 +214,7 @@ class UserController {
       user.startDate = startDate
       user.username = username
       user.disabled = disabled
-      user.idUpdated = idUpdated
+      if (idUpdated) user.idUpdated = idUpdated
       const errors = await validate(user)
       if (errors.length > 0) {
         res.status(STATUS.BAD_REQUEST).send({
@@ -231,7 +251,11 @@ class UserController {
       })
 
       //check differences
-      const isChanged = !existingPermissions.every((permission) => idPermissions.includes(permission.idPermission))
+      const isChanged = !existingPermissions.every((permission) => {
+        idPermissions.indexOf(permission.idPermission) >= 0
+      })
+
+      console.log('ĐÃ CÓ SỰ THAY ĐỔI', isChanged)
 
       if (isChanged) {
         //remove old permissions of user

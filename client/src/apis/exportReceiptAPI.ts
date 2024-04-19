@@ -17,7 +17,7 @@ const getAllExportReceiptByStatus = async (status: number) => {
         };
 
         const res = await fetch(
-            `${API_ROOT}/export/receipts/status/${status}`,
+            `${API_ROOT}/export/receipts/status/${status}?permissionId=12`,
             init
         );
         const data: iExportReceiptItemProps[] = await res.json();
@@ -41,7 +41,10 @@ const getExportReceiptById = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/export/receipts/id/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/export/receipts/id/${id}?permissionId=12`,
+            init
+        );
         const data = await res.json();
         if (data.error) {
             throw new Error(data.error);
@@ -68,7 +71,10 @@ const createExportReceipt = async (values: iExportReceiptProps) => {
             },
             body: JSON.stringify(values),
         };
-        const res = await fetch(`${API_ROOT}/export/receipts`, init);
+        const res = await fetch(
+            `${API_ROOT}/export/receipts?permissionId=9`,
+            init
+        );
 
         const data = await res.json();
         if (data.error) {
@@ -100,7 +106,10 @@ const updateExportReceipt = async (
             },
             body: JSON.stringify({ status, idUpdated }),
         };
-        const res = await fetch(`${API_ROOT}/export/receipts/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/export/receipts/${id}?permissionId=10`,
+            init
+        );
 
         const data = await res.json();
         if (data.error) {
@@ -130,7 +139,10 @@ const softDeleteExportReceipt = async (id: number, reasonFailed: string) => {
                 reasonFailed,
             }),
         };
-        const res = await fetch(`${API_ROOT}/export/receipts/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/export/receipts/${id}?permissionId=11`,
+            init
+        );
 
         const data = await res.json();
         if (data && data.error) {

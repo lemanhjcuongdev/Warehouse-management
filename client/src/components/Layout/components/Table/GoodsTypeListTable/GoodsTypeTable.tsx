@@ -23,14 +23,15 @@ function GoodsTypeTable(props: {
                 </tr>
             </thead>
             <tbody>
-                {listData.map((item, index) => (
-                    <GoodsTypeTableRow
-                        key={item.idGoodsTypes}
-                        item={item}
-                        index={index}
-                        {...props}
-                    />
-                ))}
+                {listData.length &&
+                    listData.map((item, index) => (
+                        <GoodsTypeTableRow
+                            key={item.idGoodsTypes}
+                            item={item}
+                            index={index}
+                            {...props}
+                        />
+                    ))}
             </tbody>
         </Table>
     );

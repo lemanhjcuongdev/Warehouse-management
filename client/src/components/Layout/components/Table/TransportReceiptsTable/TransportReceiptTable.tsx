@@ -28,14 +28,15 @@ function TransportReceiptTable(props: {
                 </tr>
             </thead>
             <tbody>
-                {listData.map((item, index) => (
-                    <TransportReceiptTableRow
-                        key={item.idTransportReceipts}
-                        item={item}
-                        index={index}
-                        {...props}
-                    />
-                ))}
+                {listData.length &&
+                    listData.map((item, index) => (
+                        <TransportReceiptTableRow
+                            key={item.idTransportReceipts}
+                            item={item}
+                            index={index}
+                            {...props}
+                        />
+                    ))}
             </tbody>
         </Table>
     );

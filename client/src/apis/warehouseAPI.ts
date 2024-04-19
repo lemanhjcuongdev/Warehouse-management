@@ -20,7 +20,7 @@ const getAllWarehouses = async () => {
             },
         };
 
-        const res = await fetch(`${API_ROOT}/warehouses`, init);
+        const res = await fetch(`${API_ROOT}/warehouses?permissionId=40`, init);
         const data: iWarehouseItemProps[] = await res.json();
 
         return data;
@@ -42,7 +42,10 @@ const getWarehouseById = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/warehouses/id/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/warehouses/id/${id}?permissionId=40`,
+            init
+        );
         const data = await res.json();
         if (data.error) {
             throw new Error(data.error);
@@ -68,7 +71,7 @@ const getWarehousesByProvince = async (provinceCode: string) => {
             },
         };
         const res = await fetch(
-            `${API_ROOT}/warehouses/province/${provinceCode}`,
+            `${API_ROOT}/warehouses/province/${provinceCode}?permissionId=40`,
             init
         );
 
@@ -96,7 +99,10 @@ const getWarehouseSlotsById = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/warehouses/slots/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/warehouses/slots/${id}?permissionId=40`,
+            init
+        );
         const data: {
             idWarehouse: number;
             totalFloors: number;
@@ -129,7 +135,7 @@ const createWarehouse = async (values: iWarehouseDataProps) => {
             },
             body: JSON.stringify(values),
         };
-        const res = await fetch(`${API_ROOT}/warehouses`, init);
+        const res = await fetch(`${API_ROOT}/warehouses?permissionId=37`, init);
 
         const data = await res.json();
         if (data.error) {
@@ -158,7 +164,7 @@ const updateWarehouse = async (values: iWarehouseDataProps) => {
             body: JSON.stringify(values),
         };
         const res = await fetch(
-            `${API_ROOT}/warehouses/${values.idWarehouse}`,
+            `${API_ROOT}/warehouses/${values.idWarehouse}?permissionId=38`,
             init
         );
 
@@ -187,7 +193,10 @@ const softDeleteWarehouse = async (id: number) => {
                 authorization: jwt,
             },
         };
-        const res = await fetch(`${API_ROOT}/warehouses/${id}`, init);
+        const res = await fetch(
+            `${API_ROOT}/warehouses/${id}?permissionId=39`,
+            init
+        );
 
         const data = await res.json();
         if (data && data.error) {

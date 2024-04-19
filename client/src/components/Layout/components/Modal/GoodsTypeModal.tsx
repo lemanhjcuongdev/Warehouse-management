@@ -183,14 +183,15 @@ function GoodsTypeModal(props: {
                                 <option value="">
                                     ------Chọn nhóm hàng------
                                 </option>
-                                {groupListData.map((group) => (
-                                    <option
-                                        key={group.idGoodsGroups}
-                                        value={group.idGoodsGroups}
-                                    >
-                                        {group.name}
-                                    </option>
-                                ))}
+                                {groupListData.length &&
+                                    groupListData.map((group) => (
+                                        <option
+                                            key={group.idGoodsGroups}
+                                            value={group.idGoodsGroups}
+                                        >
+                                            {group.name}
+                                        </option>
+                                    ))}
                             </Form.Select>
                             <Form.Control.Feedback type="invalid">
                                 Bắt buộc chọn

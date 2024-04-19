@@ -11,13 +11,7 @@ function WarehouseTable(props: {
     setModalType: Dispatch<SetStateAction<iModalTypes>>;
     setFormData: Dispatch<React.SetStateAction<iWarehouseDataProps>>;
 }) {
-    const {
-        listData,
-        setListData,
-        toggleShowModal,
-        setModalType,
-        setFormData,
-    } = props;
+    const { listData } = props;
     return (
         <Table striped bordered hover>
             <thead>
@@ -29,14 +23,15 @@ function WarehouseTable(props: {
                 </tr>
             </thead>
             <tbody>
-                {listData.map((item, index) => (
-                    <WarehouseTableRow
-                        key={item.idWarehouse}
-                        item={item}
-                        index={index}
-                        {...props}
-                    />
-                ))}
+                {listData.length &&
+                    listData.map((item, index) => (
+                        <WarehouseTableRow
+                            key={item.idWarehouse}
+                            item={item}
+                            index={index}
+                            {...props}
+                        />
+                    ))}
             </tbody>
         </Table>
     );

@@ -31,18 +31,19 @@ function UserTable(props: {
                 </tr>
             </thead>
             <tbody>
-                {listData.map((item, index) => (
-                    <UserTableRow
-                        key={item.idUsers}
-                        item={item}
-                        index={index}
-                        setListData={setListData}
-                        toggleShowModal={toggleShowModal}
-                        setModalType={setModalType}
-                        setFormData={setFormData}
-                        setRole={setRole}
-                    />
-                ))}
+                {listData.length &&
+                    listData.map((item, index) => (
+                        <UserTableRow
+                            key={item.idUsers}
+                            item={item}
+                            index={index}
+                            setListData={setListData}
+                            toggleShowModal={toggleShowModal}
+                            setModalType={setModalType}
+                            setFormData={setFormData}
+                            setRole={setRole}
+                        />
+                    ))}
             </tbody>
         </Table>
     );
