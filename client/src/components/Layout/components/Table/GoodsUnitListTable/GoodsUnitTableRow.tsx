@@ -3,6 +3,8 @@ import { Badge, ButtonGroup, Dropdown } from "react-bootstrap";
 import { getGoodsUnitById, softDeleteGoodsUnit } from "~/apis/goodsUnitAPI";
 import { iGoodsUnitProps } from "~/views/types";
 import { iModalTypes } from "../../Modal/types";
+import useRole from "~/hooks/useRole";
+import { ROLE_ID } from "~/constants/roles";
 
 function GoodsUnitTableRow(props: {
     item: iGoodsUnitProps;
@@ -20,6 +22,7 @@ function GoodsUnitTableRow(props: {
         setModalType,
         setFormData,
     } = props;
+    const role = useRole();
 
     const handleReadOrUpdate = async () => {
         const goodsUnitInfo: iGoodsUnitProps = await getGoodsUnitById(
@@ -88,23 +91,32 @@ function GoodsUnitTableRow(props: {
                             <i className="fa-solid fa-ruler-horizontal"></i>
                             &nbsp; Xem thông tin chi tiết
                         </Dropdown.Item>
-                        <Dropdown.Item onClick={() => handleReadOrUpdate()}>
-                            <i className="fa-solid fa-pen-to-square"></i>
-                            &nbsp; Cập nhật thông tin
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                            onClick={() => handleDelete(item.idGoodsUnits)}
-                        >
-                            <i
-                                className={
-                                    item.deletedAt
-                                        ? "fa-solid fa-check"
-                                        : "fa-solid fa-ban"
-                                }
-                            ></i>
-                            &nbsp;
-                            {item.deletedAt ? "Kích hoạt lại" : "Vô hiệu hoá"}
-                        </Dropdown.Item>
+                        {(role === ROLE_ID.ASSURANCE_3 ||
+                            role === ROLE_ID.OPERATION_1 ||
+                            role === ROLE_ID.CEO_6) && (
+                            <Dropdown.Item onClick={() => handleReadOrUpdate()}>
+                                <i className="fa-solid fa-pen-to-square"></i>
+                                &nbsp; Cập nhật thông tin
+                            </Dropdown.Item>
+                        )}
+                        {(role === ROLE_ID.ASSURANCE_3 ||
+                            role === ROLE_ID.CEO_6) && (
+                            <Dropdown.Item
+                                onClick={() => handleDelete(item.idGoodsUnits)}
+                            >
+                                <i
+                                    className={
+                                        item.deletedAt
+                                            ? "fa-solid fa-check"
+                                            : "fa-solid fa-ban"
+                                    }
+                                ></i>
+                                &nbsp;
+                                {item.deletedAt
+                                    ? "Kích hoạt lại"
+                                    : "Vô hiệu hoá"}
+                            </Dropdown.Item>
+                        )}
                     </Dropdown.Menu>
                 </Dropdown>
             </td>

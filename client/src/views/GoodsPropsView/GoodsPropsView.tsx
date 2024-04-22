@@ -10,6 +10,8 @@ import { iModalTypes } from "~/components/Layout/components/Modal/types";
 import GoodsGroupTable from "~/components/Layout/components/Table/GoodsGroupListTable/GoodsGroupTable";
 import GoodsTypeTable from "~/components/Layout/components/Table/GoodsTypeListTable/GoodsTypeTable";
 import GoodsUnitTable from "~/components/Layout/components/Table/GoodsUnitListTable/GoodsUnitTable";
+import { ROLE_ID } from "~/constants/roles";
+import useRole from "~/hooks/useRole";
 
 import { getCookie } from "~/utils/cookies";
 import {
@@ -42,6 +44,7 @@ function GoodsPropsView() {
     const [key, setKey] = useState("goods-groups");
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
+    const role = useRole();
 
     //GOODS GROUPS
     const [groupListData, setGroupListData] = useState<iGoodsGroupProps[]>([
@@ -108,13 +111,16 @@ function GoodsPropsView() {
                 <Tab eventKey="goods-groups" title="Nhóm hàng">
                     {key === "goods-groups" && (
                         <>
-                            <Button
-                                onClick={handleToggleShowModal}
-                                className="my-3"
-                            >
-                                <i className="fa-solid fa-plus"></i>
-                                &nbsp; Thêm mới
-                            </Button>
+                            {(role === ROLE_ID.ASSURANCE_3 ||
+                                role === ROLE_ID.CEO_6) && (
+                                <Button
+                                    onClick={handleToggleShowModal}
+                                    className="my-3"
+                                >
+                                    <i className="fa-solid fa-plus"></i>
+                                    &nbsp; Thêm mới
+                                </Button>
+                            )}
 
                             <GoodsGroupModal
                                 show={showModal}
@@ -139,13 +145,16 @@ function GoodsPropsView() {
                 <Tab eventKey="goods-types" title="Loại hàng">
                     {key === "goods-types" && (
                         <>
-                            <Button
-                                onClick={handleToggleShowModal}
-                                className="my-3"
-                            >
-                                <i className="fa-solid fa-plus"></i>
-                                &nbsp; Thêm mới
-                            </Button>
+                            {(role === ROLE_ID.ASSURANCE_3 ||
+                                role === ROLE_ID.CEO_6) && (
+                                <Button
+                                    onClick={handleToggleShowModal}
+                                    className="my-3"
+                                >
+                                    <i className="fa-solid fa-plus"></i>
+                                    &nbsp; Thêm mới
+                                </Button>
+                            )}
 
                             <GoodsTypeModal
                                 show={showModal}
@@ -171,13 +180,16 @@ function GoodsPropsView() {
                 <Tab eventKey="goods-units" title="Đơn vị tính">
                     {key === "goods-units" && (
                         <>
-                            <Button
-                                onClick={handleToggleShowModal}
-                                className="my-3"
-                            >
-                                <i className="fa-solid fa-plus"></i>
-                                &nbsp; Thêm mới
-                            </Button>
+                            {(role === ROLE_ID.ASSURANCE_3 ||
+                                role === ROLE_ID.CEO_6) && (
+                                <Button
+                                    onClick={handleToggleShowModal}
+                                    className="my-3"
+                                >
+                                    <i className="fa-solid fa-plus"></i>
+                                    &nbsp; Thêm mới
+                                </Button>
+                            )}
 
                             <GoodsUnitModal
                                 show={showModal}

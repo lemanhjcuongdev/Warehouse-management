@@ -15,6 +15,8 @@ import stringToDate from "~/utils/stringToDate";
 import { initGoodsTypeData } from "~/views/GoodsPropsView/GoodsPropsView";
 import { iGoodsGroupProps, iGoodsTypeProps } from "~/views/types";
 import { iModalTypes } from "./types";
+import useRole from "~/hooks/useRole";
+import { ROLE_ID } from "~/constants/roles";
 
 function GoodsTypeModal(props: {
     show: true | false;
@@ -39,6 +41,7 @@ function GoodsTypeModal(props: {
     const [validated, setValidated] = useState(false);
     const formRef = useRef<HTMLFormElement>(null);
     let title: string;
+    const role = useRole();
 
     switch (modalType.type) {
         case "create":
@@ -224,23 +227,24 @@ function GoodsTypeModal(props: {
                 <Button variant="secondary" type="reset" onClick={handleCancel}>
                     {modalType.type === "update" ? "Đóng" : "Huỷ"}
                 </Button>
-                {modalType.type === "create" ? (
-                    <Button
-                        variant="primary"
-                        type="submit"
-                        onClick={handleSubmitCreate}
-                    >
-                        Thêm mới
-                    </Button>
-                ) : (
-                    <Button
-                        variant="warning"
-                        type="submit"
-                        onClick={handleSubmitUpdate}
-                    >
-                        Cập nhật chỉnh sửa
-                    </Button>
-                )}
+                {(role === ROLE_ID.ASSURANCE_3 || role === ROLE_ID.CEO_6) &&
+                    (modalType.type === "create" ? (
+                        <Button
+                            variant="primary"
+                            type="submit"
+                            onClick={handleSubmitCreate}
+                        >
+                            Thêm mới
+                        </Button>
+                    ) : (
+                        <Button
+                            variant="warning"
+                            type="submit"
+                            onClick={handleSubmitUpdate}
+                        >
+                            Cập nhật chỉnh sửa
+                        </Button>
+                    ))}
             </Modal.Footer>
         </Modal>
     );

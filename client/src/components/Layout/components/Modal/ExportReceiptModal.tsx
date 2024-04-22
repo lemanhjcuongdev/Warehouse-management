@@ -157,7 +157,7 @@ function ExportReceiptModal(props: {
     const handleUpdateListData = (data: iExportDetailProps) => {
         const newListData = formData.idExportOrder2.exportOrderDetails.map(
             (detail) => {
-                if (detail.idGoods === data.idGoods) {
+                if (detail.idGoods === data.idGoods && !detail.checked) {
                     detail.checked = true;
                 }
                 return detail;
@@ -511,15 +511,7 @@ function ExportReceiptModal(props: {
                                                     </span>
                                                 </Accordion.Header>
                                                 <Accordion.Body>
-                                                    <Form.Group>
-                                                        <Form.Label>
-                                                            <h5>
-                                                                Quét mã QR để
-                                                                xuất kho
-                                                            </h5>
-                                                        </Form.Label>
-                                                    </Form.Group>
-                                                    <Form.Group>
+                                                    <Form.Group as={Col} sm="6">
                                                         {formData.idExportOrder !==
                                                             0 && (
                                                             <QRCodeScanner
@@ -528,13 +520,12 @@ function ExportReceiptModal(props: {
                                                                 }
                                                             />
                                                         )}
-                                                        <br />
-                                                        <Form.Text muted>
-                                                            Mặt hàng và số lượng
-                                                            sẽ tuân theo chi
-                                                            tiết phiếu xuất kho
-                                                        </Form.Text>
                                                     </Form.Group>
+                                                    <Form.Text muted>
+                                                        Mặt hàng và số lượng sẽ
+                                                        tuân theo chi tiết phiếu
+                                                        xuất kho
+                                                    </Form.Text>
                                                 </Accordion.Body>
                                             </Accordion.Item>
                                         </Accordion>
@@ -609,7 +600,7 @@ function ExportReceiptModal(props: {
                     </Button>
                 ) : (
                     formData.status === 0 &&
-                    role === ROLE_ID.DIRECTOR_2 && (
+                    (role === ROLE_ID.DIRECTOR_2 || role === ROLE_ID.CEO_6) && (
                         <Button variant="dark" onClick={handleSoftDelete}>
                             Huỷ phiếu
                         </Button>

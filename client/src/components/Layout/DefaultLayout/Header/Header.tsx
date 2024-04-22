@@ -56,7 +56,7 @@ function Header() {
                         src="https://deo.shopeemobile.com/shopee/shopee-spx-live-vn/static/media/spx-express.f3023639.svg"
                         alt="SPX Express"
                     />
-                    {/* Hệ thống quản lý kho hàng */}
+                    &nbsp;Quản lý kho&nbsp;
                 </NavLink>
                 <Navbar.Toggle
                     aria-controls="basic-navbar-nav"

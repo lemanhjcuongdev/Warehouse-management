@@ -1,64 +1,58 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
-import { OnResultFunction, QrReader } from "react-qr-reader";
+// import { OnResultFunction, QrReader } from "react-qr-reader";
+import { Html5Qrcode, Html5QrcodeResult } from "html5-qrcode";
 
 function QRCodeScanner(props: { handleUpdateListData: (data: any) => void }) {
     const { handleUpdateListData } = props;
-    const [show, setShow] = useState("block");
+    const readerRef = useRef<HTMLDivElement>(null);
 
-    const handleResult: OnResultFunction = (result) => {
-        if (result?.getText()) {
-            const currentDetail = JSON.parse(result?.getText());
-            handleUpdateListData(currentDetail);
+    useEffect(() => {
+        function onScanSuccess(
+            decodedText: string,
+            decodedResult: Html5QrcodeResult
+        ) {
+            handleUpdateListData(JSON.parse(decodedResult.result.text));
         }
-    };
 
-    const handleToggleCamera = async () => {
-        const QRCamera = document.getElementById(
-            "qr_camera"
-        ) as HTMLVideoElement;
+        function onScanFailure(error: string) {}
 
-        if (show === "block") {
-            setShow("none");
-        } else {
-            setShow("block");
-        }
-    };
+        if (!readerRef.current) return;
 
-    return (
-        <>
-            <Button className="mb-3" onClick={handleToggleCamera}>
-                {show === "block" ? (
-                    <>
-                        <i className="fa-solid fa-video-slash"></i>
-                        &nbsp; Tắt
-                    </>
-                ) : (
-                    <>
-                        <i className="fa-solid fa-video"></i>
-                        &nbsp; Bật
-                    </>
-                )}{" "}
-                Camera
-            </Button>
+        const html5QRCodeScanner = new Html5Qrcode(readerRef.current.id);
+        const didStart = html5QRCodeScanner
+            .start(
+                {
+                    facingMode: "environment",
+                },
+                {
+                    fps: 5,
+                },
 
-            {show === "block" && (
-                <QrReader
-                    constraints={{ facingMode: "user" }}
-                    scanDelay={300}
-                    videoId="qr_camera"
-                    onResult={handleResult}
-                    videoStyle={{
-                        height: "auto",
-                    }}
-                    videoContainerStyle={{
-                        display: show,
-                        paddingTop: "70%",
-                    }}
-                />
-            )}
-        </>
-    );
+                onScanSuccess,
+                onScanFailure
+            )
+            .then(() => true)
+            .catch((error: string) => console.log(error));
+
+        return () => {
+            didStart
+                .then(() => {
+                    const videoElement = document.querySelector(
+                        "video"
+                    ) as HTMLVideoElement;
+                    videoElement.onplaying = () => {
+                        videoElement.pause();
+                        html5QRCodeScanner
+                            .stop()
+                            .catch(() => console.log("Avoid re-render"));
+                    };
+                })
+                .catch(() => console.log("Avoid re-render"));
+        };
+    }, [handleUpdateListData]);
+
+    return <div ref={readerRef} id="reader"></div>;
 }
 
 export default QRCodeScanner;

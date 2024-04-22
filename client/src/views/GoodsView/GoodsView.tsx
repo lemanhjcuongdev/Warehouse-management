@@ -99,7 +99,7 @@ function GoodsView() {
     return (
         <>
             <h2>Danh sách hàng hoá</h2>
-            {role === ROLE_ID.ASSURANCE_3 && (
+            {(role === ROLE_ID.ASSURANCE_3 || role === ROLE_ID.CEO_6) && (
                 <>
                     <Button
                         onClick={handleToggleShowModal}
@@ -109,7 +109,7 @@ function GoodsView() {
                         &nbsp; Thêm mặt hàng mới
                     </Button>
                     <Link to={"/list/import-orders"}>
-                        <Button className="my-3">
+                        <Button className="mt-1 mb-3 me-3">
                             <i className="fa-solid fa-arrow-right-to-bracket"></i>
                             &nbsp; Đặt đơn nhập kho mới
                         </Button>

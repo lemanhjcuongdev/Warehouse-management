@@ -61,7 +61,7 @@ function StocktakingReceiptView() {
     return (
         <>
             <h2 className="mb-3">Danh sách phiếu kiểm kê</h2>
-            {role === ROLE_ID.ASSURANCE_3 && (
+            {(role === ROLE_ID.ASSURANCE_3 || role === ROLE_ID.CEO_6) && (
                 <Button
                     onClick={handleToggleShowModal}
                     className="mb-3"

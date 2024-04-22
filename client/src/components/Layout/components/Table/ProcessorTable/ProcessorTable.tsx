@@ -23,15 +23,16 @@ function ProcessorTable(props: {
                 </tr>
             </thead>
             <tbody>
-                {listData.length &&
-                    listData.map((item, index) => (
-                        <ProcessorTableRow
-                            key={item.idExportReceipts}
-                            item={item}
-                            index={index}
-                            {...props}
-                        />
-                    ))}
+                {listData.length
+                    ? listData.map((item, index) => (
+                          <ProcessorTableRow
+                              key={item.idExportReceipts}
+                              item={item}
+                              index={index}
+                              {...props}
+                          />
+                      ))
+                    : null}
             </tbody>
         </Table>
     );

@@ -91,7 +91,7 @@ function ImportOrderView() {
 
     return (
         <>
-            <h2>Danh sách đơn nhập kho</h2>
+            <h2>Danh sách đơn đặt hàng từ nhà cung cấp</h2>
             <Tabs
                 defaultActiveKey="in-process"
                 activeKey={key}
@@ -117,7 +117,8 @@ function ImportOrderView() {
                             <>
                                 <hr />
                                 {key === "in-process" &&
-                                    role === ROLE_ID.ASSURANCE_3 && (
+                                    (role === ROLE_ID.ASSURANCE_3 ||
+                                        role === ROLE_ID.CEO_6) && (
                                         <Button
                                             onClick={handleToggleShowModal}
                                             className="mb-3"

@@ -184,6 +184,18 @@ class TransportReceiptController {
       //try to save order details
       transportDetailRepo.save(transportDetailArray)
 
+      //update status on the way in export receipt
+      transportDetails.forEach(async (receipt) => {
+        await exportReceiptRepo.update(
+          {
+            idExportReceipts: receipt.idExportReceipt
+          },
+          {
+            status: EXPORT_STATUS.IN_PROCESS_ON_THE_WAY
+          }
+        )
+      })
+
       //if ok
       res.status(STATUS.CREATED).send({
         ...transportReceipt,

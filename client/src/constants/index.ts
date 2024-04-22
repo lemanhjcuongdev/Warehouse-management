@@ -1,5 +1,6 @@
-// const API_ROOT = "http://localhost:3001"; //LOCALHOST
-const API_ROOT = "http://192.168.1.36:3001"; //HOME
+const API_ROOT = "http://localhost:3001"; //LOCALHOST
+// const API_ROOT = "http://192.168.1.36:3001"; //HOME
+// const API_ROOT = "http://192.168.230.70:3001"; //HOTSPOT
 // const API_ROOT = "http://192.168.1.167:3001"; //CLEVAI
 // const API_ROOT = "https://eternal-spider-mutually.ngrok-free.app";   //NGROK
 

@@ -15,6 +15,8 @@ import {
 } from "~/apis/provinceAPI";
 import ExportReceiptModal from "~/components/Layout/components/Modal/ExportReceiptModal";
 import ExportReceiptTable from "~/components/Layout/components/Table/ExportReceiptsTable/ExportReceiptTable";
+import { ROLE_ID } from "~/constants/roles";
+import useRole from "~/hooks/useRole";
 import {
     iExportDetailProps,
     iExportOrderProps,
@@ -23,8 +25,6 @@ import {
     iGoodsItemProps,
 } from "~/views/types";
 import { initialWarehouseDataState } from "../WarehouseView/WarehouseView";
-import useRole from "~/hooks/useRole";
-import { ROLE_ID } from "~/constants/roles";
 
 const initExportOrder: iExportOrderProps = {
     idExportOrders: 0,
@@ -243,6 +243,7 @@ function ExportReceiptView() {
             console.log("CÓ ĐƠN HÀNG MỚI")
         );
     };
+    //
 
     return (
         <>
@@ -271,7 +272,8 @@ function ExportReceiptView() {
                         {key === tab.eventKey && (
                             <>
                                 <hr />
-                                {role === ROLE_ID.OPERATION_1 && (
+                                {(role === ROLE_ID.OPERATION_1 ||
+                                    role === ROLE_ID.CEO_6) && (
                                     <>
                                         {key === "finished" && (
                                             <Button

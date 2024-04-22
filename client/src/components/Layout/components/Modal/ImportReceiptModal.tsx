@@ -573,7 +573,7 @@ function ImportReceiptModal(props: {
                     </Button>
                 ) : (
                     formData.status === 0 &&
-                    role === ROLE_ID.DIRECTOR_2 && (
+                    (role === ROLE_ID.DIRECTOR_2 || role === ROLE_ID.CEO_6) && (
                         <Button variant="dark" onClick={handleSoftDelete}>
                             Huỷ phiếu
                         </Button>

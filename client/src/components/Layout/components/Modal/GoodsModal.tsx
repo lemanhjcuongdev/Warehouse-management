@@ -615,17 +615,18 @@ function GoodsModal(props: {
                 <Button variant="secondary" type="reset" onClick={handleCancel}>
                     {modalType.type === "update" ? "Đóng" : "Huỷ"}
                 </Button>
-                {modalType.type === "create" ? (
-                    <Button
-                        variant="primary"
-                        type="submit"
-                        onClick={handleSubmitCreate}
-                    >
-                        Thêm mới
-                    </Button>
-                ) : (
-                    (role === ROLE_ID.ASSURANCE_3 ||
-                        role === ROLE_ID.OPERATION_1) && (
+                {(role === ROLE_ID.ASSURANCE_3 ||
+                    role === ROLE_ID.OPERATION_1 ||
+                    role === ROLE_ID.CEO_6) &&
+                    (modalType.type === "create" ? (
+                        <Button
+                            variant="primary"
+                            type="submit"
+                            onClick={handleSubmitCreate}
+                        >
+                            Thêm mới
+                        </Button>
+                    ) : (
                         <Button
                             variant="warning"
                             type="submit"
@@ -633,8 +634,7 @@ function GoodsModal(props: {
                         >
                             Cập nhật chỉnh sửa
                         </Button>
-                    )
-                )}
+                    ))}
             </Modal.Footer>
         </Modal>
     );

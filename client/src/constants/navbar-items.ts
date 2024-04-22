@@ -17,7 +17,7 @@ const navbar_items: iNavbarItem[] = [
                 roleIds: [2, 3, 6],
             },
             {
-                label: "Nhập hàng từ NCC",
+                label: "Đặt hàng từ NCC",
                 to: "/list/import-orders",
                 roleIds: [1, 2, 3, 4, 6],
             },

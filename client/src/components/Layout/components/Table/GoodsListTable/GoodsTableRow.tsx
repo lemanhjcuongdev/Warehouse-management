@@ -102,13 +102,15 @@ function GoodsTableRow(props: {
                             &nbsp; Xem thông tin chi tiết
                         </Dropdown.Item>
                         {(role === ROLE_ID.ASSURANCE_3 ||
-                            role === ROLE_ID.OPERATION_1) && (
+                            role === ROLE_ID.OPERATION_1 ||
+                            role === ROLE_ID.CEO_6) && (
                             <Dropdown.Item onClick={() => handleReadOrUpdate()}>
                                 <i className="fa-solid fa-pen-to-square"></i>
                                 &nbsp; Cập nhật thông tin
                             </Dropdown.Item>
                         )}
-                        {role === ROLE_ID.ASSURANCE_3 && (
+                        {(role === ROLE_ID.ASSURANCE_3 ||
+                            role === ROLE_ID.CEO_6) && (
                             <Dropdown.Item
                                 onClick={() => handleDelete(item.idGoods)}
                             >

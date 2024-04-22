@@ -182,7 +182,8 @@ function ProcessorView() {
                         {key === tab.eventKey && (
                             <>
                                 <hr />
-                                {role === ROLE_ID.OPERATION_1 && (
+                                {(role === ROLE_ID.OPERATION_1 ||
+                                    role === ROLE_ID.CEO_6) && (
                                     <Button
                                         onClick={handleToggleShowModal}
                                         className="mb-3"

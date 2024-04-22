@@ -213,8 +213,9 @@ function ProcessorModal(props: {
                                             ))}
                                     </Form.Select>
                                     <Form.Text muted>
-                                        Chỉ những phiếu đã xuất kho mới có thể
-                                        xử lý
+                                        {tabKey === "packed"
+                                            ? "Chỉ những phiếu đã xuất kho mới có thể xử lý"
+                                            : "Chỉ những đơn đã đóng gói mới có thể phân loại"}
                                     </Form.Text>
                                 </>
                             ) : (

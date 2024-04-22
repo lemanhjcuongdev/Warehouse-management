@@ -5,6 +5,7 @@ import { iWarehouseDataProps, iWarehouseItemProps } from "~/views/types";
 import { iModalTypes } from "../../Modal/types";
 import useGlobalState from "~/hooks/useGlobalState";
 import useRole from "~/hooks/useRole";
+import { ROLE_ID } from "~/constants/roles";
 
 function WarehouseTableRow(props: {
     item: iWarehouseItemProps;
@@ -100,7 +101,8 @@ function WarehouseTableRow(props: {
                             <i className="fa-solid fa-pen-to-square"></i>
                             &nbsp; Cập nhật thông tin
                         </Dropdown.Item>
-                        {role === 3 && (
+                        {(role === ROLE_ID.ASSURANCE_3 ||
+                            role === ROLE_ID.CEO_6) && (
                             <Dropdown.Item
                                 onClick={() => handleDelete(item.idWarehouse)}
                             >

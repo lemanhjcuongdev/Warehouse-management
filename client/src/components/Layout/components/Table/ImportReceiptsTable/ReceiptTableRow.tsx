@@ -91,7 +91,8 @@ function ReceiptTableRow(props: {
                                 <i className="fa-solid fa-receipt"></i>
                                 &nbsp; Xem thông tin chi tiết
                             </Dropdown.Item>
-                            {role === ROLE_ID.DIRECTOR_2 && (
+                            {(role === ROLE_ID.DIRECTOR_2 ||
+                                role === ROLE_ID.CEO_6) && (
                                 <Dropdown.Item
                                     onClick={() =>
                                         handleDelete(item.idImportReceipts)

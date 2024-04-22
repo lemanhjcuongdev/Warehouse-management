@@ -9,7 +9,7 @@ function TransportReceiptDetailTable(props: {
     setFormData: Dispatch<SetStateAction<iTransportReceiptProps>>;
     modalType: iModalTypes;
 }) {
-    const { listData, modalType } = props;
+    const { listData } = props;
     return (
         <Table striped bordered hover responsive>
             <thead>
@@ -19,15 +19,16 @@ function TransportReceiptDetailTable(props: {
                 </tr>
             </thead>
             <tbody>
-                {listData.length &&
-                    listData.map((item, index) => (
-                        <TransportReceiptDetailTableRow
-                            key={item.idExportReceipt}
-                            item={item}
-                            index={index}
-                            {...props}
-                        />
-                    ))}
+                {listData.length
+                    ? listData.map((item, index) => (
+                          <TransportReceiptDetailTableRow
+                              key={item.idExportReceipt}
+                              item={item}
+                              index={index}
+                              {...props}
+                          />
+                      ))
+                    : null}
             </tbody>
         </Table>
     );

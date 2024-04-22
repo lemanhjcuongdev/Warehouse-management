@@ -64,8 +64,6 @@ function ImportOrderModal(props: {
         setKey,
     } = props;
     const [validated, setValidated] = useState(false);
-    const importDateRef = useRef<HTMLInputElement>(null);
-    const expRef = useRef<HTMLInputElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
     let title: string;
     const [goods, setGoods] = useState<iGoodsItemProps[]>([]);
@@ -110,12 +108,14 @@ function ImportOrderModal(props: {
                         >
                             Huỷ đơn
                         </Button>
-                        {role === ROLE_ID.ACCOUNTANT_4 && (
+                        {(role === ROLE_ID.ACCOUNTANT_4 ||
+                            role === ROLE_ID.CEO_6) && (
                             <Button onClick={() => handleUpdateStatus(1)}>
                                 KT duyệt
                             </Button>
                         )}
-                        {role === ROLE_ID.DIRECTOR_2 && (
+                        {(role === ROLE_ID.DIRECTOR_2 ||
+                            role === ROLE_ID.CEO_6) && (
                             <Button
                                 variant="info"
                                 onClick={() => handleUpdateStatus(2)}
@@ -134,7 +134,8 @@ function ImportOrderModal(props: {
                         >
                             Huỷ đơn
                         </Button>
-                        {role === ROLE_ID.DIRECTOR_2 && (
+                        {(role === ROLE_ID.DIRECTOR_2 ||
+                            role === ROLE_ID.CEO_6) && (
                             <Button
                                 variant="info"
                                 onClick={() => handleUpdateStatus(2)}
@@ -410,7 +411,8 @@ function ImportOrderModal(props: {
                                             Nhà cung cấp &nbsp;
                                         </FormLabel>
                                         {(role === ROLE_ID.DIRECTOR_2 ||
-                                            role === ROLE_ID.ASSURANCE_3) && (
+                                            role === ROLE_ID.ASSURANCE_3 ||
+                                            role === ROLE_ID.CEO_6) && (
                                             <Link to={"/list/providers/create"}>
                                                 <Button
                                                     size="sm"
