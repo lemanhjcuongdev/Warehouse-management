@@ -38,20 +38,6 @@ interface iImportReceiptRequestBody {
   idUpdated: number
   updatedAt: string
 }
-
-//DEFECTIVE RECORDS
-interface iDefectiveRecordRequestBody {
-  idDefectiveRecords: number
-  date: string
-  idWarehouse: number
-  idUser: number
-  idImportOrder: number
-  quality: string
-  defectiveRating: number
-  solution: string
-  updatedAt: string
-  idUpdated: number
-}
 //EXPORT ORDERS
 interface iExportOrderReqBody {
   provinceCode: string
@@ -120,7 +106,6 @@ export type {
   iCreateOrderRequestBody,
   iUpdateOrderRequestBody,
   iImportReceiptRequestBody,
-  iDefectiveRecordRequestBody,
   iExportOrderReqBody,
   iExportReceiptReqBody,
   iTransportReceipt,

@@ -16,6 +16,7 @@ importingRouter.delete('/orders/:id', [checkJwt], importOrderController.softDele
 //IMPORT RECEIPT
 importingRouter.post('/receipts/', [checkJwt, checkRole], importReceiptController.createImportReceipt)
 importingRouter.get('/receipts/id/:id', [checkJwt, checkRole], importReceiptController.getImportReceiptById)
+importingRouter.get('/receipts/date', [checkJwt], importReceiptController.filterImportReceiptsByDate)
 importingRouter.get(
   '/receipts/status/:status',
   [checkJwt, checkRole],

@@ -1,6 +1,10 @@
 import { API_ROOT } from "~/constants";
 import { getCookie } from "~/utils/cookies";
-import { iExportReceiptItemProps, iExportReceiptProps } from "~/views/types";
+import {
+    iExportReceiptItemProps,
+    iExportReceiptProps,
+    iExportReport,
+} from "~/views/types";
 
 const getAllExportReceiptByStatus = async (status: number) => {
     try {
@@ -21,6 +25,35 @@ const getAllExportReceiptByStatus = async (status: number) => {
             init
         );
         const data: iExportReceiptItemProps[] = await res.json();
+
+        return data;
+    } catch (error) {
+        throw new Error();
+    }
+};
+
+const filterExportReceiptsByDate = async (
+    startDate: string,
+    endDate: string
+) => {
+    try {
+        const jwt = getCookie("jwt");
+        if (!jwt) {
+            throw new Error("Hết phiên đăng nhập");
+        }
+        const init: RequestInit = {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: jwt,
+            },
+        };
+
+        const res = await fetch(
+            `${API_ROOT}/export/receipts/date?startDate=${startDate}&endDate=${endDate}`,
+            init
+        );
+        const data: iExportReport[] = await res.json();
 
         return data;
     } catch (error) {
@@ -161,4 +194,5 @@ export {
     getExportReceiptById,
     softDeleteExportReceipt,
     updateExportReceipt,
+    filterExportReceiptsByDate,
 };

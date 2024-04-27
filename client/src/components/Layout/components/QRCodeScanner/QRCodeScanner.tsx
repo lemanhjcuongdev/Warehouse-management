@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { Button } from "react-bootstrap";
-// import { OnResultFunction, QrReader } from "react-qr-reader";
+import { useEffect, useRef } from "react";
 import { Html5Qrcode, Html5QrcodeResult } from "html5-qrcode";
 
-function QRCodeScanner(props: { handleUpdateListData: (data: any) => void }) {
-    const { handleUpdateListData } = props;
+function QRCodeScanner(props: {
+    handleUpdateListData: (data: any) => void;
+    show: boolean;
+}) {
+    const { handleUpdateListData, show } = props;
     const readerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -50,9 +51,9 @@ function QRCodeScanner(props: { handleUpdateListData: (data: any) => void }) {
                 })
                 .catch(() => console.log("Avoid re-render"));
         };
-    }, [handleUpdateListData]);
+    }, []);
 
-    return <div ref={readerRef} id="reader"></div>;
+    return <>{show ? <div ref={readerRef} id="reader"></div> : null}</>;
 }
 
 export default QRCodeScanner;

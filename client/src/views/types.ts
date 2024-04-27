@@ -162,21 +162,6 @@ interface iImportReceiptProps {
     usernameUpdated?: string;
 }
 
-//DEFECTIVE RECORDS
-interface iDefectiveRecordProps {
-    idDefectiveRecords: number;
-    date: string;
-    idWarehouse?: number;
-    idUser?: number;
-    idImportOrder: number;
-    quality?: string;
-    defectiveRating?: number;
-    solution?: string;
-    updatedAt?: string;
-    idUpdated?: number;
-    usernameUpdated?: string;
-}
-
 //EXPORT ORDER PROPS
 interface iExportOrderProps {
     idExportOrders?: number;
@@ -207,7 +192,7 @@ interface iExportReceiptItemProps {
     status: number;
     reasonFailed?: string;
 }
-//PROCESSOR PROPS
+//EXPORT RECEIPT PROPS
 interface iExportReceiptProps {
     idExportReceipts: number;
     idWarehouse: number;
@@ -315,6 +300,105 @@ interface iStocktakingDetail {
     idGoods2?: iGoodsProps;
 }
 
+//REPORT
+interface iReport {
+    startDate: string;
+    endDate: string;
+    goods: iGoodsItemProps[];
+    importReceipts: iImportReport[];
+    exportReceipts: iExportReport[];
+    stocktakingReceipts: iStocktakingReport[];
+    reportDetails: iReportDetail[];
+    userCreated: string;
+}
+interface iReportDetail {
+    idGoods: number;
+    name: string;
+    unit: string;
+    beginningAmount: number;
+    importedAmount: number;
+    exportedAmount: number;
+    endedAmount: number;
+}
+
+interface iImportReport {
+    idImportReceipts: number;
+    status: number;
+    importDate: string;
+    idWarehouse2: {
+        idWarehouse: number;
+        name: string;
+        provinceCode: string;
+    };
+    idImportOrder2: {
+        idImportOrders: number;
+        importOrderDetails: {
+            idImportOrderDetails: number;
+            amount: number;
+            idGoods2: {
+                idGoods: number;
+                amount: number;
+                name: string;
+                idUnit2: {
+                    idGoodsUnits: number;
+                    name: string;
+                };
+            };
+        }[];
+    };
+}
+
+interface iExportReport {
+    idExportReceipts: number;
+    status: number;
+    exportDate: string;
+    idWarehouse2: {
+        idWarehouse: number;
+        name: string;
+        provinceCode: string;
+    };
+    idExportOrder2: {
+        idExportOrders: number;
+        exportOrderDetails: {
+            idExportOrderDetails: number;
+            amount: number;
+            idGoods2: {
+                idGoods: number;
+                amount: number;
+                name: string;
+                idUnit2: {
+                    idGoodsUnits: number;
+                    name: string;
+                };
+            };
+        }[];
+    };
+}
+
+interface iStocktakingReport {
+    idStocktakingReceipts: number;
+    date: string;
+    idWarehouse2: {
+        idWarehouse: number;
+        name: string;
+        provinceCode: string;
+    };
+    stocktakingDetails: {
+        idStocktakingDetails: number;
+        amount: number;
+        storedAmount: number;
+        idGoods2: {
+            idGoods: number;
+            amount: number;
+            name: string;
+            idUnit2: {
+                idGoodsUnits: number;
+                name: string;
+            };
+        };
+    }[];
+}
+
 export type {
     iUserDataProps,
     iUserItemProps,
@@ -330,7 +414,6 @@ export type {
     iImportOrderDetailProps,
     iImportReceiptProps,
     iImportReceiptItemProps,
-    iDefectiveRecordProps,
     iExportOrderProps,
     iExportDetailProps,
     iExportReceiptItemProps,
@@ -341,4 +424,9 @@ export type {
     iStocktakingReceiptProps,
     iStocktakingReceiptItemProps,
     iStocktakingDetail,
+    iReport,
+    iImportReport,
+    iExportReport,
+    iStocktakingReport,
+    iReportDetail,
 };

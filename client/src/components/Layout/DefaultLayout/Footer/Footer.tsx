@@ -1,9 +1,9 @@
 function Footer() {
     return (
-        <>
-            <hr className="m-0" />
+        <div>
+            <hr className="mt-6" />
             <p className="text-center">Đồ án tốt nghiệp - Lê Mạnh Cường</p>
-        </>
+        </div>
     );
 }
 

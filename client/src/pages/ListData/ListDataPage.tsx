@@ -1,5 +1,4 @@
 import { useParams } from "react-router-dom";
-import DefectiveRecordView from "~/views/DefectiveRecordView/DefectiveRecordView";
 import ExportReceiptView from "~/views/ExportReceiptView/ExportReceiptView";
 import GoodsPropsView from "~/views/GoodsPropsView/GoodsPropsView";
 import GoodsView from "~/views/GoodsView/GoodsView";
@@ -28,8 +27,6 @@ function ListData() {
             return <GoodsView />;
         case "import-orders":
             return <ImportOrderView />;
-        case "defective-records":
-            return <DefectiveRecordView />;
         case "import-receipts":
             return <ImportReceiptView />;
         case "export-receipts":

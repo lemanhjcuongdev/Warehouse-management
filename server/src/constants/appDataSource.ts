@@ -1,7 +1,6 @@
-import { DataSource } from 'typeorm'
 import dotenv from 'dotenv'
+import { DataSource } from 'typeorm'
 
-import { DefectiveRecords } from '~/models/entities/DefectiveRecords'
 import { ExportOrderDetails } from '~/models/entities/ExportOrderDetails'
 import { ExportOrders } from '~/models/entities/ExportOrders'
 import { ExportReceipts } from '~/models/entities/ExportReceipts'
@@ -52,8 +51,7 @@ export const appDataSource = new DataSource({
     GoodsUnits,
     ExportReceipts,
     ExportOrders,
-    ExportOrderDetails,
-    DefectiveRecords
+    ExportOrderDetails
   ],
   subscribers: [],
   migrations: []

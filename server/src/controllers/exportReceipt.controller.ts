@@ -8,6 +8,7 @@ import { Users } from '~/models/entities/Users'
 import { iExportReceiptReqBody } from './types'
 import EXPORT_STATUS from '~/constants/ExportOrderStatusCode'
 import { ExportOrders } from '~/models/entities/ExportOrders'
+import { And, LessThan, MoreThanOrEqual } from 'typeorm'
 
 dotenv.config()
 
@@ -29,7 +30,7 @@ class ExportReceiptController {
         order: {
           exportDate: 'DESC'
         },
-        relations: ['idWarehouse2', 'idExportOrder2', 'idExportOrder2.exportOrderDetails.idGoods2']
+        relations: ['idWarehouse2', 'idExportOrder2.exportOrderDetails.idGoods2']
       })
       res.status(STATUS.SUCCESS).send(exportReceipt)
     } catch (error) {
@@ -38,6 +39,58 @@ class ExportReceiptController {
       })
     }
   }
+
+  async filterExportReceiptsByDate(req: Request, res: Response, next: NextFunction) {
+    //get query string
+    const startDate = req.query.startDate as string
+    const endDate = req.query.endDate as string
+
+    try {
+      //get all ExportReceipt from DB
+      const exportReceipt = await exportReceiptRepo.find({
+        select: {
+          idExportReceipts: true,
+          status: true,
+          exportDate: true,
+          idWarehouse2: {
+            idWarehouse: true,
+            name: true,
+            provinceCode: true
+          },
+          idExportOrder2: {
+            idExportOrders: true,
+            exportOrderDetails: {
+              idExportOrderDetails: true,
+              amount: true,
+              idGoods2: {
+                idGoods: true,
+                amount: true,
+                name: true,
+                idUnit2: {
+                  idGoodsUnits: true,
+                  name: true
+                }
+              }
+            }
+          }
+        },
+        where: {
+          status: And(MoreThanOrEqual(EXPORT_STATUS.IN_PROCESS_CREATED), LessThan(EXPORT_STATUS.FAILED)),
+          exportDate: And(LessThan(new Date(endDate)), MoreThanOrEqual(new Date(startDate)))
+        },
+        order: {
+          exportDate: 'ASC'
+        },
+        relations: ['idWarehouse2', 'idExportOrder2.exportOrderDetails.idGoods2.idUnit2']
+      })
+      res.status(STATUS.SUCCESS).send(exportReceipt)
+    } catch (error) {
+      res.status(STATUS.BAD_REQUEST).send({
+        error: 'Trạng thái phiếu xuất không đúng'
+      })
+    }
+  }
+
   //[GET /ExportReceipt/:id]
   async getExportReceiptById(req: Request, res: Response, next: NextFunction) {
     //get id from query string

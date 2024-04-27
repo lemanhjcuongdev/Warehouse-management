@@ -68,7 +68,7 @@ const navbar_items: iNavbarItem[] = [
     {
         label: "Báo cáo / Kiểm kê",
         to: "#",
-        roleIds: [1, 2, 3, 4, 6],
+        roleIds: [2, 3, 4, 6],
         children: [
             {
                 label: "Kiểm kê kho",
@@ -77,13 +77,8 @@ const navbar_items: iNavbarItem[] = [
             },
             {
                 label: "Báo cáo nhập - xuất - tồn",
-                to: "/list/stock-taking",
+                to: "/report",
                 roleIds: [2, 3, 4, 6],
-            },
-            {
-                label: "Biên bản hàng lỗi, hỏng",
-                to: "/list/defective-records",
-                roleIds: [1, 2, 3, 4, 6],
             },
         ],
     },

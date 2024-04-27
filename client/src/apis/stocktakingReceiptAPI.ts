@@ -3,6 +3,7 @@ import { getCookie } from "~/utils/cookies";
 import {
     iStocktakingReceiptItemProps,
     iStocktakingReceiptProps,
+    iStocktakingReport,
 } from "~/views/types";
 
 const getAllStocktakingReceipts = async () => {
@@ -24,6 +25,35 @@ const getAllStocktakingReceipts = async () => {
             init
         );
         const data: iStocktakingReceiptItemProps[] = await res.json();
+
+        return data;
+    } catch (error) {
+        throw new Error();
+    }
+};
+
+const filterStocktakingReceiptsByDate = async (
+    startDate: string,
+    endDate: string
+) => {
+    try {
+        const jwt = getCookie("jwt");
+        if (!jwt) {
+            throw new Error("Hết phiên đăng nhập");
+        }
+        const init: RequestInit = {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: jwt,
+            },
+        };
+
+        const res = await fetch(
+            `${API_ROOT}/stocktaking/date?startDate=${startDate}&endDate=${endDate}`,
+            init
+        );
+        const data: iStocktakingReport[] = await res.json();
 
         return data;
     } catch (error) {
@@ -127,6 +157,7 @@ const updateStocktakingReceipt = async (
 
 export {
     createStocktakingReceipt,
+    filterStocktakingReceiptsByDate,
     getAllStocktakingReceipts,
     getStocktakingReceiptById,
     updateStocktakingReceipt,

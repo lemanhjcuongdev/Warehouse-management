@@ -20,6 +20,7 @@ exportingRouter.get(
   [checkJwt, checkRole],
   exportReceiptController.getAllExportReceiptsByStatus
 )
+exportingRouter.get('/receipts/date', [checkJwt], exportReceiptController.filterExportReceiptsByDate)
 exportingRouter.patch('/receipts/:id', [checkJwt, checkRole], exportReceiptController.editExportReceiptById)
 exportingRouter.delete('/receipts/:id', [checkJwt, checkRole], exportReceiptController.softDeleteExportReceiptById)
 

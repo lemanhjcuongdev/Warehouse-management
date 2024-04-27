@@ -130,7 +130,7 @@ function ProcessorView() {
                 break;
         }
         getAllExportReceiptByStatus(statusCode).then((data) => {
-            if (!data.length) return;
+            if (!data) return;
             let filteredData: iExportReceiptItemProps[] = [];
             if (isHeavy) {
                 for (const receipt of data) {

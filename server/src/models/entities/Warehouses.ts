@@ -1,5 +1,4 @@
 import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
-import { DefectiveRecords } from './DefectiveRecords'
 import { ExportReceipts } from './ExportReceipts'
 import { Goods } from './Goods'
 import { ImportReceipts } from './ImportReceipts'
@@ -48,9 +47,6 @@ export class Warehouses {
 
   @Column('tinyint', { name: 'disabled' })
   disabled: number
-
-  @OneToMany(() => DefectiveRecords, (defectiveRecords) => defectiveRecords.idWarehouse2)
-  defectiveRecords: DefectiveRecords[]
 
   @OneToMany(() => ExportReceipts, (exportReceipts) => exportReceipts.idWarehouse2)
   exportReceipts: ExportReceipts[]

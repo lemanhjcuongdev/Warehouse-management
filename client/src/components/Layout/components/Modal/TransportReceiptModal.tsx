@@ -521,6 +521,7 @@ function TransportReceiptModal(props: {
                                         </Form.Label>
                                         <br />
                                         <QRCodeScanner
+                                            show={show}
                                             handleUpdateListData={
                                                 handleUpdateTransportDetail
                                             }

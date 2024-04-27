@@ -6,6 +6,7 @@ const initialState: iStateProps = {
     isAuthentication: false,
     userId: -1,
     username: "",
+    name: "",
     role: 0,
 };
 

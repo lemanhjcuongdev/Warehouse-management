@@ -26,7 +26,7 @@ class ExportOrderController {
         order: {
           orderDate: 'ASC'
         },
-        relations: ['exportOrderDetails']
+        relations: ['exportOrderDetails.idGoods2']
       })
       res.status(STATUS.SUCCESS).send(exportOrder)
     } catch (error) {
@@ -55,7 +55,7 @@ class ExportOrderController {
         where: {
           idExportOrders: id
         },
-        relations: ['exportOrderDetails']
+        relations: ['exportOrderDetails.idGoods2']
       })
       res.status(STATUS.SUCCESS).send(exportOrder)
     } catch (error) {

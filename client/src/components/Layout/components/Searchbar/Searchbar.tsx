@@ -30,6 +30,7 @@ function SearchBar(props: iSearchBarProps) {
                         type="text"
                         name="q"
                         ref={inputSearch}
+                        autoComplete="off"
                         placeholder="Tìm kiếm trong danh sách ..."
                         className=" mr-sm-2"
                         onChange={onChange}

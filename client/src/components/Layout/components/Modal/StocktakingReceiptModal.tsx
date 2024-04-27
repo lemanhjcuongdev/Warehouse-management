@@ -291,8 +291,8 @@ function StocktakingReceiptModal(props: {
             backdrop={modalType.type === "create" ? "static" : undefined}
             show={show}
             onHide={handleCancel}
-            keyboard={false}
-            fullscreen={true}
+            keyboard={modalType.type === "create" ? false : true}
+            fullscreen={modalType.type === "create" ? true : undefined}
             size="xl"
         >
             <Modal.Header closeButton>
@@ -352,6 +352,7 @@ function StocktakingReceiptModal(props: {
                                         sm="6"
                                     >
                                         <QRCodeScanner
+                                            show={show}
                                             handleUpdateListData={
                                                 handleUpdateDetailList
                                             }

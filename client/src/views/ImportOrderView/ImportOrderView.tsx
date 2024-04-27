@@ -34,9 +34,7 @@ function ImportOrderView() {
     const [key, setKey] = useState("in-process");
     const [showModal, setShowModal] = useState(initShowModal);
     const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
-    const [listData, setListData] = useState<iImportOrderProps[]>([
-        initImportOrderData,
-    ]);
+    const [listData, setListData] = useState<iImportOrderProps[]>([]);
     const [formData, setFormData] =
         useState<iImportOrderProps>(initImportOrderData);
     const role = useRole();

@@ -2,7 +2,6 @@ import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeor
 import * as bcrypt from 'bcryptjs'
 import * as dotenv from 'dotenv'
 
-import { DefectiveRecords } from './DefectiveRecords'
 import { ExportReceipts } from './ExportReceipts'
 import { ImportReceipts } from './ImportReceipts'
 import { PermissionDetails } from './PermissionDetails'
@@ -63,9 +62,6 @@ export class Users {
 
   @Column('tinyint', { name: 'disabled', nullable: true, default: () => 0 })
   disabled: number
-
-  @OneToMany(() => DefectiveRecords, (defectiveRecords) => defectiveRecords.idUser2)
-  defectiveRecords: DefectiveRecords[]
 
   @OneToMany(() => ExportReceipts, (exportReceipts) => exportReceipts.idUserExport2)
   exportReceipts: ExportReceipts[]

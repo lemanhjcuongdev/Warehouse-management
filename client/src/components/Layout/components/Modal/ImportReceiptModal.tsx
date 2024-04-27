@@ -67,9 +67,7 @@ function ImportReceiptModal(props: {
     let title: string;
     const [goods, setGoods] = useState<iGoodsItemProps[]>([]);
     const [warehouses, setWarehouses] = useState<iWarehouseItemProps[]>([]);
-    const [importOrders, setImportOrders] = useState<iImportOrderProps[]>([
-        initImportOrderData,
-    ]);
+    const [importOrders, setImportOrders] = useState<iImportOrderProps[]>([]);
     const [currentOrder, setCurrentOrder] =
         useState<iImportOrderProps>(initImportOrderData);
     const role = useRole();
@@ -126,6 +124,7 @@ function ImportReceiptModal(props: {
                             idImportOrder2: {
                                 ...order,
                             },
+                            idWarehouse: 4,
                             idProvider: order.idProvider,
                         }));
                     }
@@ -138,29 +137,29 @@ function ImportReceiptModal(props: {
                 }));
         }
     };
-    const handleUpdateListData = (data: iImportOrderDetailProps) => {
-        const newListData = formData.idImportOrder2.importOrderDetails.map(
-            (detail) => {
-                if (
-                    detail.idImportOrder === data.idImportOrder &&
-                    detail.idGoods === data.idGoods &&
-                    detail.amount === data.amount
-                ) {
-                    detail.checked = true;
-                }
-                return detail;
-            }
-        );
-        setFormData((prev) => {
-            return {
-                ...prev,
-                idImportOrder2: {
-                    ...formData.idImportOrder2,
-                    importOrderDetails: newListData,
-                },
-            };
-        });
-    };
+    // const handleUpdateListData = (data: iImportOrderDetailProps) => {
+    //     const newListData = formData.idImportOrder2.importOrderDetails.map(
+    //         (detail) => {
+    //             if (
+    //                 detail.idImportOrder === data.idImportOrder &&
+    //                 detail.idGoods === data.idGoods &&
+    //                 detail.amount === data.amount
+    //             ) {
+    //                 detail.checked = true;
+    //             }
+    //             return detail;
+    //         }
+    //     );
+    //     setFormData((prev) => {
+    //         return {
+    //             ...prev,
+    //             idImportOrder2: {
+    //                 ...formData.idImportOrder2,
+    //                 importOrderDetails: newListData,
+    //             },
+    //         };
+    //     });
+    // };
 
     const customValidateDate = () => {
         const importDate = importDateRef.current;
@@ -294,6 +293,7 @@ function ImportReceiptModal(props: {
         setValidated(false);
         onHide();
     };
+    console.log(importOrders);
 
     return (
         <Modal
@@ -328,28 +328,38 @@ function ImportReceiptModal(props: {
                                             value={formData.idImportOrder}
                                             onChange={handleChangeReceiptInput}
                                         >
-                                            <option value="">
+                                            <option value={0}>
                                                 ------Chọn đơn nhập kho------
                                             </option>
-                                            {importOrders.map((order) => (
-                                                <option
-                                                    key={order.idImportOrders}
-                                                    value={order.idImportOrders}
-                                                >
-                                                    ID: {order.idImportOrders} -{" "}
-                                                    NCC:{" "}
-                                                    {order.idProvider2?.name}-{" "}
-                                                    Ngày đặt:{" "}
-                                                    {stringToDate(
-                                                        order.orderDate
-                                                    )}{" "}
-                                                    - SL:{" "}
-                                                    {
-                                                        order.importOrderDetails
-                                                            .length
-                                                    }
-                                                </option>
-                                            ))}
+                                            {importOrders.length &&
+                                                importOrders.map((order) => (
+                                                    <option
+                                                        key={
+                                                            order.idImportOrders
+                                                        }
+                                                        value={
+                                                            order.idImportOrders
+                                                        }
+                                                    >
+                                                        ID:{" "}
+                                                        {order.idImportOrders} -{" "}
+                                                        NCC:{" "}
+                                                        {
+                                                            order.idProvider2
+                                                                ?.name
+                                                        }
+                                                        - Ngày đặt:{" "}
+                                                        {stringToDate(
+                                                            order.orderDate
+                                                        )}{" "}
+                                                        - SL:{" "}
+                                                        {
+                                                            order
+                                                                .importOrderDetails
+                                                                .length
+                                                        }
+                                                    </option>
+                                                ))}
                                         </Form.Select>
                                         <Form.Text muted>
                                             Chỉ những đơn đã hoàn thành mới có
@@ -442,63 +452,6 @@ function ImportReceiptModal(props: {
                                 )}
                             </Form.Group>
                             <hr />
-                            {/* {formData.status === 0 &&
-                                modalType.type === "create" && (
-                                    <>
-                                        <Accordion
-                                            defaultActiveKey={
-                                                modalType.type === "create"
-                                                    ? "0"
-                                                    : ""
-                                            }
-                                        >
-                                            <Accordion.Item eventKey="0">
-                                                <Accordion.Header>
-                                                    <span
-                                                        style={{
-                                                            fontWeight: "bold",
-                                                        }}
-                                                    >
-                                                        Nhập hàng vào kho
-                                                    </span>
-                                                </Accordion.Header>
-                                                <Accordion.Body>
-                                                    <Form.Group>
-                                                        <Form.Label>
-                                                            <h5>
-                                                                Quét mã QR để
-                                                                nhập hàng
-                                                            </h5>
-                                                        </Form.Label>
-                                                    </Form.Group>
-                                                    <Form.Group>
-                                                        {formData.idImportOrder !==
-                                                            0 && (
-                                                            <QRCodeScanner
-                                                                handleUpdateListData={
-                                                                    handleUpdateListData
-                                                                }
-                                                            />
-                                                        )}
-                                                        <br />
-                                                        <Form.Text muted>
-                                                            Mặt hàng và số lượng
-                                                            sẽ tuân theo đơn
-                                                            nhập kho
-                                                            <br />
-                                                            Nếu không thể sử
-                                                            dụng mã QR, vui lòng
-                                                            kiểm tra kỹ và tích
-                                                            vào các chi tiết
-                                                            phiếu!
-                                                        </Form.Text>
-                                                    </Form.Group>
-                                                </Accordion.Body>
-                                            </Accordion.Item>
-                                        </Accordion>
-                                        <hr />
-                                    </>
-                                )} */}
                         </Col>
 
                         <Col lg={6}>

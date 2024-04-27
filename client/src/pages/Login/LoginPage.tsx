@@ -62,6 +62,7 @@ function Login() {
                 actions.setAuthentication({
                     userId: data.userId,
                     username: data.username,
+                    name: data.name,
                     role: roleIdGenerator(data.idPermissions),
                 })
             );

@@ -174,6 +174,7 @@ function ProcessorModal(props: {
                         {modalType.type === "create" && (
                             <Form.Group>
                                 <QRCodeScanner
+                                    show={show}
                                     handleUpdateListData={handleUpdateListData}
                                 />
                             </Form.Group>

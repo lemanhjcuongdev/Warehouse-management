@@ -28,7 +28,7 @@ class AuthController {
     let user: Users
     try {
       user = await userRepository.findOneOrFail({
-        select: ['username', 'password', 'idUsers'],
+        select: ['username', 'password', 'idUsers', 'name'],
         where: {
           username,
           disabled: 0
@@ -69,7 +69,8 @@ class AuthController {
       userId: user.idUsers,
       username,
       idPermissions,
-      token
+      token,
+      name: user.name
     })
   }
 

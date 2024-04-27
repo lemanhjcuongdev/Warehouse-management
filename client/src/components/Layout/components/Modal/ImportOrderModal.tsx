@@ -19,7 +19,7 @@ import {
     Modal,
     Row,
 } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getAllGoods } from "~/apis/goodsAPI";
 import {
     createImportOrder,
@@ -75,6 +75,7 @@ function ImportOrderModal(props: {
     const [currentDetail, setCurrentDetail] =
         useState<iImportOrderDetailProps>(initDetail);
     const role = useRole();
+    const navigate = useNavigate();
 
     switch (modalType.type) {
         case "create":
@@ -393,7 +394,7 @@ function ImportOrderModal(props: {
             size="xl"
         >
             <Modal.Header closeButton>
-                <Modal.Title>{`${title} đơn nhập kho`}</Modal.Title>
+                <Modal.Title>{`${title} đơn đặt hàng từ NCC`}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form

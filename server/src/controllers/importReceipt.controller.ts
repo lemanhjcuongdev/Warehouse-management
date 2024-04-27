@@ -6,6 +6,8 @@ import STATUS from '~/constants/statusCode'
 import { ImportReceipts } from '~/models/entities/ImportReceipts'
 import { Users } from '~/models/entities/Users'
 import { iImportReceiptRequestBody } from './types'
+import { And, Equal, LessThan, MoreThanOrEqual } from 'typeorm'
+import IMPORT_STATUS from '~/constants/ImportOrderStatusCode'
 
 dotenv.config()
 
@@ -35,6 +37,58 @@ class ImportReceiptController {
       })
     }
   }
+
+  async filterImportReceiptsByDate(req: Request, res: Response, next: NextFunction) {
+    //get query string
+    const startDate = req.query.startDate as string
+    const endDate = req.query.endDate as string
+
+    try {
+      //get all ImportReceipt from DB
+      const importReceipt = await importReceiptRepo.find({
+        select: {
+          idImportReceipts: true,
+          status: true,
+          importDate: true,
+          idWarehouse2: {
+            idWarehouse: true,
+            name: true,
+            provinceCode: true
+          },
+          idImportOrder2: {
+            idImportOrders: true,
+            importOrderDetails: {
+              idImportOrderDetails: true,
+              amount: true,
+              idGoods2: {
+                idGoods: true,
+                amount: true,
+                name: true,
+                idUnit2: {
+                  idGoodsUnits: true,
+                  name: true
+                }
+              }
+            }
+          }
+        },
+        where: {
+          status: Equal(0),
+          importDate: And(LessThan(new Date(endDate)), MoreThanOrEqual(new Date(startDate)))
+        },
+        order: {
+          importDate: 'ASC'
+        },
+        relations: ['idWarehouse2', 'idImportOrder2.importOrderDetails.idGoods2.idUnit2']
+      })
+      res.status(STATUS.SUCCESS).send(importReceipt)
+    } catch (error) {
+      res.status(STATUS.BAD_REQUEST).send({
+        error: 'Trạng thái phiếu nhập không đúng'
+      })
+    }
+  }
+
   //[GET /ImportReceipt/:id]
   async getImportReceiptById(req: Request, res: Response, next: NextFunction) {
     //get id from query string

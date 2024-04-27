@@ -13,6 +13,7 @@ const postLogin = async (loginData: { username: string; password: string }) => {
         const data: {
             userId: number;
             username: string;
+            name: string;
             token: string;
             idPermissions: number[];
             error?: string;

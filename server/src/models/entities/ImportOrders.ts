@@ -1,8 +1,7 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
-import { DefectiveRecords } from './DefectiveRecords'
 import { ImportOrderDetails } from './ImportOrderDetails'
-import { Providers } from './Providers'
 import { ImportReceipts } from './ImportReceipts'
+import { Providers } from './Providers'
 
 @Index('FK_import_provider_idx', ['idProvider'], {})
 @Entity('import_orders', { schema: 'quanlykho' })
@@ -37,9 +36,6 @@ export class ImportOrders {
 
   @Column('int', { name: 'pallet_code' })
   palletCode: number
-
-  @OneToMany(() => DefectiveRecords, (defectiveRecords) => defectiveRecords.idImportOrder2)
-  defectiveRecords: DefectiveRecords[]
 
   @OneToMany(() => ImportOrderDetails, (importOrderDetails) => importOrderDetails.idImportOrder2)
   importOrderDetails: ImportOrderDetails[]

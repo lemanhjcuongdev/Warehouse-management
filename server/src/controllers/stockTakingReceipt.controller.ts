@@ -7,6 +7,7 @@ import { StocktakingDetails } from '~/models/entities/StocktakingDetails'
 import { StocktakingReceipts } from '~/models/entities/StocktakingReceipts'
 import { Users } from '~/models/entities/Users'
 import { iStocktakingReceiptReqBody } from './types'
+import { And, LessThan, MoreThanOrEqual } from 'typeorm'
 
 dotenv.config()
 
@@ -28,6 +29,53 @@ class StocktakingReceiptController {
         relations: ['idWarehouse2']
       })
       res.status(STATUS.SUCCESS).send(stocktakingReceipt)
+    } catch (error) {
+      res.status(STATUS.BAD_REQUEST).send({
+        error: 'Trạng thái phiếu kiểm kê không đúng'
+      })
+    }
+  }
+
+  async filterStocktakingReceiptsByDate(req: Request, res: Response, next: NextFunction) {
+    //get query string
+    const startDate = req.query.startDate as string
+    const endDate = req.query.endDate as string
+
+    try {
+      //get all StocktakingReceipt from DB
+      const exportReceipt = await stocktakingReceiptRepo.find({
+        select: {
+          idStocktakingReceipts: true,
+          date: true,
+          idWarehouse2: {
+            idWarehouse: true,
+            name: true,
+            provinceCode: true
+          },
+          stocktakingDetails: {
+            idStocktakingDetails: true,
+            amount: true,
+            storedAmount: true,
+            idGoods2: {
+              idGoods: true,
+              amount: true,
+              name: true,
+              idUnit2: {
+                idGoodsUnits: true,
+                name: true
+              }
+            }
+          }
+        },
+        where: {
+          date: And(LessThan(new Date(endDate)), MoreThanOrEqual(new Date(startDate)))
+        },
+        order: {
+          date: 'ASC'
+        },
+        relations: ['idWarehouse2', 'stocktakingDetails.idGoods2.idUnit2']
+      })
+      res.status(STATUS.SUCCESS).send(exportReceipt)
     } catch (error) {
       res.status(STATUS.BAD_REQUEST).send({
         error: 'Trạng thái phiếu kiểm kê không đúng'

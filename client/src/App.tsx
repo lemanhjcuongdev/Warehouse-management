@@ -28,6 +28,7 @@ function App() {
                                 actions.setAuthentication({
                                     userId: data.idUsers,
                                     username: data.username,
+                                    name: data.name,
                                     role: roleIdGenerator(data.idPermissions),
                                 })
                             );

@@ -86,7 +86,7 @@ class ImportOrderController {
         where: {
           idImportOrders: id
         },
-        relations: ['importOrderDetails', 'idProvider2']
+        relations: ['importOrderDetails.idGoods2', 'idProvider2']
       })
 
       //get user info

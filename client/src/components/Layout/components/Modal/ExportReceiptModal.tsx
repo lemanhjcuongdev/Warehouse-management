@@ -74,9 +74,7 @@ function ExportReceiptModal(props: {
     let title: string;
     const [goods, setGoods] = useState<iGoodsItemProps[]>([]);
     const [warehouses, setWarehouses] = useState<iWarehouseItemProps[]>([]);
-    const [exportOrders, setExportOrders] = useState<iExportOrderProps[]>([
-        initExportOrder,
-    ]);
+    const [exportOrders, setExportOrders] = useState<iExportOrderProps[]>([]);
     const [currentOrder, setCurrentOrder] =
         useState<iExportOrderProps>(initExportOrder);
     const role = useRole();
@@ -98,7 +96,7 @@ function ExportReceiptModal(props: {
     useEffect(() => {
         getAllExportOrders().then((data) => {
             const ordersWithoutReceipt = [];
-            if (!data.length || !listData.length) {
+            if (data === undefined || listData === undefined) {
                 return;
             }
             //filter orders have been imported
@@ -114,6 +112,7 @@ function ExportReceiptModal(props: {
                         break;
                     }
                 }
+                console.log(order);
 
                 if (!hasReceipt) {
                     ordersWithoutReceipt.push(order);
@@ -133,6 +132,8 @@ function ExportReceiptModal(props: {
                     const order = exportOrders.find(
                         (order) => order.idExportOrders === +value
                     );
+                    const idWarehouse =
+                        order?.exportOrderDetails[0].idGoods2?.idWarehouse;
                     if (order) {
                         setCurrentOrder(order);
                         if (order.idExportOrders) {
@@ -141,6 +142,7 @@ function ExportReceiptModal(props: {
                                     ...prev,
                                     idExportOrder: order.idExportOrders || 0,
                                     idExportOrder2: order,
+                                    idWarehouse: idWarehouse || 0,
                                 };
                             });
                         }
@@ -515,6 +517,7 @@ function ExportReceiptModal(props: {
                                                         {formData.idExportOrder !==
                                                             0 && (
                                                             <QRCodeScanner
+                                                                show={show}
                                                                 handleUpdateListData={
                                                                     handleUpdateListData
                                                                 }

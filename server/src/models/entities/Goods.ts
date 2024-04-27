@@ -1,23 +1,10 @@
-import {
-  BeforeInsert,
-  BeforeUpdate,
-  Check,
-  Column,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn
-} from 'typeorm'
-import { DefectiveRecords } from './DefectiveRecords'
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { ExportOrderDetails } from './ExportOrderDetails'
-import { ExportReceipts } from './ExportReceipts'
 import { GoodsTypes } from './GoodsTypes'
 import { GoodsUnits } from './GoodsUnits'
-import { Warehouses } from './Warehouses'
 import { ImportOrderDetails } from './ImportOrderDetails'
 import { StocktakingDetails } from './StocktakingDetails'
+import { Warehouses } from './Warehouses'
 @Index('FK_goods_type_idx', ['idType'], {})
 @Index('FK_goods_unit_idx', ['idUnit'], {})
 @Index('FK_goods_warehouse_idx', ['idWarehouse'], {})

@@ -8,6 +8,7 @@ interface iStateProps {
     isAuthentication?: boolean;
     userId: number;
     username: string;
+    name: string;
     role: number;
 }
 

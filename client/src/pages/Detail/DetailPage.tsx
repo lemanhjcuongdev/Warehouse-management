@@ -1,7 +1,7 @@
-function Detail () {
-    return (
-        <h2>Detail page</h2>
-    );
+import ReportView from "~/views/ReportView/ReportView";
+
+function Detail() {
+    return <ReportView />;
 }
 
-export default Detail ;
+export default Detail;

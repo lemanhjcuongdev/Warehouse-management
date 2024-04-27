@@ -75,9 +75,7 @@ function ExportReceiptView() {
     const [key, setKey] = useState("finished");
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
-    const [listData, setListData] = useState<iExportReceiptItemProps[]>([
-        initExportReceiptItem,
-    ]);
+    const [listData, setListData] = useState<iExportReceiptItemProps[]>([]);
     const [formData, setFormData] =
         useState<iExportReceiptProps>(initExportReceipt);
     const [provinces, setProvinces] = useState<iProvinceProps[]>([]);
