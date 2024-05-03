@@ -142,6 +142,7 @@ function ReportView() {
                     };
                 }
             }
+            console.log("PHIẾU KIỂM KÊ: ", matchedStocktakings);
 
             const endedAmount =
                 returnedData.beginningAmount +

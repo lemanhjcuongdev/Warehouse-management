@@ -147,7 +147,6 @@ function StocktakingReceiptModal(props: {
                 }));
         }
     };
-    console.log("CURRENT DETAIL: ", currentDetail);
 
     const handleUpdateDetailList = (data: iImportOrderDetailProps) => {
         const goodsResult = goods.find((item) => item.idGoods === data.idGoods);
@@ -389,7 +388,12 @@ function StocktakingReceiptModal(props: {
                                                             >
                                                                 ID:{" "}
                                                                 {item.idGoods} -{" "}
-                                                                {item.name}
+                                                                {item.name} -
+                                                                ĐVT:{" "}
+                                                                {
+                                                                    item.idUnit2
+                                                                        ?.name
+                                                                }
                                                             </option>
                                                         ))}
                                                 </Form.Select>

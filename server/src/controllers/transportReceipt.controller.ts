@@ -267,7 +267,8 @@ class TransportReceiptController {
                 idUserReceive,
                 idWarehouseTo,
                 transportToDate,
-                plateNumber
+                plateNumber,
+                status: EXPORT_STATUS.FINISHED
               }
             )
             if (updateResult.affected === 0) {

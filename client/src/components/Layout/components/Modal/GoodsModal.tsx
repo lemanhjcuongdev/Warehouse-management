@@ -15,6 +15,7 @@ import {
     Col,
     Form,
     FormLabel,
+    Image,
     Modal,
     Row,
 } from "react-bootstrap";
@@ -37,6 +38,7 @@ import { iModalTypes } from "./types";
 import { createGoods, updateGoods } from "~/apis/goodsAPI";
 import useRole from "~/hooks/useRole";
 import { ROLE_ID } from "~/constants/roles";
+import { QR_API_ROOT } from "~/constants";
 
 interface iWarehouseSlots {
     warehouse: {
@@ -115,6 +117,11 @@ function GoodsModal(props: {
     ]);
     const [radioValue, setRadioValue] = useState("0-0");
     const role = useRole();
+    //Goods QR
+    const qrObject = {
+        idGoods: formData.idGoods,
+    };
+    const qrData = encodeURIComponent(JSON.stringify(qrObject));
 
     switch (modalType.type) {
         case "create":
@@ -537,25 +544,42 @@ function GoodsModal(props: {
                                 )}
                             </Row>
                             {modalType.type === "update" && (
-                                <Row className="mb-3">
-                                    <Form.Group as={Col} sm>
-                                        <Form.Label>Số tầng ban đầu</Form.Label>
-                                        <Form.Control
-                                            readOnly
-                                            name="floor"
-                                            value={formData.floor}
-                                        />
-                                    </Form.Group>
+                                <>
+                                    <Row className="mb-3">
+                                        <Form.Group as={Col} sm>
+                                            <Form.Label>
+                                                Số tầng ban đầu
+                                            </Form.Label>
+                                            <Form.Control
+                                                readOnly
+                                                name="floor"
+                                                value={formData.floor}
+                                            />
+                                        </Form.Group>
 
-                                    <Form.Group as={Col} sm>
-                                        <Form.Label>Số kệ ban đầu</Form.Label>
-                                        <Form.Control
-                                            readOnly
-                                            name="slot"
-                                            value={formData.slot}
-                                        />
-                                    </Form.Group>
-                                </Row>
+                                        <Form.Group as={Col} sm>
+                                            <Form.Label>
+                                                Số kệ ban đầu
+                                            </Form.Label>
+                                            <Form.Control
+                                                readOnly
+                                                name="slot"
+                                                value={formData.slot}
+                                            />
+                                        </Form.Group>
+                                    </Row>
+                                    <Row>
+                                        <Form.Group as={Col}>
+                                            <FormLabel>
+                                                Mã QR hàng hoá
+                                            </FormLabel>
+                                            <br />
+                                            <Image
+                                                src={`${QR_API_ROOT}&data=${qrData}`}
+                                            />
+                                        </Form.Group>
+                                    </Row>
+                                </>
                             )}
                         </Col>
 

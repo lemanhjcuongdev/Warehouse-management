@@ -30,6 +30,7 @@ import stringToDate from "~/utils/stringToDate";
 import TransportReceiptDetailTable from "../Table/TransportReceiptsTable/TransportReceiptDetailTable";
 import QRCodeScanner from "../QRCodeScanner/QRCodeScanner";
 import { initialWarehouseDataState } from "~/views/WarehouseView/WarehouseView";
+import convertUTCToVNTime from "~/utils/convertUTCToVNTime";
 
 interface iReceiptByProvince {
     provinceCode: string;
@@ -234,7 +235,6 @@ function TransportReceiptModal(props: {
         if (!isValidated) return;
         e.preventDefault();
         e.stopPropagation();
-        formData.status = 4;
 
         //call API
         updateTransportReceipt(formData).then(() => {
@@ -294,7 +294,7 @@ function TransportReceiptModal(props: {
         onHide();
     };
 
-    console.log("RECEIPT DATA: ", formData);
+    console.log("CHI TIẾT ĐC: ", formData.transportDetails);
 
     return (
         <Modal
@@ -419,26 +419,43 @@ function TransportReceiptModal(props: {
                                     ></Form.Control>
                                 )}
                             </Form.Group>
-                            {formData.status === 3 && (
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Ngày đến</Form.Label>
-                                    <Form.Control
-                                        required={
-                                            modalType.type === "create"
-                                                ? false
-                                                : true
-                                        }
-                                        type="datetime-local"
-                                        name="transportToDate"
-                                        ref={toDateRef}
-                                        value={formData.transportToDate}
-                                        onChange={handleChangeReceiptInput}
-                                        onBlur={customValidateDate}
-                                    />
-                                    <Form.Control.Feedback type="invalid">
-                                        Bắt buộc chọn
-                                    </Form.Control.Feedback>
-                                </Form.Group>
+                            {(formData.status === 3 ||
+                                formData.status === 4) && (
+                                <>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Ngày đi</Form.Label>
+                                        <Form.Control
+                                            type="datetime-local"
+                                            name="transportFromDate"
+                                            value={
+                                                formData.transportFromDate &&
+                                                convertUTCToVNTime(
+                                                    formData.transportFromDate
+                                                )
+                                            }
+                                            readOnly
+                                        />
+                                    </Form.Group>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Ngày đến</Form.Label>
+                                        <Form.Control
+                                            required={
+                                                modalType.type === "create"
+                                                    ? false
+                                                    : true
+                                            }
+                                            type="datetime-local"
+                                            name="transportToDate"
+                                            ref={toDateRef}
+                                            value={formData.transportToDate}
+                                            onChange={handleChangeReceiptInput}
+                                            onBlur={customValidateDate}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            Bắt buộc chọn
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </>
                             )}
                             <Form.Group className="mb-3">
                                 <Form.Label>Kho đi</Form.Label>
@@ -520,12 +537,16 @@ function TransportReceiptModal(props: {
                                             Quét mã QR gói hàng
                                         </Form.Label>
                                         <br />
-                                        <QRCodeScanner
-                                            show={show}
-                                            handleUpdateListData={
-                                                handleUpdateTransportDetail
-                                            }
-                                        />
+                                        <Row>
+                                            <Col lg={6}>
+                                                <QRCodeScanner
+                                                    show={show}
+                                                    handleUpdateListData={
+                                                        handleUpdateTransportDetail
+                                                    }
+                                                />
+                                            </Col>
+                                        </Row>
                                     </Form.Group>
                                     {/* <Form.Group className="mb-3">
                                         <Form.Label>Mã phiếu xuất</Form.Label>
