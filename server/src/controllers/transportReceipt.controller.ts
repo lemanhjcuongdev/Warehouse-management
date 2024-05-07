@@ -283,7 +283,7 @@ class TransportReceiptController {
             idWarehouseTo,
             transportToDate: new Date(transportToDate),
             plateNumber,
-            status
+            status: EXPORT_STATUS.FINISHED
           }
           break
         case EXPORT_STATUS.FINISHED:

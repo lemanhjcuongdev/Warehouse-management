@@ -10,27 +10,29 @@ import {
     useState,
 } from "react";
 import { Alert, Button, Col, Form, Modal, Row } from "react-bootstrap";
+
+import { getAllExportReceiptByStatus } from "~/apis/exportReceiptAPI";
 import { getProvinces, iProvinceProps } from "~/apis/provinceAPI";
 import {
     createTransportReceipt,
+    getTransportReceiptById,
     updateTransportReceipt,
 } from "~/apis/transportReceiptAPI";
+import { getWarehousesByProvince } from "~/apis/warehouseAPI";
+import convertUTCToVNTime from "~/utils/convertUTCToVNTime";
 import { getCookie } from "~/utils/cookies";
+import stringToDate from "~/utils/stringToDate";
 import { initTransportReceipt } from "~/views/TransportReceiptView/TransportReceiptView";
+import { initialWarehouseDataState } from "~/views/WarehouseView/WarehouseView";
 import {
     iExportReceiptItemProps,
     iTransportReceiptItemProps,
     iTransportReceiptProps,
     iWarehouseDataProps,
 } from "~/views/types";
-import { iModalTypes } from "./types";
-import { getAllExportReceiptByStatus } from "~/apis/exportReceiptAPI";
-import { getWarehousesByProvince } from "~/apis/warehouseAPI";
-import stringToDate from "~/utils/stringToDate";
-import TransportReceiptDetailTable from "../Table/TransportReceiptsTable/TransportReceiptDetailTable";
 import QRCodeScanner from "../QRCodeScanner/QRCodeScanner";
-import { initialWarehouseDataState } from "~/views/WarehouseView/WarehouseView";
-import convertUTCToVNTime from "~/utils/convertUTCToVNTime";
+import TransportReceiptDetailTable from "../Table/TransportReceiptsTable/TransportReceiptDetailTable";
+import { iModalTypes } from "./types";
 
 interface iReceiptByProvince {
     provinceCode: string;
@@ -52,6 +54,7 @@ function TransportReceiptModal(props: {
     modalType: iModalTypes;
     formData: iTransportReceiptProps;
     setFormData: Dispatch<React.SetStateAction<iTransportReceiptProps>>;
+    handlePrint: () => void;
 }) {
     const {
         show,
@@ -61,6 +64,7 @@ function TransportReceiptModal(props: {
         modalType,
         formData,
         setFormData,
+        handlePrint,
     } = props;
     const [validated, setValidated] = useState(false);
     const toDateRef = useRef<HTMLInputElement>(null);
@@ -72,6 +76,13 @@ function TransportReceiptModal(props: {
     );
     const [warehousesTo, setWarehousesTo] = useState<iWarehouseDataProps[]>([]);
     const [isHeavy, setIsHeavy] = useState<boolean>(false);
+    const [scanData, setScanData] = useState<{
+        idTransportReceipts: number;
+        transportLength: number;
+    }>({
+        idTransportReceipts: 0,
+        transportLength: 0,
+    });
 
     let title: string;
     switch (modalType.type) {
@@ -187,7 +198,6 @@ function TransportReceiptModal(props: {
     const validateForm = () => {
         const form = formRef.current;
         const idCreated = getCookie("id");
-        formData.transportFromDate = new Date().toString();
         formData.idWarehouseFrom = +formData.idWarehouseFrom;
         if (formData.idWarehouseTo)
             formData.idWarehouseTo = +formData.idWarehouseTo;
@@ -216,11 +226,15 @@ function TransportReceiptModal(props: {
             e.preventDefault();
             e.stopPropagation();
 
+            //automatic data embed
+            formData.transportFromDate = new Date().toString();
+
             //call API
             if (isValidated) {
                 const data = await createTransportReceipt(formData);
                 data && setListData((prev) => [data, ...prev]);
                 if (!data.error) {
+                    handlePrint();
                     handleCancel();
                 }
             }
@@ -286,6 +300,40 @@ function TransportReceiptModal(props: {
         }
     };
 
+    const handleUpdateTransportStatus = (scanResult: {
+        idTransportReceipts: number;
+        transportLength: number;
+    }) => {
+        const transportReceipt = listData.find(
+            (receipt) =>
+                (receipt.idTransportReceipts = scanResult.idTransportReceipts)
+        );
+        if (!transportReceipt) return;
+        setScanData((prev) => {
+            if (prev.idTransportReceipts === scanResult.idTransportReceipts) {
+                return prev;
+            } else {
+                return scanResult;
+            }
+        });
+    };
+
+    //USE EFFECT UPDATE RECEIPT STATUS FINISHED
+    useEffect(() => {
+        if (scanData.idTransportReceipts) {
+            getTransportReceiptById(scanData.idTransportReceipts).then(
+                (data) => {
+                    setFormData({
+                        ...data,
+                        transportToDate: new Date().toISOString(),
+                        idUserReceive: +getCookie("id"),
+                        idUpdated: +getCookie("id"),
+                    });
+                }
+            );
+        }
+    }, [scanData, setFormData]);
+
     const handleCancel = () => {
         setIsHeavy(false);
         setSelectedReceipt(initReceiptByProvince);
@@ -294,19 +342,24 @@ function TransportReceiptModal(props: {
         onHide();
     };
 
-    console.log("CHI TIẾT ĐC: ", formData.transportDetails);
-
     return (
         <Modal
             backdrop={modalType.type === "create" ? "static" : undefined}
             show={show}
             onHide={handleCancel}
-            keyboard={false}
+            keyboard={modalType.type === "create" ? false : true}
             fullscreen={formData.status < 3 ? true : undefined}
             size="xl"
         >
             <Modal.Header closeButton>
-                <Modal.Title>{`${title} phiếu điều chuyển kho `}</Modal.Title>
+                <Modal.Title>
+                    {`${title} phiếu điều chuyển kho `} &nbsp;
+                    {modalType.type === "update" && formData.status === 3 && (
+                        <Button onClick={handlePrint}>
+                            In phiếu điều chuyển kho
+                        </Button>
+                    )}
+                </Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form
@@ -368,7 +421,8 @@ function TransportReceiptModal(props: {
                                                 }
                                             >
                                                 Mã tỉnh:{" "}
-                                                {receiptByProvince.provinceCode}{" "}
+                                                {receiptByProvince.provinceCode ||
+                                                    ""}{" "}
                                                 - Tổng SL phiếu xuất:{" "}
                                                 {
                                                     receiptByProvince
@@ -381,7 +435,13 @@ function TransportReceiptModal(props: {
                                     <Form.Control
                                         required
                                         name="provinceCode"
-                                        value={`Mã tỉnh: ${formData.idWarehouseTo2?.provinceCode} - Tổng SL phiếu xuất: ${formData.transportDetails?.length}`}
+                                        value={`Mã tỉnh: ${
+                                            formData.idWarehouseTo2
+                                                ?.provinceCode || ""
+                                        } - Tổng SL phiếu xuất: ${
+                                            formData.transportDetails?.length ||
+                                            ""
+                                        }`}
                                         readOnly
                                     ></Form.Control>
                                 )}
@@ -447,7 +507,12 @@ function TransportReceiptModal(props: {
                                             type="datetime-local"
                                             name="transportToDate"
                                             ref={toDateRef}
-                                            value={formData.transportToDate}
+                                            value={
+                                                formData.transportToDate &&
+                                                convertUTCToVNTime(
+                                                    formData.transportToDate
+                                                )
+                                            }
                                             onChange={handleChangeReceiptInput}
                                             onBlur={customValidateDate}
                                         />
@@ -465,7 +530,15 @@ function TransportReceiptModal(props: {
                                             name="idWarehouse"
                                             value={
                                                 selectedReceipt
-                                                    ? `${selectedReceipt?.idWarehouse2.name} - Đ/c: ${selectedReceipt.idWarehouse2.address}`
+                                                    ? `${
+                                                          selectedReceipt
+                                                              ?.idWarehouse2
+                                                              .name || ""
+                                                      } - Đ/c: ${
+                                                          selectedReceipt
+                                                              .idWarehouse2
+                                                              .address || ""
+                                                      }`
                                                     : ""
                                             }
                                             readOnly
@@ -478,7 +551,13 @@ function TransportReceiptModal(props: {
                                 ) : (
                                     <Form.Control
                                         name="idWarehouse"
-                                        value={`${formData.idWarehouseFrom2?.name} - Đ/c: ${formData.idWarehouseFrom2?.address}`}
+                                        value={`${
+                                            formData.idWarehouseFrom2?.name ||
+                                            ""
+                                        } - Đ/c: ${
+                                            formData.idWarehouseFrom2
+                                                ?.address || ""
+                                        }`}
                                         readOnly
                                     ></Form.Control>
                                 )}
@@ -514,7 +593,12 @@ function TransportReceiptModal(props: {
                                 ) : (
                                     <Form.Control
                                         name="idWarehouse"
-                                        value={`${formData.idWarehouseTo2?.name} - Đ/c: ${formData.idWarehouseTo2?.address}`}
+                                        value={`${
+                                            formData.idWarehouseTo2?.name || ""
+                                        } - Đ/c: ${
+                                            formData.idWarehouseTo2?.address ||
+                                            ""
+                                        }`}
                                         readOnly
                                     ></Form.Control>
                                 )}
@@ -530,36 +614,42 @@ function TransportReceiptModal(props: {
                                     formData.transportDetails?.length}
                                 )
                             </h4>
-                            {selectedReceipt.provinceCode && (
+                            {(selectedReceipt.provinceCode ||
+                                (modalType.type === "update" &&
+                                    formData.status !== 4)) && (
                                 <>
                                     <Form.Group className="mb-3">
                                         <Form.Label>
-                                            Quét mã QR gói hàng
+                                            Quét mã QR{" "}
+                                            {modalType.type === "create"
+                                                ? "gói hàng"
+                                                : "phiếu điều chuyển"}
                                         </Form.Label>
                                         <br />
                                         <Row>
                                             <Col lg={6}>
                                                 <QRCodeScanner
                                                     show={show}
-                                                    handleUpdateListData={
-                                                        handleUpdateTransportDetail
-                                                    }
+                                                    handleUpdateListData={(
+                                                        data: any
+                                                    ) => {
+                                                        if (
+                                                            modalType.type ===
+                                                            "create"
+                                                        ) {
+                                                            handleUpdateTransportDetail(
+                                                                data
+                                                            );
+                                                        } else {
+                                                            handleUpdateTransportStatus(
+                                                                data
+                                                            );
+                                                        }
+                                                    }}
                                                 />
                                             </Col>
                                         </Row>
                                     </Form.Group>
-                                    {/* <Form.Group className="mb-3">
-                                        <Form.Label>Mã phiếu xuất</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            name="idExportReceipt"
-                                            onChange={handleChangeReceiptInput}
-                                        />
-                                        <Form.Text muted>
-                                            Nhập thủ công nếu không dùng được
-                                            quét mã QR
-                                        </Form.Text>
-                                    </Form.Group> */}
                                 </>
                             )}
                             <TransportReceiptDetailTable

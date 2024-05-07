@@ -22,15 +22,7 @@ function TransportReceiptTableRow(props: {
     setModalType: Dispatch<SetStateAction<iModalTypes>>;
     setFormData: Dispatch<React.SetStateAction<iTransportReceiptProps>>;
 }) {
-    const {
-        tabKey,
-        item,
-        setListData,
-        index,
-        toggleShowModal,
-        setModalType,
-        setFormData,
-    } = props;
+    const { tabKey, item, toggleShowModal, setModalType, setFormData } = props;
 
     const handleReadOrUpdate = async () => {
         const receiptInfo: iTransportReceiptProps =
@@ -50,27 +42,6 @@ function TransportReceiptTableRow(props: {
         toggleShowModal();
         setModalType({ type: "update" });
     };
-
-    // const handleDelete = useCallback(
-    //     (id: number) => {
-    //         const message = `Nhập lý do huỷ phiếu xuất kho mã số "${item.idTransportReceipts}"?`;
-    //         const reasonFailed = window.prompt(message)?.trim();
-    //         const idUpdated = +getCookie("id");
-    //         if (reasonFailed) {
-    //             softDeleteTransportReceipt(id, idUpdated)
-    //                 .then(() => {
-    //                     setListData((prev) => {
-    //                         //deep clone
-    //                         const data = [...prev];
-    //                         data.splice(index, 1);
-    //                         return data;
-    //                     });
-    //                 })
-    //                 .catch((error) => console.log(error));
-    //         }
-    //     },
-    //     [index, item, setListData]
-    // );
 
     return (
         <tr
@@ -113,14 +84,6 @@ function TransportReceiptTableRow(props: {
                                     &nbsp; Cập nhật thông tin
                                 </Dropdown.Item>
                             )}
-                            {/* <Dropdown.Item
-                                onClick={() =>
-                                    handleDelete(item.idTransportReceipts)
-                                }
-                            >
-                                <i className={"fa-solid fa-ban"}></i>
-                                &nbsp; Huỷ phiếu xuất
-                            </Dropdown.Item> */}
                         </Dropdown.Menu>
                     </Dropdown>
                 </td>

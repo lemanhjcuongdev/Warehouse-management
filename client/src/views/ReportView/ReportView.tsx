@@ -4,11 +4,10 @@ import { filterExportReceiptsByDate } from "~/apis/exportReceiptAPI";
 import { getAllGoods } from "~/apis/goodsAPI";
 import { filterImportReceiptsByDate } from "~/apis/importReceiptAPI";
 import { filterStocktakingReceiptsByDate } from "~/apis/stocktakingReceiptAPI";
-import formatPeriodDate from "~/utils/formatPeriodDate";
-import { iReport, iReportDetail } from "../types";
-import generateReportHTML from "~/utils/receiptGenerator/generateReportHTML";
-import { getCookie } from "~/utils/cookies";
 import useGlobalState from "~/hooks/useGlobalState";
+import formatPeriodDate from "~/utils/formatPeriodDate";
+import generateReportHTML from "~/utils/receiptGenerator/generateReportHTML";
+import { iReport, iReportDetail } from "../types";
 
 const initReport: iReport = {
     startDate: "",
@@ -142,7 +141,6 @@ function ReportView() {
                     };
                 }
             }
-            console.log("PHIẾU KIỂM KÊ: ", matchedStocktakings);
 
             const endedAmount =
                 returnedData.beginningAmount +

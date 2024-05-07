@@ -11,6 +11,7 @@ import {
 } from "~/views/types";
 import useRole from "~/hooks/useRole";
 import { ROLE_ID } from "~/constants/roles";
+import generateTransportReceiptHTML from "~/utils/receiptGenerator/generateTransportReceiptHTML";
 
 const initTransportReceipt: iTransportReceiptProps = {
     idUserSend: 0,
@@ -85,7 +86,24 @@ function TransportReceiptView() {
         setModalType({ type: "create" });
     };
 
-    console.log("RECEIPT DATA: ", formData);
+    const handlePrint = () => {
+        const html = generateTransportReceiptHTML(formData);
+        const printWindow = window.open("", "_blank", "width=800,height=600");
+        if (!printWindow) return;
+        printWindow.document.write(html);
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => {
+            const img = printWindow.document.querySelector("img");
+            if (img) {
+                img.onload = () => {
+                    printWindow.print();
+                    printWindow.close();
+                };
+            }
+        }, 1000);
+    };
+
     return (
         <>
             <h2>Danh sách phiếu điều chuyển kho</h2>
@@ -116,17 +134,36 @@ function TransportReceiptView() {
                                 {key === "on_the_way" &&
                                     (role === ROLE_ID.OPERATION_1 ||
                                         role === ROLE_ID.CEO_6) && (
-                                        <Button
-                                            onClick={handleToggleShowModal}
-                                            className="mb-3"
-                                            variant="outline-primary"
-                                            style={{
-                                                fontWeight: "bold",
-                                            }}
-                                        >
-                                            <i className="fa-solid fa-plus"></i>
-                                            &nbsp; Thêm mới
-                                        </Button>
+                                        <>
+                                            <Button
+                                                onClick={handleToggleShowModal}
+                                                className="mb-3"
+                                                variant="outline-primary"
+                                                style={{
+                                                    fontWeight: "bold",
+                                                }}
+                                            >
+                                                <i className="fa-solid fa-plus"></i>
+                                                &nbsp; Thêm mới
+                                            </Button>{" "}
+                                            &nbsp;{" "}
+                                            <Button
+                                                onClick={() => {
+                                                    handleToggleShowModal();
+                                                    setModalType({
+                                                        type: "update",
+                                                    });
+                                                }}
+                                                className="mb-3"
+                                                variant="outline-primary"
+                                                style={{
+                                                    fontWeight: "bold",
+                                                }}
+                                            >
+                                                <i className="fa-solid fa-expand"></i>
+                                                &nbsp; Xác nhận đã điều chuyển
+                                            </Button>
+                                        </>
                                     )}
 
                                 <TransportReceiptModal
@@ -137,6 +174,7 @@ function TransportReceiptView() {
                                     modalType={modalType}
                                     formData={formData}
                                     setFormData={setFormData}
+                                    handlePrint={handlePrint}
                                 />
 
                                 <TransportReceiptTable

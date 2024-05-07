@@ -87,7 +87,7 @@ const createTransportReceipt = async (values: iTransportReceiptProps) => {
     }
 };
 
-const updateTransportReceipt = async (value: iTransportReceiptProps) => {
+const updateTransportReceipt = async (value: iTransportReceiptProps | any) => {
     try {
         const jwt = getCookie("jwt");
         if (!jwt) {
