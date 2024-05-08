@@ -33,7 +33,7 @@ exports.appDataSource = new typeorm_1.DataSource({
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    synchronize: true,
+    synchronize: false,
     logging: true,
     entities: [
         Users_1.Users,
