@@ -5,7 +5,7 @@ import { checkJwt, checkRole } from '~/middleware/authentication'
 
 const userRouter = express.Router()
 
-userRouter.get('/', [checkJwt, checkRole], userController.getAllUser)
+userRouter.get('/', userController.getAllUser)
 userRouter.get('/:id', [checkJwt], userController.getUserById)
 userRouter.post('/create-user', userController.createUser)
 userRouter.patch('/:id', [checkJwt, checkRole], userController.editUserById)
