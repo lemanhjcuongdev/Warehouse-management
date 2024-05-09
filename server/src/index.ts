@@ -1,9 +1,8 @@
 import bodyParser from 'body-parser'
 import cors from 'cors'
-import express from 'express'
-import morgan from 'morgan'
-import 'reflect-metadata'
 import dotenv from 'dotenv'
+import express from 'express'
+import 'reflect-metadata'
 
 import helmet from 'helmet'
 import { appDataSource } from './constants/appDataSource'

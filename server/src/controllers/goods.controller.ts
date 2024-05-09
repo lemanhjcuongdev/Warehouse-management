@@ -22,6 +22,8 @@ class GoodsController {
       relations: ['idUnit2']
     })
 
+    console.log("WTF WHY CAN'T CALL GOODS API")
+
     res.status(STATUS.SUCCESS).send(goods)
   }
 
