@@ -2,12 +2,12 @@
   {
     "name": "default",
     "type": "mysql",
-    "host": "127.0.0.1",
+    "host": "bzamuh0jjsgfx1lritzf-mysql.services.clever-cloud.com",
     "port": 3306,
-    "username": "root",
-    "password": "123456",
-    "database": "",
-    "synchronize": false,
+    "username": "uv3ripq0hxoinwju",
+    "password": "WohhsyQOugxHEoCQz09Y",
+    "database": "bzamuh0jjsgfx1lritzf",
+    "synchronize": true,
     "entities": ["entities/*.js"]
   }
 ]
