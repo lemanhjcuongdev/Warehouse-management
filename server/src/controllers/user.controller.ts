@@ -255,8 +255,6 @@ class UserController {
         idPermissions.indexOf(permission.idPermission) >= 0
       })
 
-      console.log('ĐÃ CÓ SỰ THAY ĐỔI', isChanged)
-
       if (isChanged) {
         //remove old permissions of user
         await entityManager.delete(PermissionDetails, {

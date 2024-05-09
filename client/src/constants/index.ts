@@ -1,4 +1,5 @@
-const API_ROOT = "http://localhost:3001"; //LOCALHOST
+// const API_ROOT = "http://localhost:3001"; //LOCALHOST
+const API_ROOT = "https://spx-express-be.vercel.app"; //VERCEL
 // const API_ROOT = "http://192.168.1.36:3001"; //HOME
 // const API_ROOT = "http://192.168.97.70:3001"; //HOTSPOT
 // const API_ROOT = "http://192.168.1.167:3001"; //CLEVAI
