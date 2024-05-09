@@ -66,7 +66,6 @@ async function checkRole(req, res, next) {
     //get the userID from previous middleware
     const id = +res.locals.JwtPayload.userId;
     const permissionId = req.query.permissionId;
-    console.log('PERMISSION ID: ', permissionId);
     //Get user role from the database
     try {
         //get permissions of user

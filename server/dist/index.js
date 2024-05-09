@@ -26,6 +26,7 @@ app.use((0, helmet_1.default)());
 //Init Datasource
 const main = async () => {
     console.time('main');
+    console.log('Initializing app data source');
     await appDataSource_1.appDataSource.initialize();
 };
 main().catch((err) => {

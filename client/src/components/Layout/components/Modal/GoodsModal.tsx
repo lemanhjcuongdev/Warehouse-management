@@ -155,6 +155,8 @@ function GoodsModal(props: {
     }, [formData.idWarehouse]);
     const renderWarehouseDiagram = useCallback(
         (idWarehouse: number) => {
+            if (idWarehouse === 0) return;
+
             getWarehouseSlotsById(idWarehouse).then((data: any) => {
                 if (!data.error && data.goods) {
                     const goodsSlots = data.goods.map((good: iGoodsProps) => {

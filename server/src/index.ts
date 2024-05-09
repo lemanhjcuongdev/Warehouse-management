@@ -27,6 +27,7 @@ route(app)
 //Init Datasource
 const main = async () => {
   console.time('main')
+  console.log('Initializing app data source')
   await appDataSource.initialize()
 }
 
