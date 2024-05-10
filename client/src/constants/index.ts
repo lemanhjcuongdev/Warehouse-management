@@ -1,9 +1,7 @@
-// const API_ROOT = "http://localhost:3001"; //LOCALHOST
-const API_ROOT = "https://spx-express-be.vercel.app"; //VERCEL
-// const API_ROOT = "http://192.168.1.36:3001"; //HOME
-// const API_ROOT = "http://192.168.97.70:3001"; //HOTSPOT
-// const API_ROOT = "http://192.168.1.167:3001"; //CLEVAI
-// const API_ROOT = "https://eternal-spider-mutually.ngrok-free.app";   //NGROK
+const currentURL = window.location.href;
+const API_ROOT = currentURL.includes("localhost")
+    ? "http://localhost:3001"
+    : "https://spx-express-be.vercel.app"; //VERCEL
 
 const QR_API_ROOT = "https://api.qrserver.com/v1/create-qr-code/?size=150x150";
 const PROVINCE_API_ROOT = "https://vapi.vnappmob.com/api";
