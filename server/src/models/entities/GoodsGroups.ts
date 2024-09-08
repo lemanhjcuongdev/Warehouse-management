@@ -1,20 +1,18 @@
-import { Column, DeleteDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
-import { GoodsTypes } from './GoodsTypes'
+import { Column, DeleteDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { GoodsTypes } from './GoodsTypes';
+
 @Index('name_UNIQUE', ['name'], { unique: true })
 @Entity('goods_groups', { schema: 'quanlykho' })
 export class GoodsGroups {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id_goods_groups' })
-  idGoodsGroups: number
+  idGoodsGroups: number;
 
   @Column('varchar', { name: 'name', length: 45 })
-  name: string | null
+  name: string | null;
 
-  @DeleteDateColumn({
-    type: 'datetime',
-    name: 'deleted_at'
-  })
+  @DeleteDateColumn()
   deletedAt: Date
 
   @OneToMany(() => GoodsTypes, (goodsTypes) => goodsTypes.idGoodsGroup2)
-  goodsTypes: GoodsTypes[]
+  goodsTypes: GoodsTypes[];
 }
