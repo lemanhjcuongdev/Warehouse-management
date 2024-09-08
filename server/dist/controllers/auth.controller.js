@@ -66,6 +66,7 @@ class AuthController {
         }
         // //Check if encrypted password match
         if (!user.verifyPassword(password)) {
+            console.log({ user });
             res.status(statusCode_1.default.UNAUTHORIZED).send({
                 error: 'Tài khoản hoặc mật khẩu không đúng'
             });

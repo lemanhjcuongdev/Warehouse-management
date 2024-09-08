@@ -28,10 +28,7 @@ __decorate([
     __metadata("design:type", Object)
 ], GoodsGroups.prototype, "name", void 0);
 __decorate([
-    (0, typeorm_1.DeleteDateColumn)({
-        type: 'datetime',
-        name: 'deleted_at'
-    }),
+    (0, typeorm_1.DeleteDateColumn)(),
     __metadata("design:type", Date)
 ], GoodsGroups.prototype, "deletedAt", void 0);
 __decorate([

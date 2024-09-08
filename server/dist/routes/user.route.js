@@ -10,6 +10,6 @@ const userRouter = express_1.default.Router();
 userRouter.get('/', [authentication_1.checkJwt, authentication_1.checkRole], user_controller_1.default.getAllUser);
 userRouter.get('/:id', [authentication_1.checkJwt], user_controller_1.default.getUserById);
 userRouter.post('/create-user', [authentication_1.checkJwt, authentication_1.checkRole], user_controller_1.default.createUser);
-userRouter.patch('/:id', user_controller_1.default.editUserById);
+userRouter.patch('/:id', [authentication_1.checkJwt, authentication_1.checkRole], user_controller_1.default.editUserById);
 userRouter.delete('/:id', [authentication_1.checkJwt, authentication_1.checkRole], user_controller_1.default.softDeleteUserById);
 exports.default = userRouter;

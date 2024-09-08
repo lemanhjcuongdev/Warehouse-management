@@ -1,7 +1,8 @@
 const currentURL = window.location.href;
-const API_ROOT = currentURL.includes("localhost")
-  ? "http://localhost:3001"
-  : "https://spx-express-be.vercel.app"; //VERCEL
+// const API_ROOT = currentURL.includes("localhost")
+//   ? "http://localhost:3001"
+//   : "https://spx-express-be.vercel.app"; //VERCEL
+const API_ROOT = "https://spx-express-be.vercel.app"; //VERCEL
 
 const QR_API_ROOT = "https://api.qrserver.com/v1/create-qr-code/?size=150x150";
 const PROVINCE_API_ROOT = "https://vapi.vnappmob.com/api";
