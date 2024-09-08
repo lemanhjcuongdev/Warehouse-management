@@ -9,74 +9,72 @@ import { iWarehouseDataProps, iWarehouseItemProps } from "~/views/types";
 
 const managerId = getCookie("id");
 const initialWarehouseDataState: iWarehouseDataProps = {
-    name: "",
-    address: "",
-    provinceCode: "",
-    totalFloors: 0,
-    totalSlots: 0,
-    idCreated: +managerId,
-    disabled: 0,
+  name: "",
+  address: "",
+  provinceCode: "",
+  totalFloors: 0,
+  totalSlots: 0,
+  idCreated: +managerId,
+  disabled: 0,
 };
 
 function WarehouseView() {
-    const [showModal, setShowModal] = useState(false);
-    const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
-    const [listData, setListData] = useState<iWarehouseItemProps[]>([
-        {
-            idWarehouse: -1,
-            name: "",
-            address: "",
-            provinceCode: "",
-            disabled: 0,
-        },
-    ]);
-    const [formData, setFormData] = useState<iWarehouseDataProps>(
-        initialWarehouseDataState
-    );
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
+  const [listData, setListData] = useState<iWarehouseItemProps[]>([
+    {
+      idWarehouse: -1,
+      name: "",
+      address: "",
+      provinceCode: "",
+      disabled: 0,
+    },
+  ]);
+  const [formData, setFormData] = useState<iWarehouseDataProps>(
+    initialWarehouseDataState
+  );
 
-    const handleSetListData = useCallback(() => {
-        getAllWarehouses().then((data) => setListData(data));
-    }, []);
+  const handleSetListData = useCallback(() => {
+    getAllWarehouses().then((data) => data && setListData(data));
+  }, []);
 
-    useEffect(() => {
-        handleSetListData();
-    }, [handleSetListData]);
+  useEffect(() => {
+    handleSetListData();
+  }, [handleSetListData]);
 
-    const handleToggleShowModal = useCallback(() => {
-        setShowModal(!showModal);
-        setModalType({ type: "create" });
-    }, [showModal]);
+  const handleToggleShowModal = useCallback(() => {
+    setShowModal(!showModal);
+    setModalType({ type: "create" });
+  }, [showModal]);
 
-    console.log("WAREHOUSE FORM: ", formData);
+  return (
+    <>
+      <h2>Danh sách kho hàng</h2>
 
-    return (
-        <>
-            <h2>Danh sách kho hàng</h2>
+      <Button onClick={handleToggleShowModal} className="my-3">
+        <i className="fa-solid fa-plus"></i>
+        &nbsp; Thêm mới
+      </Button>
 
-            <Button onClick={handleToggleShowModal} className="my-3">
-                <i className="fa-solid fa-plus"></i>
-                &nbsp; Thêm mới
-            </Button>
+      <WarehouseModal
+        show={showModal}
+        onHide={handleToggleShowModal}
+        listData={listData}
+        setListData={setListData}
+        modalType={modalType}
+        formData={formData}
+        setFormData={setFormData}
+      />
 
-            <WarehouseModal
-                show={showModal}
-                onHide={handleToggleShowModal}
-                listData={listData}
-                setListData={setListData}
-                modalType={modalType}
-                formData={formData}
-                setFormData={setFormData}
-            />
-
-            <WarehouseTable
-                listData={listData}
-                setListData={setListData}
-                toggleShowModal={handleToggleShowModal}
-                setModalType={setModalType}
-                setFormData={setFormData}
-            />
-        </>
-    );
+      <WarehouseTable
+        listData={listData}
+        setListData={setListData}
+        toggleShowModal={handleToggleShowModal}
+        setModalType={setModalType}
+        setFormData={setFormData}
+      />
+    </>
+  );
 }
 
 export { initialWarehouseDataState };

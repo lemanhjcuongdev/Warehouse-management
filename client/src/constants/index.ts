@@ -1,4 +1,4 @@
-const currentURL = window.location.href;
+// const currentURL = window.location.href;
 // const API_ROOT = currentURL.includes("localhost")
 //   ? "http://localhost:3001"
 //   : "https://spx-express-be.vercel.app"; //VERCEL

@@ -9,79 +9,77 @@ import { iUserDataProps, iUserItemProps } from "~/views/types";
 
 const managerId = getCookie("id") || 1;
 const initialUserDataState: iUserDataProps = {
-    name: "",
-    email: "",
-    gender: "",
-    phone: "",
-    startDate: "",
-    username: "",
-    password: "",
-    idCreated: +managerId,
-    disabled: 0,
-    idPermissions: [],
+  name: "",
+  email: "",
+  gender: "",
+  phone: "",
+  startDate: "",
+  username: "",
+  password: "",
+  idCreated: +managerId,
+  disabled: 0,
+  idPermissions: [],
 };
 
 function UserView() {
-    const [showModal, setShowModal] = useState(false);
-    const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
-    const [listData, setListData] = useState<iUserItemProps[]>([
-        {
-            name: "",
-            idUsers: 1,
-            username: "",
-            disabled: 0,
-        },
-    ]);
-    const [formData, setFormData] =
-        useState<iUserDataProps>(initialUserDataState);
-    const [role, setRole] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState<iModalTypes>({ type: "create" });
+  const [listData, setListData] = useState<iUserItemProps[]>([
+    {
+      name: "",
+      idUsers: 1,
+      username: "",
+      disabled: 0,
+    },
+  ]);
+  const [formData, setFormData] =
+    useState<iUserDataProps>(initialUserDataState);
+  const [role, setRole] = useState(0);
 
-    const handleSetListData = useCallback(() => {
-        getAllUser().then((data) => setListData(data));
-    }, []);
+  const handleSetListData = useCallback(() => {
+    getAllUser().then((data) => data && setListData(data));
+  }, []);
 
-    useEffect(() => {
-        handleSetListData();
-    }, [handleSetListData]);
+  useEffect(() => {
+    handleSetListData();
+  }, [handleSetListData]);
 
-    const handleToggleShowModal = useCallback(() => {
-        setShowModal(!showModal);
-        setModalType({ type: "create" });
-    }, [showModal]);
+  const handleToggleShowModal = useCallback(() => {
+    setShowModal(!showModal);
+    setModalType({ type: "create" });
+  }, [showModal]);
 
-    console.log("USER DATA: ", formData);
+  return (
+    <>
+      <h2>Danh sách nhân viên</h2>
 
-    return (
-        <>
-            <h2>Danh sách nhân viên</h2>
+      <Button onClick={handleToggleShowModal} className="my-3">
+        <i className="fa-solid fa-plus"></i>
+        &nbsp; Thêm mới
+      </Button>
 
-            <Button onClick={handleToggleShowModal} className="my-3">
-                <i className="fa-solid fa-plus"></i>
-                &nbsp; Thêm mới
-            </Button>
+      <UserModal
+        show={showModal}
+        onHide={handleToggleShowModal}
+        listData={listData}
+        setListData={setListData}
+        modalType={modalType}
+        formData={formData}
+        setFormData={setFormData}
+        role={role}
+        setRole={setRole}
+      />
 
-            <UserModal
-                show={showModal}
-                onHide={handleToggleShowModal}
-                listData={listData}
-                setListData={setListData}
-                modalType={modalType}
-                formData={formData}
-                setFormData={setFormData}
-                role={role}
-                setRole={setRole}
-            />
-
-            <UserTable
-                listData={listData}
-                setListData={setListData}
-                toggleShowModal={handleToggleShowModal}
-                setModalType={setModalType}
-                setFormData={setFormData}
-                setRole={setRole}
-            />
-        </>
-    );
+      <UserTable
+        listData={listData}
+        setListData={setListData}
+        toggleShowModal={handleToggleShowModal}
+        setModalType={setModalType}
+        setFormData={setFormData}
+        setRole={setRole}
+      />
+    </>
+  );
 }
 
 export { initialUserDataState };

@@ -12,7 +12,9 @@ const app = express()
 dotenv.config()
 const port = process.env.APP_PORT
 const corsOrigin = {
-  origin: '*'
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true // Nếu cần thiết cho cookie và authentication
 }
 
 app.use(bodyParser.json())

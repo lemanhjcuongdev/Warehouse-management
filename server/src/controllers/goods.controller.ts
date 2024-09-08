@@ -146,7 +146,7 @@ class GoodsController {
           idUnit
         }
       })
-      if (isExisted.length > 0) throw new Error()
+      if (isExisted.length > 0) console.log()
       goods = await goodsRepository.save(goods)
     } catch (error) {
       res.status(STATUS.CONFLICT).send({

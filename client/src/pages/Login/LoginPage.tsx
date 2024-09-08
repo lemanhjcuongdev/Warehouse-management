@@ -52,8 +52,7 @@ function Login() {
     //call login API
     try {
       const data = await postLogin(loginData);
-      console.log(data);
-
+      if (!data) return
 
       //store jwt in cookie
       setCookie("jwt", data.token);
